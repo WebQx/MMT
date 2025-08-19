@@ -11,6 +11,11 @@ MMT (Multilingual Medical Transcription) is an open-source project dedicated to 
 - **Robust Multilingual Support:** Accurate transcription in many languages and dialects.
 - **Cross-Platform:** Flutter UI for Android and iOS.
 - **Customizable:** Easily extend backend API, fine-tune models, or integrate with EMR systems.
+-  Secure Consent & Identity
+
+   GDPR, HIPAA, ISO 27701 compliant
+   Multilingual consent flows
+   Keycloak-based OAuth2 login
 
 ---
 
