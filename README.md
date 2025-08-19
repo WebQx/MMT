@@ -1,124 +1,126 @@
-MMT: Multilingual Medical Transcription Suite
-🌟 Project Overview
-MMT (Multilingual Medical Transcription) is an open-source project dedicated to making high-quality medical transcription accessible and affordable for healthcare professionals worldwide, especially in resource-constrained environments. By combining the power of OpenAI's Whisper, Flutter, and a lightweight Python backend, MMT offers a sustainable, self-hosted alternative to expensive, proprietary cloud services.
+WebQx MMT: Multilingual Medical Transcription Suite 🌟
 
-✨ Key Features
-Offline-First Workflow: The Flutter app can record and store audio locally, allowing doctors to continue their work even without a stable internet connection. Recordings are automatically transcribed when connectivity is restored.
+MMT (Multilingual Medical Transcription) is an open-source project dedicated to making high-quality medical transcription accessible and affordable for healthcare professionals worldwide, especially in resource-constrained environments. By combining OpenAI's Whisper, Flutter, and a lightweight Python backend, MMT offers a sustainable, self-hosted alternative to expensive, proprietary cloud services.
 
-Cost-Effective: By running the Whisper model on a local or low-cost cloud server, MMT eliminates the per-minute transcription costs associated with commercial APIs like Google or Amazon.
+---
 
-Robust Multilingual Support: Leverage Whisper's state-of-the-art multilingual capabilities to accurately transcribe medical conversations in a wide range of languages and dialects.
+## ✨ Key Features
 
-Cross-Platform: The intuitive Flutter UI works seamlessly on both Android and iOS devices, with a consistent user experience.
+- **Offline-First Workflow:** Record and store audio locally; transcribe automatically when online.
+- **Cost-Effective:** Run Whisper locally or on a low-cost cloud server—no per-minute API fees.
+- **Robust Multilingual Support:** Accurate transcription in many languages and dialects.
+- **Cross-Platform:** Flutter UI for Android and iOS.
+- **Customizable:** Easily extend backend API, fine-tune models, or integrate with EMR systems.
 
-Customizable: The backend API can be easily modified to add new features, fine-tune the model with local terminology, or integrate with existing EMR systems.
+---
 
-🚀 Getting Started
-Prerequisites
-To get started with MMT, you'll need the following installed:
+## 🚀 Getting Started
 
-Flutter SDK (latest stable version)
+### Prerequisites
 
-Python 3.8+
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) (latest stable)
+- Python 3.8+
+- Git
 
-Git
+---
 
-Installation & Setup
-Clone the repository:
+### 1. Clone the Repository
 
-Bash
-
-git clone https://github.com/your-username/MMT.git
+```bash
+git clone https://github.com/WebQx/MMT.git
 cd MMT
-Backend Server Setup
+```
 
-Navigate to the backend directory:
+---
 
-Bash
+### 2. Backend Server Setup
 
+```bash
 cd backend
-Create and activate a virtual environment (recommended):
-
-Bash
-
 python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-Install the required Python packages:
-
-Bash
-
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-Start the server. For development, a simple local server is sufficient:
-
-Bash
-
 uvicorn main:app --host 0.0.0.0 --port 8000
-The transcription API will now be live at http://localhost:8000.
+```
 
-Flutter App Setup
+The API will be live at [http://localhost:8000](http://localhost:8000).
 
-Navigate to the app directory:
+---
 
-Bash
+### 3. Flutter App Setup
 
+```bash
 cd ../app
-Install Flutter dependencies:
-
-Bash
-
 flutter pub get
-Configure API Endpoint: Open lib/config/api_config.dart and update the BASE_URL to point to your backend server's IP address.
+```
 
-Dart
+**Configure API Endpoint:**  
+Edit `lib/config/api_config.dart`:
 
-// Replace with your server's IP address.
-const String BASE_URL = 'http://your-server-ip:8000'; 
-Run the app on a connected device or simulator:
+```dart
+// lib/config/api_config.dart
+const String BASE_URL = 'http://your-server-ip:8000';
+```
 
-Bash
+**Run the app:**
 
+```bash
 flutter run
-🏗️ Architecture
-MMT follows a decoupled, client-server architecture to ensure flexibility and scalability.
+```
 
-Frontend (Flutter): Manages the user interface, audio recording, and communication with the backend. It's designed to be a thin client, with all heavy processing handled on the server.
+---
 
-Backend (Python/FastAPI): A simple RESTful API that receives audio files, processes them using the Whisper model, and returns the transcribed text. This is the heart of the transcription engine.
+## 🏗️ Architecture
 
-Local or Cloud Server: The backend can be hosted on a local machine in a clinic for maximum privacy and low cost, or on a low-cost cloud VM for more flexible access.
+- **Frontend (Flutter):** UI, audio recording, backend communication.
+- **Backend (Python/FastAPI):** REST API for audio upload, Whisper transcription, and response.
+- **Server:** Host locally for privacy/cost, or on a cloud VM for flexible access.
 
-A high-level diagram illustrating the data flow from the Flutter app to the Whisper backend.
+```
+[Flutter App] <---audio---> [Python/FastAPI + Whisper] <---optionally---> [EMR/Other Systems]
+```
 
-📈 Performance & Resource Usage
-The performance of the transcription depends on the hardware of your backend server.
+---
 
-Model Size	VRAM Required	Transcription Time (per min of audio)
-tiny	~1 GB	~5 seconds
-base	~1 GB	~15 seconds
-small	~2 GB	~30 seconds
-medium	~5 GB	~1 minute
-large-v2	~10 GB	~2 minutes
+## 📈 Performance & Resource Usage
 
-Export to Sheets
-Note: The base or small model is often a good balance of accuracy and speed for most use cases. For resource-constrained hardware, tiny is a great starting point.
+| Model Size | VRAM Required | Transcription Time (per min audio) |
+|------------|--------------|-------------------------------------|
+| tiny       | ~1 GB        | ~5 seconds                         |
+| base       | ~1 GB        | ~15 seconds                        |
+| small      | ~2 GB        | ~30 seconds                        |
+| medium     | ~5 GB        | ~1 minute                          |
+| large-v2   | ~10 GB       | ~2 minutes                         |
 
-🤝 How to Contribute
-We welcome contributions from the community! Whether it's adding a new feature, fixing a bug, or improving documentation, your help is appreciated.
+> **Tip:** `base` or `small` models balance accuracy and speed. For limited hardware, use `tiny`.
 
-Fork the repository.
+---
 
-Create your feature branch (git checkout -b feature/AmazingFeature).
+## 🤝 Contributing
 
-Commit your changes (git commit -m 'feat: Add new feature').
+1. Fork the repository.
+2. Create your feature branch:  
+   `git checkout -b feature/AmazingFeature`
+3. Commit your changes:  
+   `git commit -m 'feat: Add new feature'`
+4. Push to the branch:  
+   `git push origin feature/AmazingFeature`
+5. Open a Pull Request.
 
-Push to the branch (git push origin feature/AmazingFeature).
+---
 
-Open a Pull Request.
+## 📄 License
 
-📄 License
-This project is licensed under the MIT License. See the LICENSE file for details.
+MIT License. See [LICENSE](LICENSE).
 
-📧 Contact
-Info@WebQx.Healthcare
+---
 
-Project Link: https://github.com/WebQx/MMT
+## 📧 Contact
+
+- Email: Info@WebQx.Healthcare
+- Project: [https://github.com/WebQx/MMT](https://github.com/WebQx/MMT)
+## 📧 Contact
+
+- Email: Info@WebQx.Healthcare
+- Project Link: [https://github.com/WebQx/MMT](https://github.com/WebQx/MMT)
+
