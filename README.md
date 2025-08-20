@@ -18,7 +18,26 @@ MMT (Multilingual Medical Transcription) is an open-source project dedicated to 
    Keycloak-based OAuth2 login
 
 ---
+# 🩺 MMT–OpenEMR Integration via RabbitMQ
 
+This project connects the [WebQx MMT](https://github.com/WebQx/MMT) Multilingual Medical Transcription Suite with [OpenEMR](https://github.com/openemr/openemr), using RabbitMQ as a message broker. It enables automatic, asynchronous transfer of transcribed medical notes into OpenEMR patient records.
+
+---
+
+## 🚀 Features
+
+- ✅ **Asynchronous Messaging** via RabbitMQ
+- 🧠 **Automatic Transcription** using Whisper (via MMT)
+- 🔄 **Real-Time Integration** with OpenEMR REST API
+- 🔐 **Secure & Scalable** architecture for clinical environments
+- 🌍 **Multilingual Support** for global healthcare settings
+
+---
+
+## 🧩 Architecture Overview
+
+```text
+MMT (FastAPI) ──► RabbitMQ ──► OpenEMR Listener ──► OpenEMR API
 ## 🚀 Getting Started
 
 ### Prerequisites
