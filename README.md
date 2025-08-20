@@ -1,122 +1,131 @@
-WebQx MMT: Multilingual Medical Transcription Suite 🌟
+# Multilingual Medical Transcription (MMT) - End-to-End Blueprint
 
-MMT (Multilingual Medical Transcription) is an open-source project dedicated to making high-quality medical transcription accessible and affordable for healthcare professionals worldwide, especially in resource-constrained environments. By combining OpenAI's Whisper, Flutter, and a lightweight Python backend, MMT offers a sustainable, self-hosted alternative to expensive, proprietary cloud services.
-
----
-
-## ✨ Key Features
-
-- **Offline-First Workflow:** Record and store audio locally; transcribe automatically when online.
-- **Cost-Effective:** Run Whisper locally or on a low-cost cloud server—no per-minute API fees.
-- **Robust Multilingual Support:** Accurate transcription in many languages and dialects.
-- **Cross-Platform:** Flutter UI for Android and iOS.
-- **Customizable:** Easily extend backend API, fine-tune models, or integrate with EMR systems.
--  Secure Consent & Identity
-
-   GDPR, HIPAA, ISO 27701 compliant
-   Multilingual consent flows
-   Keycloak-based OAuth2 login
-
----
-# 🩺 MMT–OpenEMR Integration via RabbitMQ
-
-This project connects the [WebQx MMT](https://github.com/WebQx/MMT) Multilingual Medical Transcription Suite with [OpenEMR](https://github.com/openemr/openemr), using RabbitMQ as a message broker. It enables automatic, asynchronous transfer of transcribed medical notes into OpenEMR patient records.
+## Overview
+MMT is a secure, multilingual, healthcare-grade transcription platform supporting real-time, ambient, and offline transcription. It integrates with OpenAI Whisper (cloud), local Whisper, OpenEMR, and supports OAuth2 (Keycloak) and guest login. The app is deployable as a Flutter web app (e.g., GitHub Pages) and as a mobile/desktop app.
 
 ---
 
-## 🚀 Features
+## Architecture
 
-- ✅ **Asynchronous Messaging** via RabbitMQ
-- 🧠 **Automatic Transcription** using Whisper (via MMT)
-- 🔄 **Real-Time Integration** with OpenEMR REST API
-- 🔐 **Secure & Scalable** architecture for clinical environments
-- 🌍 **Multilingual Support** for global healthcare settings
+**Frontend:** Flutter (Web, Mobile, Desktop)
+- Multilingual UI (Flutter intl)
+- OAuth2 (Keycloak) & Guest login
+- Audio recording, file picker, ambient mode
+- Print/email/share results
+
+**Backend:** FastAPI (Python)
+- REST API for transcription, login, health, etc.
+- Local Whisper for "transcribe later"
+- OpenAI Whisper API for real-time/ambient
+- RabbitMQ for async integration with OpenEMR
+- .env for secrets (OpenAI, Keycloak, OpenEMR, RabbitMQ)
+
+**EHR Integration:**
+- OpenEMR via REST API (RabbitMQ consumer)
+
+**Security & Compliance:**
+- GDPR, HIPAA, ISO 27701 ready
+- OAuth2 (Keycloak), HTTPS, audit logging, data minimization
 
 ---
 
-## 🧩 Architecture Overview
+## User Flows
 
-```text
-MMT (FastAPI) ──► RabbitMQ ──► OpenEMR Listener ──► OpenEMR API
-## 🚀 Getting Started
+### 1. Login
+- User chooses: Login with Keycloak (OAuth2) or Continue as Guest
+- On success, receives access token (JWT or guest secret)
 
-### Prerequisites
+### 2. Main UI
+- Select transcription type:
+	- Realtime Transcription (OpenAI Whisper API)
+	- Record Now, Transcribe Later (local Whisper)
+- Select network mode: Cellular, WiFi, Cloud
+- Optionally enable Ambient Mode (continuous listening, OpenAI Whisper API)
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) (latest stable)
-- Python 3.8+
-- Git
+### 3. Transcription
+- Upload/record audio or enable ambient mode
+- For real-time/ambient/cloud: `/transcribe/cloud/` (OpenAI Whisper API)
+- For transcribe later: `/transcribe/` (local Whisper)
+- Results shown in app, can be printed/emailed
+- All results sent to RabbitMQ for OpenEMR integration
+
+### 4. EHR Integration
+- RabbitMQ consumer posts transcriptions to OpenEMR API
 
 ---
 
-### 1. Clone the Repository
+## Security & Compliance
+- All secrets in `/backend/.env`
+- OAuth2 (Keycloak) for user auth, guest mode for demo/testing
+- HTTPS required for all production deployments
+- CORS enabled for frontend domain
+- Data minimization, audit logging, user data management
 
-```bash
-git clone https://github.com/WebQx/MMT.git
-cd MMT
+---
+
+## Deployment
+
+### Backend (FastAPI)
+1. Set up `.env` with all secrets (OpenAI, Keycloak, OpenEMR, RabbitMQ)
+2. Run: `uvicorn main:app --reload`
+3. Ensure CORS is enabled for your frontend domain
+
+### Frontend (Flutter Web)
+1. Run: `flutter build web --base-href /MMT/`
+2. Deploy `build/web` to GitHub Pages or your web host
+3. Set Keycloak redirect URI to your GitHub Pages URL
+
+### OpenEMR & RabbitMQ
+1. Deploy OpenEMR and RabbitMQ
+2. Configure OpenEMR API key in `.env`
+3. Start the RabbitMQ consumer
+
+---
+
+## File Structure (Key Parts)
+
+- `/backend/main.py` - FastAPI backend, all endpoints
+- `/backend/.env` - Secrets and API keys
+- `/backend/openemr_consumer.py` - RabbitMQ to OpenEMR integration
+- `/app/lib/main.dart` - Flutter app main logic
+- `/app/pubspec.yaml` - Flutter dependencies
+- `/app/web/index.html` - Web entry point
+
+---
+
+## Example .env
+```env
+OPENAI_API_KEY=sk-...
+KEYCLOAK_PUBLIC_KEY=...
+KEYCLOAK_ISSUER=...
+GUEST_SECRET=guestsecret
+OPENEMR_API_KEY=test-api-key
+RABBITMQ_URL=amqp://guest:guest@localhost/
 ```
 
 ---
 
-### 2. Backend Server Setup
+## API Endpoints (Backend)
 
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-The API will be live at [http://localhost:8000](http://localhost:8000).
+- `/login/oauth2` - Exchange Keycloak token
+- `/login/guest` - Get guest token
+- `/transcribe/` - Local Whisper (transcribe later)
+- `/transcribe/cloud/` - OpenAI Whisper API (real-time/ambient)
+- `/upload_chunk/` - Chunked upload
+- `/network_advice/` - Bandwidth check
 
 ---
 
-### 3. Flutter App Setup
-
-```bash
-cd ../app
-flutter pub get
-```
-
-**Configure API Endpoint:**  
-Edit `lib/config/api_config.dart`:
-
-```dart
-// lib/config/api_config.dart
-const String BASE_URL = 'http://your-server-ip:8000';
-```
-
-**Run the app:**
-
-```bash
-flutter run
-```
-
----
-
-## 🏗️ Architecture
-
-- **Frontend (Flutter):** UI, audio recording, backend communication.
-- **Backend (Python/FastAPI):** REST API for audio upload, Whisper transcription, and response.
-- **Server:** Host locally for privacy/cost, or on a cloud VM for flexible access.
-
-```
-[Flutter App] <---audio---> [Python/FastAPI + Whisper] <---optionally---> [EMR/Other Systems]
-```
-
----
-
-## 📈 Performance & Resource Usage
-
-| Model Size | VRAM Required | Transcription Time (per min audio) |
-|------------|--------------|-------------------------------------|
-| tiny       | ~1 GB        | ~5 seconds                         |
-| base       | ~1 GB        | ~15 seconds                        |
-| small      | ~2 GB        | ~30 seconds                        |
-| medium     | ~5 GB        | ~1 minute                          |
-| large-v2   | ~10 GB       | ~2 minutes                         |
-
-> **Tip:** `base` or `small` models balance accuracy and speed. For limited hardware, use `tiny`.
+## Compliance Checklist
+- [x] OAuth2 login (Keycloak)
+- [x] Guest login
+- [x] HTTPS everywhere
+- [x] All secrets in .env
+- [x] CORS enabled
+- [x] Data minimization
+- [x] User data management (delete/export)
+- [x] Audit logging (backend)
+- [x] EHR integration (OpenEMR)
 
 ---
 
