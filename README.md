@@ -255,6 +255,18 @@ MMT is a secure, multilingual, healthcare-grade transcription platform supportin
 
 ## Deployment
 
+### Web (Flutter) via Firebase Hosting
+1. Create a Firebase project (or use existing) and enable Hosting.
+2. Add secrets in GitHub repo settings:
+	- `FIREBASE_SERVICE_ACCOUNT`: JSON service account (Base64 or raw) with `Firebase Hosting Admin`.
+	- `FIREBASE_PROJECT_ID`: Your project id.
+3. Update `.firebaserc` replacing `YOUR_FIREBASE_PROJECT_ID`.
+4. (Optional) Adjust `firebase.json` headers or path if you change build dir.
+5. Push to `main` (or run workflow manually) to trigger `firebase-web` workflow.
+
+The workflow builds the Flutter web app from `app/` and deploys the contents of `app/build/web` to the live channel.
+
+
 ### Backend (FastAPI)
 1. Set up `.env` with all secrets (OpenAI, Keycloak, OpenEMR, RabbitMQ)
 2. Run: `uvicorn main:app --reload`
