@@ -1,0 +1,58 @@
+{{- if .Values.alerts.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+	name: {{ include "mmt.fullname" . }}
+spec:
+	groups:
+		- name: mmt.rules
+			rules:
+				- alert: MMTDLQSpike
+					expr: increase(consumer_dlq_total[5m]) > 5
+					for: 5m
+					labels:
+						severity: warning
+					annotations:
+						summary: "MMT DLQ spike"
+						description: "More than 5 DLQ messages in 5m"
+				- alert: MMTRetentionFailures
+					expr: increase(transcripts_purged_total[1d]) == 0 and on() (sum(transcripts_published_total) > 0)
+					for: 1d
+					labels:
+						severity: warning
+					annotations:
+						summary: "Retention purge not deleting records"
+						description: "No transcripts purged in 24h while transcripts are being published"
+				- alert: MMTHighE2ELatencyP95
+					expr: histogram_quantile(0.95, sum(rate(e2e_transcription_latency_seconds_bucket[5m])) by (le)) > 8
+					for: 10m
+					labels:
+						severity: warning
+					annotations:
+						summary: "P95 end-to-end transcription latency high"
+						description: "P95 e2e latency > 8s over 10m"
+				- alert: MMTConsumerFailureRatio
+					expr: (increase(consumer_failure_total[10m]) / clamp_min(increase(transcripts_persisted_total[10m]),1)) > 0.1
+					for: 10m
+					labels:
+						severity: critical
+					annotations:
+						summary: "Consumer failure ratio above 10%"
+						description: ">10% consumer failures vs persisted transcripts in 10m"
+				- alert: MMTDuplicateSpike
+					expr: increase(duplicates_skipped_total[5m]) > 20
+					for: 5m
+					labels:
+						severity: info
+					annotations:
+						summary: "Unexpected duplicate messages spike"
+						description: ">20 duplicates skipped within 5m; investigate idempotency hashing or upstream retries"
+				- alert: MMTQueueBacklogHigh
+					expr: transcription_queue_depth > 100
+					for: 10m
+					labels:
+						severity: warning
+					annotations:
+						summary: "Transcription queue backlog high"
+						description: "Queue depth > 100 for over 10m; consider scaling consumers or investigating slowdown"
+{{- end }}

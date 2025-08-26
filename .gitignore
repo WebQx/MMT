@@ -1,0 +1,28 @@
+# Global ignore rules
+.env
+.env.*
+*.env
+backend/.env
+backend/.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.sqlite*
+.transcripts.db
+.transcripts-*.db
+# Node / Flutter artifacts
+node_modules/
+.packages
+.pub/
+.dart_tool/
+/build/
+# IDE
+.idea/
+.vscode/
+*.iml
+# Logs
+*.log
+# Coverage
+htmlcov/
+.coverage*
+.pytest_cache/

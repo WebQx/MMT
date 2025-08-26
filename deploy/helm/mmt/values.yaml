@@ -1,0 +1,127 @@
+image:
+  repository: yourrepo/mmt-backend
+  tag: latest
+  pullPolicy: IfNotPresent
+
+rabbitmq:
+  enabled: true
+  auth:
+    username: user
+    password: password
+  url: amqp://user:password@mmt-rabbitmq:5672/
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  url: redis://mmt-redis-master:6379/0
+
+env:
+  OPENEMR_FHIR_BASE_URL: ""
+  OPENEMR_FHIR_CLIENT_ID: ""
+  OPENEMR_FHIR_CLIENT_SECRET: ""
+  OPENEMR_FHIR_USERNAME: ""
+  OPENEMR_FHIR_PASSWORD: ""
+  OPENEMR_FHIR_REDIRECT_URI: ""
+  RATE_LIMIT_PER_MINUTE: 120
+  RETENTION_DAYS: 0
+  STORE_PHI: "true"
+  ENABLE_IDEMPOTENCY: "true"
+  IDEMPOTENCY_CACHE_SIZE: 5000
+  IDEMPOTENCY_TTL_SECONDS: 3600
+  USE_BLOOM_IDEMPOTENCY: "false"
+  BLOOM_ERROR_RATE: 0.001
+  BLOOM_CAPACITY: 100000
+  USE_RSA_INTERNAL_JWT: "false"
+  DRAIN_WAIT_SECONDS: 60
+  ENABLE_DB_IDEMPOTENCY: "false"
+  IDEMPOTENCY_DB_TTL_SECONDS: 86400
+  VAULT_ADDR: ""
+  VAULT_RSA_SECRET_PATH: ""
+  ENABLE_FIELD_ENCRYPTION: "false"
+  ENCRYPTION_KEYS: ""  # key1:base64key,key2:base64key (mount via secret)
+  PRIMARY_ENCRYPTION_KEY_ID: ""
+  ENCRYPTION_ROTATE_HOURS: 0
+
+service:
+  type: ClusterIP
+  port: 8000
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+podSecurityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+containerSecurityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+sidecars:
+  reprocessor:
+    enabled: false
+    resources: {}
+    args: []
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []  # [{host: example.com}]
+  tls: []    # [{hosts: [example.com], secretName: example-tls}]
+
+serviceMonitor:
+  enabled: false
+
+alerts:
+  enabled: false
+
+extraEnv: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  queueDepthTarget: 5  # average queue depth per pod
+  cpu:
+    enabled: true
+    targetAverageUtilization: 70
+
+keda:
+  enabled: false
+  pollingInterval: 15
+  cooldownPeriod: 120
+  queueName: openemr_transcriptions
+  queueLengthTarget: "50"  # scale when > this many messages
+  rabbitmqHostSecretRef: RABBITMQ_URL  # env var style connection string
+
+vault:
+  approle:
+    roleId: ""
+    secretId: ""
+secrets:
+  enabled: true
+  # Kubernetes Secret names containing sensitive values (mounted as env via envFrom or individual refs)
+  fhir:
+    secretName: "fhir-credentials"  # keys: client-id, client-secret, username, password
+  db:
+    secretName: "transcripts-db"     # keys: host, user, password, name
+  rabbitmq:
+    secretName: "rabbitmq-conn"      # key: url
+  redis:
+    secretName: "redis-conn"         # key: url
+  vault:
+    secretName: "vault-approle"      # keys: roleId, secretId

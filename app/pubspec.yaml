@@ -1,0 +1,21 @@
+  speech_to_text: ^6.6.0
+  permission_handler: ^11.0.1
+name: mmt
+version: 0.1.0
+description: Multilingual Medical Transcription Flutter App
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  audioplayers: ^5.2.0
+  path_provider: ^2.1.0
+  provider: ^6.0.0
+  file_picker: ^6.1.1
+  # Add more as needed
+  printing: ^5.12.0
+  url_launcher: ^6.2.6
+  sentry_flutter: ^8.3.0
+flutter:
+  uses-material-design: true

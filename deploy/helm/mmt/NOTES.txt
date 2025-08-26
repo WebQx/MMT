@@ -1,0 +1,36 @@
+Thank you for deploying MMT.
+
+1. Access
+   If ingress enabled:
+     URL: http(s)://<your-host>/
+   Otherwise port-forward:
+     kubectl port-forward svc/{{ include "mmt.fullname" . }} 8000:{{ .Values.service.port }}
+     Then: curl http://localhost:8000/health/ready
+
+2. Metrics
+   If ServiceMonitor enabled, Prometheus will scrape /metrics automatically.
+
+3. Secrets
+   Provide database credentials via a Secret named `transcripts-db` (see template `secret-example.yaml`).
+
+4. TLS
+   Create TLS secret:
+     kubectl create secret tls mmt-tls --cert=cert.pem --key=key.pem
+   Then set:
+     ingress.enabled=true
+     ingress.tls[0].hosts[0]=your.host
+     ingress.tls[0].secretName=mmt-tls
+
+5. Retention & DLQ
+   Configure RETENTION_DAYS>0 to enable purge CronJob. DLQ reprocessor CronJob runs every 10m.
+
+6. Sidecar Mode
+   Enable inline DLQ reprocessor sidecar:
+     --set sidecars.reprocessor.enabled=true
+
+7. Advanced PHI Masking
+   Enable with:
+     --set env.ADVANCED_PHI_MASKING=true (requires presidio-analyzer image layer)
+
+8. Uninstall
+   helm uninstall {{ .Release.Name }}
