@@ -18,6 +18,7 @@ redis:
   url: redis://mmt-redis-master:6379/0
 
 env:
+  ENV: prod
   OPENEMR_FHIR_BASE_URL: ""
   OPENEMR_FHIR_CLIENT_ID: ""
   OPENEMR_FHIR_CLIENT_SECRET: ""
@@ -43,6 +44,25 @@ env:
   ENCRYPTION_KEYS: ""  # key1:base64key,key2:base64key (mount via secret)
   PRIMARY_ENCRYPTION_KEY_ID: ""
   ENCRYPTION_ROTATE_HOURS: 0
+  # Production hardening
+  AUDIT_LOG_FILE: "/app/logs/audit.log"
+  ENFORCE_TLS_IN_PRODUCTION: "true"
+  # Worker optimization
+  ASYNC_MAX_WORKERS: 4
+  ASYNC_QUEUE_MAXSIZE: 100
+  WORKER_POOL_OPTIMIZATION_ENABLED: "true"
+  MIN_WORKERS_PER_CORE: 1
+  MAX_WORKERS_PER_CORE: 4
+  # External services
+  EXTERNAL_RABBITMQ_ENABLED: "false"
+  EXTERNAL_REDIS_ENABLED: "false"
+  # RedisBloom idempotency
+  ENABLE_REDIS_BLOOM_IDEMPOTENCY: "false"
+  REDIS_BLOOM_KEY_PREFIX: "mmt:bloom:"
+  REDIS_BLOOM_TTL_SECONDS: 86400
+  # Async task retention
+  ASYNC_TASK_RETENTION_DAYS: 7
+  ASYNC_CLEANUP_INTERVAL_HOURS: 24
 
 service:
   type: ClusterIP
@@ -57,6 +77,38 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
+
+# Retention job configuration
+retention:
+  schedule: "0 2 * * *"  # Run at 2 AM daily
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# Database configuration
+database:
+  secretName: "mmt-database"
+  secretKey: "url"
+
+# Audit logging persistence
+auditLogs:
+  enabled: true
+  storageClass: ""
+  size: 10Gi
+  accessMode: ReadWriteOnce
+
+# TLS configuration
+tls:
+  enabled: false
+  secretName: "mmt-tls"
+  certFile: "tls.crt"
+  keyFile: "tls.key"
 
 podSecurityContext:
   enabled: true
@@ -75,7 +127,13 @@ containerSecurityContext:
 sidecars:
   reprocessor:
     enabled: false
-    resources: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
     args: []
 
 ingress:
@@ -87,6 +145,8 @@ ingress:
 
 serviceMonitor:
   enabled: false
+  interval: 30s
+  path: /metrics
 
 alerts:
   enabled: false
@@ -106,14 +166,19 @@ keda:
   enabled: false
   pollingInterval: 15
   cooldownPeriod: 120
-  queueName: openemr_transcriptions
-  queueLengthTarget: "50"  # scale when > this many messages
-  rabbitmqHostSecretRef: RABBITMQ_URL  # env var style connection string
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  rabbitmq:
+    queueName: openemr_transcriptions
+    queueLength: 50  # scale when > this many messages
+    hostFromSecret: rabbitmq-credentials
+    hostFromSecretKey: connection
 
 vault:
   approle:
     roleId: ""
     secretId: ""
+
 secrets:
   enabled: true
   # Kubernetes Secret names containing sensitive values (mounted as env via envFrom or individual refs)
@@ -127,3 +192,5 @@ secrets:
     secretName: "redis-conn"         # key: url
   vault:
     secretName: "vault-approle"      # keys: roleId, secretId
+  encryption:
+    secretName: "encryption-keys"    # keys: keys, primary-id

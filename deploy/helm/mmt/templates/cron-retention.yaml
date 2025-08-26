@@ -3,13 +3,26 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ include "mmt.fullname" . }}-retention
+  labels:
+    {{- include "mmt.labels" . | nindent 4 }}
+    component: retention
 spec:
-  schedule: "0 2 * * *"
+  schedule: {{ .Values.retention.schedule | default "0 2 * * *" | quote }}
+  successfulJobsHistoryLimit: {{ .Values.retention.successfulJobsHistoryLimit | default 3 }}
+  failedJobsHistoryLimit: {{ .Values.retention.failedJobsHistoryLimit | default 1 }}
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            {{- include "mmt.selectorLabels" . | nindent 12 }}
+            component: retention
         spec:
           restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
           containers:
             - name: retention
               image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -18,9 +31,40 @@ spec:
               env:
                 - name: RETENTION_DAYS
                   value: {{ .Values.env.RETENTION_DAYS | quote }}
-                - name: TRANSCRIPTS_DB_HOST
+                - name: DATABASE_URL
                   valueFrom:
                     secretKeyRef:
-                      name: transcripts-db
-                      key: host
+                      name: {{ .Values.database.secretName | default "mmt-database" }}
+                      key: {{ .Values.database.secretKey | default "url" }}
+                - name: ENV
+                  value: {{ .Values.env.ENV | default "prod" | quote }}
+                {{- if .Values.env.AUDIT_LOG_FILE }}
+                - name: AUDIT_LOG_FILE
+                  value: {{ .Values.env.AUDIT_LOG_FILE | quote }}
+                {{- end }}
+                {{- range $key, $value := .Values.env }}
+                {{- if and $value (ne $key "RETENTION_DAYS") (ne $key "DATABASE_URL") }}
+                - name: {{ $key }}
+                  value: {{ $value | quote }}
+                {{- end }}
+                {{- end }}
+              resources:
+                {{- toYaml .Values.retention.resources | nindent 16 }}
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                {{- if .Values.env.AUDIT_LOG_FILE }}
+                - name: audit-logs
+                  mountPath: /app/logs
+                {{- end }}
+          volumes:
+            {{- if .Values.env.AUDIT_LOG_FILE }}
+            - name: audit-logs
+              persistentVolumeClaim:
+                claimName: {{ include "mmt.fullname" . }}-audit-logs
+            {{- end }}
 {{- end }}

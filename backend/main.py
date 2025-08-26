@@ -275,6 +275,10 @@ threading.Thread(target=_executor_dispatch_loop, daemon=True, name="async-dispat
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # type: ignore
+    # Run production startup validation checks
+    from startup_checks import run_all_startup_checks
+    run_all_startup_checks()
+    
     if os.environ.get('FAST_TEST_MODE') != '1':
         preload_models_if_configured()
     _start_migration_revision_check()

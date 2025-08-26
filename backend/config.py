@@ -109,6 +109,21 @@ class Settings(BaseSettings):
     async_task_retention_days: int = Field(default=7, env="ASYNC_TASK_RETENTION_DAYS")
     async_cleanup_interval_hours: int = Field(default=24, env="ASYNC_CLEANUP_INTERVAL_HOURS")
     force_sync_publish: bool = Field(default=False, env="FORCE_SYNC_PUBLISH")  # primarily for test determinism
+    # Production worker optimization
+    worker_pool_optimization_enabled: bool = Field(default=False, env="WORKER_POOL_OPTIMIZATION_ENABLED")
+    min_workers_per_core: int = Field(default=1, env="MIN_WORKERS_PER_CORE")
+    max_workers_per_core: int = Field(default=4, env="MAX_WORKERS_PER_CORE")
+    # RedisBloom idempotency enhancements
+    enable_redis_bloom_idempotency: bool = Field(default=False, env="ENABLE_REDIS_BLOOM_IDEMPOTENCY")
+    redis_bloom_key_prefix: str = Field(default="mmt:bloom:", env="REDIS_BLOOM_KEY_PREFIX")
+    redis_bloom_ttl_seconds: int = Field(default=86400, env="REDIS_BLOOM_TTL_SECONDS")  # 24 hours
+    # External service configurations for production
+    external_rabbitmq_enabled: bool = Field(default=False, env="EXTERNAL_RABBITMQ_ENABLED")
+    external_redis_enabled: bool = Field(default=False, env="EXTERNAL_REDIS_ENABLED")
+    external_rabbitmq_host: str | None = Field(default=None, env="EXTERNAL_RABBITMQ_HOST")
+    external_redis_host: str | None = Field(default=None, env="EXTERNAL_REDIS_HOST")
+    # TLS enforcement
+    enforce_tls_in_production: bool = Field(default=True, env="ENFORCE_TLS_IN_PRODUCTION")
     # Telemetry (Sentry)
     sentry_dsn: str | None = Field(default=None, env="SENTRY_DSN")
     sentry_traces_sample_rate: float = Field(default=0.0, env="SENTRY_TRACES_SAMPLE_RATE")
@@ -135,5 +150,38 @@ def get_settings() -> Settings:
             # basic validation: must have keys & primary (deeper handled elsewhere)
             if not (s.encryption_keys and s.primary_encryption_key_id):
                 raise RuntimeError("Field encryption enabled in prod but keys/primary missing")
+        
+        # Production worker optimization
+        if s.worker_pool_optimization_enabled:
+            import multiprocessing
+            cpu_count = multiprocessing.cpu_count()
+            min_workers = max(s.min_workers_per_core * cpu_count, 1)
+            max_workers = s.max_workers_per_core * cpu_count
+            
+            # Auto-adjust async worker settings based on CPU cores
+            if s.async_max_workers < min_workers:
+                s.async_max_workers = min_workers
+                log.info("worker_optimization", 
+                        adjusted_workers=s.async_max_workers,
+                        cpu_cores=cpu_count,
+                        reason="increased_for_cpu_count")
+            elif s.async_max_workers > max_workers:
+                s.async_max_workers = max_workers
+                log.info("worker_optimization",
+                        adjusted_workers=s.async_max_workers, 
+                        cpu_cores=cpu_count,
+                        reason="limited_for_cpu_count")
+        
+        # External service validation
+        if s.external_rabbitmq_enabled and not s.external_rabbitmq_host:
+            raise RuntimeError("External RabbitMQ enabled but EXTERNAL_RABBITMQ_HOST not configured")
+        
+        if s.external_redis_enabled and not s.external_redis_host:
+            raise RuntimeError("External Redis enabled but EXTERNAL_REDIS_HOST not configured")
+        
+        # RedisBloom validation  
+        if s.enable_redis_bloom_idempotency and not s.redis_url:
+            raise RuntimeError("RedisBloom idempotency enabled but Redis not configured")
+        
         log.info("config/validated", prod=True)
     return s
