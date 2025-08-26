@@ -1,0 +1,26 @@
+{{- if gt (int .Values.env.RETENTION_DAYS) 0 }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "mmt.fullname" . }}-retention
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: retention
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["python", "-m", "retention"]
+              env:
+                - name: RETENTION_DAYS
+                  value: {{ .Values.env.RETENTION_DAYS | quote }}
+                - name: TRANSCRIPTS_DB_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: transcripts-db
+                      key: host
+{{- end }}
