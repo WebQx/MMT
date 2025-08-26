@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - KEYCLOAK_PUBLIC_KEY=${KEYCLOAK_PUBLIC_KEY}
+      - KEYCLOAK_ISSUER=${KEYCLOAK_ISSUER}
+      - GUEST_SECRET=${GUEST_SECRET}
+      - OPENEMR_API_KEY=${OPENEMR_API_KEY}
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - FRONTEND_DOMAIN=http://localhost:3000
+      - SECRET_KEY=${SECRET_KEY}
+      - OPENEMR_BASE_URL=${OPENEMR_BASE_URL}
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./backend:/app
+      - uploads:/tmp/uploads
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # OpenEMR Consumer Service
+  openemr-consumer:
+    build: ./backend
+    command: python openemr_consumer.py
+    environment:
+      - OPENEMR_API_KEY=${OPENEMR_API_KEY}
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - OPENEMR_BASE_URL=${OPENEMR_BASE_URL}
+    depends_on:
+      - rabbitmq
+      - backend
+    volumes:
+      - ./backend:/app
+
+  # Flutter Web (Development)
+  frontend:
+    image: cirrusci/flutter:stable
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/app
+    command: flutter run -d web-server --web-hostname 0.0.0.0 --web-port 3000
+
+volumes:
+  rabbitmq_data:
+  uploads:

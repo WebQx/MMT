@@ -1,0 +1,79 @@
+name: mmt_app
+description: Multilingual Medical Transcription - Healthcare-grade transcription platform
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI and Navigation
+  cupertino_icons: ^1.0.2
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.18.1
+  
+  # HTTP and API
+  http: ^1.1.0
+  dio: ^5.3.2
+  
+  # Authentication
+  oauth2: ^2.0.2
+  jwt_decode: ^0.3.1
+  
+  # Audio recording and playback
+  record: ^5.0.4
+  audioplayers: ^5.2.1
+  file_picker: ^6.1.1
+  
+  # State management
+  provider: ^6.1.1
+  shared_preferences: ^2.2.2
+  
+  # UI components
+  flutter_svg: ^2.0.9
+  cached_network_image: ^3.3.0
+  
+  # Permissions
+  permission_handler: ^11.1.0
+  
+  # PDF and sharing
+  pdf: ^3.10.7
+  share_plus: ^7.2.1
+  printing: ^5.11.1
+  
+  # Utils
+  uuid: ^4.2.1
+  path: ^1.8.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/lang/
+  
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+
+flutter_intl:
+  enabled: true
+  main_locale: en
+  arb_dir: lib/l10n
+  output_dir: lib/generated
