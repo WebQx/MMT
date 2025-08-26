@@ -286,6 +286,21 @@ async def lifespan(app: FastAPI):  # type: ignore
     _tx_executor.shutdown(wait=True, cancel_futures=False)
 
 app = FastAPI(title="MMT Transcription API", version="0.1.0", docs_url="/docs" if docs_enabled else None, redoc_url=None if not docs_enabled else "/redoc", lifespan=lifespan)
+
+@app.exception_handler(HTTPException)
+async def _http_exc_handler(request: Request, exc: HTTPException):  # type: ignore[override]
+    cid = getattr(request.state, 'correlation_id', None)
+    body = {"error": {"code": exc.status_code, "message": exc.detail}, "correlation_id": cid}
+    if exc.headers:
+        return JSONResponse(status_code=exc.status_code, content=body, headers=exc.headers)
+    return JSONResponse(status_code=exc.status_code, content=body)
+
+@app.exception_handler(Exception)
+async def _unhandled_exc_handler(request: Request, exc: Exception):  # type: ignore[override]
+    cid = getattr(request.state, 'correlation_id', None)
+    structlog.get_logger(__name__).exception("unhandled_error", correlation_id=cid)
+    body = {"error": {"code": 500, "message": "Internal Server Error"}, "correlation_id": cid}
+    return JSONResponse(status_code=500, content=body)
 if 'trace' in globals():  # instrument only if tracing set up
     try:  # noqa: SIM105
         from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
