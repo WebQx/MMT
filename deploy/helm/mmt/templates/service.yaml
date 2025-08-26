@@ -8,6 +8,6 @@ spec:
     app: {{ include "mmt.name" . }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: 8000
+      targetPort: {{ .Values.service.targetPort | default 9000 }}
       protocol: TCP
       name: http
