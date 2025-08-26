@@ -8,6 +8,12 @@ on:
       - 'app/web/**'
       - 'app/pubspec.yaml'
       - '.github/workflows/firebase_web.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'app/lib/**'
+      - 'app/web/**'
+      - 'app/pubspec.yaml'
   workflow_dispatch:
 
 jobs:
@@ -15,6 +21,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Cache Flutter SDK
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: flutter-pub-${{ hashFiles('app/pubspec.lock') }}
+          restore-keys: |
+            flutter-pub-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -25,7 +38,22 @@ jobs:
       - name: Build web
         working-directory: app
         run: flutter build web --release --base-href "/"
-      - name: Deploy to Firebase Hosting
+      - name: Deploy preview channel (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: pr-${{ github.event.number }}
+          expires: 7d
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+      - name: Comment preview URL
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: "Preview deployed for this PR. (See Firebase action logs for URL)."
+      - name: Deploy live (main)
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
