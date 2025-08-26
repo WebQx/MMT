@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mmt.fullname" . }}
+  labels:
+    app: {{ include "mmt.name" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "mmt.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "mmt.name" . }}
+    spec:
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext:
+        runAsNonRoot: {{ .Values.podSecurityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.podSecurityContext.runAsUser }}
+        runAsGroup: {{ .Values.podSecurityContext.runAsGroup }}
+        fsGroup: {{ .Values.podSecurityContext.fsGroup }}
+      {{- end }}
+      containers:
+        - name: api
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "if [ -n \"$ADMIN_API_KEY\" ]; then curl -s -X POST -H 'x-admin-key: $ADMIN_API_KEY' http://localhost:8000/admin/drain || true; fi; sleep ${DRAIN_WAIT_SECONDS:-60}"]
+          {{- if .Values.containerSecurityContext.enabled }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.containerSecurityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.containerSecurityContext.readOnlyRootFilesystem }}
+            capabilities:
+              drop: {{ toYaml .Values.containerSecurityContext.capabilities.drop | nindent 14 }}
+          {{- end }}
+          env:
+            - name: RABBITMQ_URL
+              value: {{ .Values.rabbitmq.url | quote }}
+            - name: REDIS_URL
+              value: {{ .Values.redis.url | quote }}
+          {{- if .Values.secrets.enabled }}
+          {{- if .Values.secrets.rabbitmq.secretName }}
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.rabbitmq.secretName }}
+                  key: url
+          {{- end }}
+          {{- if .Values.secrets.redis.secretName }}
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.redis.secretName }}
+                  key: url
+          {{- end }}
+          {{- if .Values.secrets.fhir.secretName }}
+            - name: OPENEMR_FHIR_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.fhir.secretName }}
+                  key: client-id
+            - name: OPENEMR_FHIR_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.fhir.secretName }}
+                  key: client-secret
+            - name: OPENEMR_FHIR_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.fhir.secretName }}
+                  key: username
+            - name: OPENEMR_FHIR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.fhir.secretName }}
+                  key: password
+          {{- end }}
+          {{- if .Values.secrets.vault.secretName }}
+            - name: VAULT_ROLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.vault.secretName }}
+                  key: roleId
+            - name: VAULT_SECRET_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.vault.secretName }}
+                  key: secretId
+          {{- end }}
+          {{- end }}
+{{- range $k, $v := .Values.env }}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+{{- end }}
+            - name: DRAIN_WAIT_SECONDS
+              value: {{ .Values.env.DRAIN_WAIT_SECONDS | quote }}
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.sidecars.reprocessor.enabled }}
+        - name: dlq-reprocessor
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "-m", "dlq_reprocessor"]
+          env:
+            - name: RABBITMQ_URL
+              value: {{ .Values.rabbitmq.url | quote }}
+          resources: {{- toYaml .Values.sidecars.reprocessor.resources | nindent 12 }}
+        {{- end }}
