@@ -46,7 +46,9 @@ env:
 
 service:
   type: ClusterIP
-  port: 8000
+  port: 80
+  # Container listen port
+  targetPort: 9000
 
 resources:
   requests:
