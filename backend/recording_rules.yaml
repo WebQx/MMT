@@ -1,0 +1,36 @@
+groups:
+  - name: mmt_api.rules
+    interval: 30s
+    rules:
+      - record: job:mmt_requests:rate5m
+        expr: sum by (job) (rate(http_requests_total{job="mmt-api"}[5m]))
+      - record: job:mmt_transcription_latency_seconds:p95
+        expr: histogram_quantile(0.95, sum by (le) (rate(transcription_duration_seconds_bucket[5m])))
+      - record: job:mmt_transcription_latency_seconds:p99
+        expr: histogram_quantile(0.99, sum by (le) (rate(transcription_duration_seconds_bucket[5m])))
+      - record: job:mmt_e2e_latency_seconds:p95
+        expr: histogram_quantile(0.95, sum by (le) (rate(e2e_transcription_latency_seconds_bucket[5m])))
+      - record: job:mmt_e2e_latency_seconds:p99
+        expr: histogram_quantile(0.99, sum by (le) (rate(e2e_transcription_latency_seconds_bucket[5m])))
+      - record: job:mmt_vault_refresh_failures:rate5m
+        expr: sum(rate(vault_refresh_failures_total[5m]))
+      - record: job:mmt_vault_token_renew_failures:rate5m
+        expr: sum(rate(vault_token_renew_failures_total[5m]))
+      - record: job:mmt_queue_depth:avg1m
+        expr: avg_over_time(transcription_queue_depth[1m])
+      - record: job:mmt_async_queue_size:avg1m
+        expr: avg_over_time(async_task_queue_size[1m])
+      - record: job:mmt_breaker_open_rate5m
+        expr: sum(rate(breaker_open_total[5m]))
+      - record: job:mmt_publish_fail_ratio5m
+        expr: (sum(rate(publish_failures_total[5m])))/(sum(rate(transcripts_published_total[5m])) + 1e-6)
+      - record: job:mmt_api_success_ratio5m
+        expr: 1 - (sum(rate(api_requests_total{code=~"5.."}[5m])) / sum(rate(api_requests_total[5m])))
+      - record: job:mmt_api_error_budget_burn_fast
+        expr: (1 - job:mmt_api_success_ratio5m) / 0.01  # 99% target
+      - record: job:mmt_api_error_budget_remaining_1h
+        expr: 0.01 - (sum(rate(api_requests_total{code=~"5.."}[1h])) / sum(rate(api_requests_total[1h])))
+      - record: job:mmt_api_error_budget_burn_slow
+        expr: (1 - (1 - (sum(rate(api_requests_total{code=~"5.."}[30m])) / sum(rate(api_requests_total[30m]))))) / 0.01
+      - record: job:mmt_ambient_publish_rate5m
+        expr: sum(rate(transcripts_published_total{source="api"}[5m]))
