@@ -8,7 +8,7 @@ import time
 from collections import defaultdict
 from typing import Dict, Optional
 import os
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 try:  # pragma: no cover - optional dependency
@@ -88,10 +88,24 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):  # type: ignore[override]
         key = request.client.host if request.client else "global"
+        limit = self.capacity
+        remaining = None
+        reset = int(time.time()) + 60
         if self._redis:
-            if not self._redis_allow(key):
-                raise HTTPException(status_code=429, detail="Rate limit exceeded")
-            return await call_next(request)
+            allowed = self._redis_allow(key)
+            if not allowed:
+                headers = {
+                    "X-RateLimit-Limit": str(limit),
+                    "X-RateLimit-Remaining": "0",
+                    "X-RateLimit-Reset": str(reset),
+                }
+                raise HTTPException(status_code=429, detail="Rate limit exceeded", headers=headers)
+            # Can't cheaply compute remaining without extra roundtrip; omit or set -1 sentinel
+            response = await call_next(request)
+            response.headers.setdefault("X-RateLimit-Limit", str(limit))
+            response.headers.setdefault("X-RateLimit-Remaining", "-1")
+            response.headers.setdefault("X-RateLimit-Reset", str(reset))
+            return response
         # Fallback in-memory
         now = time.time()
         last = self.timestamp[key]
@@ -101,6 +115,16 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             self.tokens[key] = min(self.capacity, new_tokens)
             self.timestamp[key] = now
         if self.tokens[key] < 1:
-            raise HTTPException(status_code=429, detail="Rate limit exceeded")
+            headers = {
+                "X-RateLimit-Limit": str(limit),
+                "X-RateLimit-Remaining": "0",
+                "X-RateLimit-Reset": str(reset),
+            }
+            raise HTTPException(status_code=429, detail="Rate limit exceeded", headers=headers)
         self.tokens[key] -= 1
-        return await call_next(request)
+        remaining = int(self.tokens[key])
+        response = await call_next(request)
+        response.headers.setdefault("X-RateLimit-Limit", str(limit))
+        response.headers.setdefault("X-RateLimit-Remaining", str(max(0, remaining)))
+        response.headers.setdefault("X-RateLimit-Reset", str(reset))
+        return response
