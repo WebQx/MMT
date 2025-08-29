@@ -791,9 +791,43 @@ async def transcribe_cloud_endpoint(
         except Exception:  # noqa: BLE001
             raise HTTPException(status_code=400, detail="Invalid JSON body")
         raw_text = body.get("text")
-        if not raw_text:
-            raise HTTPException(status_code=400, detail="No text provided.")
-        text = normalize_text(raw_text)
+        audio_b64 = body.get("audio_b64")  # optional base64 audio payload instead of separate multipart
+        language = body.get("language")
+        prompt = body.get("prompt")
+        temperature = body.get("temperature")
+        # If raw text provided, treat as already-transcribed ambient snippet.
+        if raw_text:
+            text = normalize_text(raw_text)
+            _publish_transcription("ambient", text, getattr(request.state, 'correlation_id', None) if request else None)
+            logger.info("ambient_text_ingested", chars=len(text))
+            if settings.mask_phi_in_responses:
+                return {"text": mask_phi_for_response(text)}
+            return {"text": text}
+        # Else if audio base64 provided, decode and send to cloud service with optional hints
+        if audio_b64:
+            import base64
+            try:
+                audio_bytes = base64.b64decode(audio_b64)
+            except Exception:  # noqa: BLE001
+                raise HTTPException(status_code=400, detail="Invalid base64 audio")
+            try:
+                text = transcribe_cloud(
+                    audio_bytes,
+                    "inline.wav",
+                    "audio/wav",
+                    prompt=prompt,
+                    language=language,
+                    temperature=temperature,
+                )
+            except Exception as e:  # noqa: BLE001
+                raise HTTPException(status_code=500, detail=f"Cloud transcription failed: {e}")
+            text = normalize_text(text)
+            _publish_transcription("inline", text, getattr(request.state, 'correlation_id', None))
+            logger.info("cloud_transcribe_success_inline", chars=len(text), language=language, temperature=temperature)
+            if settings.mask_phi_in_responses:
+                return {"text": mask_phi_for_response(text)}
+            return {"text": text}
+        raise HTTPException(status_code=400, detail="No text or audio provided.")
         _publish_transcription("ambient", text, getattr(request.state, 'correlation_id', None) if request else None)
         logger.info("ambient_text_ingested", chars=len(text))
         if settings.mask_phi_in_responses:

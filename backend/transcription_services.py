@@ -84,7 +84,26 @@ def transcribe_local(data: bytes, filename: str, mime_type: str | None) -> str:
     return result.get("text", "")
 
 
-def transcribe_cloud(data: bytes, filename: str, mime_type: str | None) -> str:
+def transcribe_cloud(
+    data: bytes,
+    filename: str,
+    mime_type: str | None,
+    *,
+    prompt: str | None = None,
+    language: str | None = None,
+    temperature: float | None = None,
+) -> str:
+    """Call OpenAI Whisper API.
+
+    Parameters
+    ----------
+    data: raw audio bytes
+    filename: original filename
+    mime_type: detected/declared mime type
+    prompt: optional vocabulary / context prompt to bias decoding
+    language: optional ISO language code (e.g. 'en', 'es'); if None let model auto-detect
+    temperature: optional decoding temperature (0.0 – 1.0). Lower = more deterministic.
+    """
     settings = get_settings()
     if not settings.openai_api_key:
         raise RuntimeError("OPENAI_API_KEY not configured")
@@ -92,7 +111,19 @@ def transcribe_cloud(data: bytes, filename: str, mime_type: str | None) -> str:
     openai_url = "https://api.openai.com/v1/audio/transcriptions"
     headers = {"Authorization": f"Bearer {settings.openai_api_key}"}
     files = {"file": (filename, data, mime_type or "audio/mpeg")}
-    data_form = {"model": "whisper-1"}
+    # Build form fields. Only include optional params if provided (API rejects unknown empty fields sometimes).
+    data_form: dict[str, object] = {"model": "whisper-1"}
+    if prompt:
+        data_form["prompt"] = prompt[:2000]  # guard length
+    if language and language.lower() != "auto":
+        data_form["language"] = language
+    if temperature is not None:
+        # clamp for safety
+        if temperature < 0:
+            temperature = 0.0
+        if temperature > 1.0:
+            temperature = 1.0
+        data_form["temperature"] = temperature
     resp = requests.post(openai_url, headers=headers, files=files, data=data_form, timeout=120)
     resp.raise_for_status()
     return resp.json().get("text", "")
