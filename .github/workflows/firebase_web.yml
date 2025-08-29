@@ -21,6 +21,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Fail fast if required secrets missing
+        run: |
+          missing=0
+          for var in FIREBASE_SERVICE_ACCOUNT FIREBASE_PROJECT_ID PROD_BASE_URL KEYCLOAK_ISSUER; do
+            if [ -z "${!var}" ]; then echo "Required secret $var not set"; missing=1; fi
+          done
+          if [ "$missing" -eq 1 ]; then exit 1; fi
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          PROD_BASE_URL: ${{ secrets.PROD_BASE_URL }}
+          KEYCLOAK_ISSUER: ${{ secrets.KEYCLOAK_ISSUER }}
       - name: Cache Flutter SDK
         uses: actions/cache@v4
         with:
@@ -35,9 +47,17 @@ jobs:
       - name: Flutter pub get
         working-directory: app
         run: flutter pub get
-      - name: Build web
+      - name: Build web (production defines)
         working-directory: app
-        run: flutter build web --release --base-href "/"
+        env:
+          PROD_BASE_URL: ${{ secrets.PROD_BASE_URL }}
+          KEYCLOAK_ISSUER: ${{ secrets.KEYCLOAK_ISSUER }}
+        run: |
+          if [ -z "$PROD_BASE_URL" ]; then echo "PROD_BASE_URL secret not set"; exit 1; fi
+          if [ -z "$KEYCLOAK_ISSUER" ]; then echo "KEYCLOAK_ISSUER secret not set"; exit 1; fi
+          flutter build web --release --base-href "/" \
+            --dart-define=BASE_URL=$PROD_BASE_URL \
+            --dart-define=KEYCLOAK_ISSUER=$KEYCLOAK_ISSUER
       - name: Deploy preview channel (PR)
         if: ${{ github.event_name == 'pull_request' }}
         uses: FirebaseExtended/action-hosting-deploy@v0

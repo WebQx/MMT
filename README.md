@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Multilingual Medical Transcription (MMT) - End-to-End Blueprint
 
 ## Overview
@@ -358,6 +357,20 @@ RABBITMQ_URL=amqp://guest:guest@localhost/
 
 ---
 
+### Optional ML Dependencies
+The backend Docker image can omit heavy ML / NLP dependencies (Whisper local, spaCy, Presidio) by building with:
+```
+docker build -t mmt-backend:slim --build-arg INCLUDE_ML=0 backend/
+```
+Set `INCLUDE_ML=1` (default) to include them.
+
+### Clinical Chart Templates
+Experimental structured chart extraction & prompting endpoints:
+* `GET /chart/templates` list available templates (flag: `ENABLE_CHART_TEMPLATES=1`).
+* `POST /chart/parse` parse raw transcript into structured sections.
+* `GET /chart/prompt/{template}` generate a prompt skeleton for LLM completion.
+
+Disable via env: `ENABLE_CHART_TEMPLATES=0` (default off in prod). See backend README for details.
+
 ## Contact & Support
 For issues, open a GitHub issue or contact the maintainers.
->>>>>>> 8abbe87 (feat(security,auth): JWKS caching, websocket origin allowlist, response PHI masking + tests (JWKS rotation, ws origin))
