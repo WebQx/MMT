@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     internal_jwt_old_secrets: str | None = Field(default=None, env="INTERNAL_JWT_OLD_SECRETS")  # comma separated
     environment_name: str = Field(default_factory=lambda: os.environ.get("ENV", "dev"), env="ENVIRONMENT_NAME")
     advanced_phi_masking: bool = Field(default=False, env="ADVANCED_PHI_MASKING")
-    app_version: str = Field(default="0.1.0", env="APP_VERSION")
+    app_version: str = Field(default="0.3.0", env="APP_VERSION")
     # Data retention / compliance
     retention_days: int = Field(default=0, env="RETENTION_DAYS")  # 0 => disabled
     store_phi: bool = Field(default=True, env="STORE_PHI")  # if False, mask before persistence
