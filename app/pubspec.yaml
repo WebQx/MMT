@@ -1,7 +1,7 @@
   speech_to_text: ^6.6.0
   permission_handler: ^11.0.1
 name: mmt
-version: 0.1.0
+version: 0.3.0
 description: Multilingual Medical Transcription Flutter App
 environment:
   sdk: ">=3.0.0 <4.0.0"
