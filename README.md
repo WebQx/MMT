@@ -1,7 +1,27 @@
 # Multilingual Medical Transcription (MMT) - End-to-End Blueprint
 
+Current Version: **v0.3.0**
+
 ## Overview
-MMT is a secure, multilingual, healthcare-grade transcription platform supporting real-time, ambient, and offline transcription. It integrates with OpenAI Whisper (cloud), local Whisper, OpenEMR, and supports OAuth2 (Keycloak) and guest login. The app is deployable as a Flutter web app (e.g., GitHub Pages) and as a mobile/desktop app.
+MMT is a secure, multilingual, healthcare-grade transcription platform supporting real-time, ambient, and offline transcription. It integrates with OpenAI Whisper (cloud), local Whisper, OpenEMR, and supports OAuth2 (Keycloak) and guest login. The app is deployable as a Flutter web app (e.g., Firebase Hosting / GitHub Pages) and as a mobile/desktop app.
+
+---
+
+## What's New (v0.3.0)
+Focused release adding clinical usability + transcription flexibility:
+
+* Cloud transcription enhancements: support for `prompt`, `language`, `temperature`, and inline base64 audio (`audio_b64`) in JSON mode.
+* Temperature clamping & optional language omission when set to `auto` (tests included).
+* Experimental clinical chart templates & parsing endpoints (feature flag) for structured SOAP-style extraction.
+* Build slimming: optional heavy ML dependency exclusion via Docker build arg `INCLUDE_ML=0`.
+* Unified version bump across backend, Helm chart, and Flutter app.
+* Security / infra from earlier releases: JWKS rotation metrics, circuit breaker + fallback persistence, field encryption, rate limit headers, PHI masking (persist + response), Vault RSA key retrieval.
+
+Upgrade Notes:
+* Rebuild backend image with tag `0.3.0` (and optionally `--build-arg INCLUDE_ML=0`).
+* If using chart templates, set `ENABLE_CHART_TEMPLATES=1` in environment.
+* No breaking API changes for existing multipart `/transcribe/cloud/` usage.
+* New JSON mode body fields are optional; omit to keep prior behavior.
 
 ---
 
@@ -45,14 +65,16 @@ Comprehensive, healthcare-grade transcription platform supporting real-time, amb
 
 ---
 
-### Key Recently Added Features
+### Key Features Snapshot
 * JWKS-based external JWT verification with background refresh + metrics (`jwks_refresh_total`, `jwks_keys_active`).
 * WebSocket origin allowlist & rejection metrics.
-* Response PHI masking (`MASK_PHI_IN_RESPONSES`) in addition to persistence masking (`STORE_PHI=false`).
+* Response PHI masking (`MASK_PHI_IN_RESPONSES`) + persistence PHI masking (`STORE_PHI=false`).
 * Circuit breaker & fallback local persistence when queue unavailable.
 * Async task executor with bounded queue & metrics.
 * Field-level encryption (AES-GCM) with rotation & metrics.
 * Vault AppRole RSA key retrieval + renewal for internal JWT signing (optional RSA mode).
+* Cloud transcription JSON mode with customizable prompt, language, temperature.
+* Clinical chart template listing, prompt generation, and transcript parsing (flagged).
 
 ---
 
@@ -98,7 +120,7 @@ See `deploy/helm/mmt`:
 helm dependency update deploy/helm/mmt
 helm upgrade --install mmt deploy/helm/mmt \
 	--set image.repository=yourrepo/mmt-backend \
-	--set image.tag=1.0.0 \
+	--set image.tag=0.3.0 \
 	--set env.INTERNAL_JWT_SECRET=<strong-secret> \
 	--set env.KEYCLOAK_ISSUER=... --set env.KEYCLOAK_JWKS_URL=...
 ```
@@ -333,14 +355,30 @@ RABBITMQ_URL=amqp://guest:guest@localhost/
 
 ---
 
-## API Endpoints (Backend)
+### API Endpoints (Backend)
 
-- `/login/oauth2` - Exchange Keycloak token
-- `/login/guest` - Get guest token
-- `/transcribe/` - Local Whisper (transcribe later)
-- `/transcribe/cloud/` - OpenAI Whisper API (real-time/ambient)
-- `/upload_chunk/` - Chunked upload
-- `/network_advice/` - Bandwidth check
+- `/login/oauth2` – Exchange Keycloak token
+- `/login/guest` – Guest token (if allowed)
+- `/transcribe/` – Unified local/cloud (multipart). `use_cloud=true` to force cloud.
+- `/transcribe/cloud/` – Direct cloud endpoint. Supports:
+	* Multipart form (file upload) – legacy behavior.
+	* JSON mode:
+		```json
+		{
+			"audio_b64": "<optional base64 wav/mp3/ogg>",
+			"prompt": "<custom domain prompt>",
+			"language": "en" ,          // or "auto"
+			"temperature": 0.2           // clamped (0.0–1.0)
+		}
+		```
+		Provide either `audio_b64` or multipart `file`.
+- `/chart/templates` – (flag) list chart template metadata.
+- `/chart/prompt/{template}` – (flag) generate structured prompt.
+- `/chart/parse` – (flag) extract structured fields from transcript.
+- `/upload_chunk/` – Chunked upload for large files.
+- `/network_advice/` – Simple bandwidth / advice endpoint.
+- `/metrics` – Prometheus metrics.
+- `/health` – Liveness / readiness.
 
 ---
 
@@ -357,20 +395,33 @@ RABBITMQ_URL=amqp://guest:guest@localhost/
 
 ---
 
-### Optional ML Dependencies
-The backend Docker image can omit heavy ML / NLP dependencies (Whisper local, spaCy, Presidio) by building with:
+### Optional ML Dependencies / Slim Build
+Exclude heavy local ML & NLP dependencies (Whisper local, spaCy, etc.):
 ```
-docker build -t mmt-backend:slim --build-arg INCLUDE_ML=0 backend/
+docker build -t mmt-backend:0.3.0-slim --build-arg INCLUDE_ML=0 backend/
 ```
-Set `INCLUDE_ML=1` (default) to include them.
+Default (`INCLUDE_ML=1`) keeps full local transcription capability. Cloud-only deployments can safely disable.
 
-### Clinical Chart Templates
-Experimental structured chart extraction & prompting endpoints:
-* `GET /chart/templates` list available templates (flag: `ENABLE_CHART_TEMPLATES=1`).
-* `POST /chart/parse` parse raw transcript into structured sections.
-* `GET /chart/prompt/{template}` generate a prompt skeleton for LLM completion.
+### Clinical Chart Templates (Experimental)
+Enable via env: `ENABLE_CHART_TEMPLATES=1`.
+Endpoints:
+* `GET /chart/templates`
+* `GET /chart/prompt/{template}`
+* `POST /chart/parse` (body: `{ "text": "...", "template_key": "general_soap" }`)
+Disable with `ENABLE_CHART_TEMPLATES=0`.
 
-Disable via env: `ENABLE_CHART_TEMPLATES=0` (default off in prod). See backend README for details.
+Use cases:
+* Provide dictation guidance prompts in UI.
+* Pre-structure transcripts for downstream coding / summarization.
+
+Roadmap:
+* Specialty templates (cardiology, pediatrics)
+* ML/LLM-assisted extraction
+* Confidence scoring per field
 
 ## Contact & Support
 For issues, open a GitHub issue or contact the maintainers.
+
+---
+
+© 2025 WebQx – Released under MIT License.
