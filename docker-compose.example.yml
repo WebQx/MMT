@@ -7,7 +7,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: openemr
-      MYSQL_P    MYSQL_DATABASE: openemr
+      MYSQL_PASSWORD: openemr
+      MYSQL_DATABASE: openemr
     ports:
       - "3306:3306"
     volumes:

@@ -1,130 +1,107 @@
-"""Token bucket rate limiting middleware with optional Redis backend.
+"""Rate limiting middleware with optional Redis backend.
 
-Falls back to in-memory bucket (single-process only) if REDIS not configured.
+Adds response headers:
+ - X-RateLimit-Limit
+ - X-RateLimit-Remaining
+ - X-RateLimit-Reset (epoch seconds bucket reset)
 """
 from __future__ import annotations
 
 import time
-from collections import defaultdict
-from typing import Dict, Optional
-import os
-from fastapi import Request, HTTPException, Response
+import hashlib
+from typing import Optional
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response, JSONResponse
+import threading
 
-try:  # pragma: no cover - optional dependency
-    import redis  # type: ignore
-except ImportError:  # pragma: no cover
-    redis = None  # type: ignore
+try:
+	import redis  # type: ignore
+except Exception:  # pragma: no cover
+	redis = None  # type: ignore
+
+
+class _InMemoryBucket:
+	def __init__(self, capacity: int, window_seconds: int = 60):
+		self.capacity = capacity
+		self.window = window_seconds
+		self.tokens = capacity
+		self.reset_at = int(time.time()) + window_seconds
+		self.lock = threading.Lock()
+
+	def take(self) -> tuple[bool, int, int]:
+		now = int(time.time())
+		with self.lock:
+			if now >= self.reset_at:
+				self.tokens = self.capacity
+				self.reset_at = now + self.window
+			allowed = self.tokens > 0
+			if allowed:
+				self.tokens -= 1
+			return allowed, self.tokens, self.reset_at
+
+
+_buckets: dict[str, _InMemoryBucket] = {}
+_global_lock = threading.Lock()
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """Optional Redis-backed rate limiter.
+	def __init__(self, app, limit_per_minute: int = 60, redis_url: Optional[str] = None):  # type: ignore[override]
+		super().__init__(app)
+		self.limit = limit_per_minute
+		self.redis_url = redis_url
+		self._r = None
+		if redis_url and redis:
+			try:
+				self._r = redis.from_url(redis_url)
+			except Exception:
+				self._r = None
 
-    Redis implementation uses Lua script for atomic refill + decrement.
-    """
+	async def dispatch(self, request: Request, call_next):  # type: ignore[override]
+		if self.limit <= 0:
+			return await call_next(request)
+		key = self._key_for(request)
+		allowed, remaining, reset_at = self._consume(key)
+		if not allowed:
+			return JSONResponse(status_code=429, content={"error": {"code": 429, "message": "Rate limit exceeded"}, "correlation_id": getattr(request.state,'correlation_id',None)})
+		response: Response = await call_next(request)
+		response.headers['X-RateLimit-Limit'] = str(self.limit)
+		response.headers['X-RateLimit-Remaining'] = str(remaining)
+		response.headers['X-RateLimit-Reset'] = str(reset_at)
+		return response
 
-    LUA_SCRIPT = """
-    local key = KEYS[1]
-    local now = tonumber(ARGV[1])
-    local capacity = tonumber(ARGV[2])
-    local refill_rate = tonumber(ARGV[3])
-    local ttl = tonumber(ARGV[4])
-    local bucket = redis.call('HMGET', key, 'tokens', 'ts')
-    local tokens = tonumber(bucket[1])
-    local ts = tonumber(bucket[2])
-    if tokens == nil then
-        tokens = capacity
-        ts = now
-    end
-    if now > ts then
-        local delta = now - ts
-        tokens = math.min(capacity, tokens + delta * refill_rate)
-        ts = now
-    end
-    if tokens < 1 then
-        redis.call('HMSET', key, 'tokens', tokens, 'ts', ts)
-        redis.call('EXPIRE', key, ttl)
-        return 0
-    else
-        tokens = tokens - 1
-        redis.call('HMSET', key, 'tokens', tokens, 'ts', ts)
-        redis.call('EXPIRE', key, ttl)
-        return 1
-    end
-    """
+	def _key_for(self, request: Request) -> str:
+		ident = request.client.host if request.client else 'anon'
+		raw = f"{ident}:{int(time.time()//60)}"
+		return hashlib.sha256(raw.encode()).hexdigest()
 
-    def __init__(self, app, limit_per_minute: int = 120, redis_url: str | None = None):  # type: ignore[override]
-        super().__init__(app)
-        self.capacity = max(1, limit_per_minute)
-        self.refill_rate = self.capacity / 60.0
-        self.tokens: Dict[str, float] = defaultdict(lambda: float(self.capacity))
-        self.timestamp: Dict[str, float] = defaultdict(lambda: time.time())
-        self._redis = None
-        self._script_sha: Optional[str] = None
-        if redis and redis_url:
-            try:  # pragma: no cover
-                self._redis = redis.Redis.from_url(redis_url, decode_responses=False)
-                self._script_sha = self._redis.script_load(self.LUA_SCRIPT)
-            except Exception:  # noqa: BLE001
-                self._redis = None
-
-    def _redis_allow(self, key: str) -> bool:
-        if not self._redis or not self._script_sha:
-            return False
-        now = int(time.time())
-        try:  # pragma: no cover
-            allowed = self._redis.evalsha(
-                self._script_sha,
-                1,
-                f"ratelimit:{key}",
-                now,
-                self.capacity,
-                self.refill_rate,
-                120,
-            )
-            return allowed == 1
-        except Exception:  # noqa: BLE001
-            return False
-
-    async def dispatch(self, request: Request, call_next):  # type: ignore[override]
-        key = request.client.host if request.client else "global"
-        limit = self.capacity
-        remaining = None
-        reset = int(time.time()) + 60
-        if self._redis:
-            allowed = self._redis_allow(key)
-            if not allowed:
-                headers = {
-                    "X-RateLimit-Limit": str(limit),
-                    "X-RateLimit-Remaining": "0",
-                    "X-RateLimit-Reset": str(reset),
-                }
-                raise HTTPException(status_code=429, detail="Rate limit exceeded", headers=headers)
-            # Can't cheaply compute remaining without extra roundtrip; omit or set -1 sentinel
-            response = await call_next(request)
-            response.headers.setdefault("X-RateLimit-Limit", str(limit))
-            response.headers.setdefault("X-RateLimit-Remaining", "-1")
-            response.headers.setdefault("X-RateLimit-Reset", str(reset))
-            return response
-        # Fallback in-memory
-        now = time.time()
-        last = self.timestamp[key]
-        delta = now - last
-        if delta > 0:
-            new_tokens = self.tokens[key] + delta * self.refill_rate
-            self.tokens[key] = min(self.capacity, new_tokens)
-            self.timestamp[key] = now
-        if self.tokens[key] < 1:
-            headers = {
-                "X-RateLimit-Limit": str(limit),
-                "X-RateLimit-Remaining": "0",
-                "X-RateLimit-Reset": str(reset),
-            }
-            raise HTTPException(status_code=429, detail="Rate limit exceeded", headers=headers)
-        self.tokens[key] -= 1
-        remaining = int(self.tokens[key])
-        response = await call_next(request)
-        response.headers.setdefault("X-RateLimit-Limit", str(limit))
-        response.headers.setdefault("X-RateLimit-Remaining", str(max(0, remaining)))
-        response.headers.setdefault("X-RateLimit-Reset", str(reset))
-        return response
+	def _consume(self, key: str) -> tuple[bool, int, int]:
+		# Redis path simple counter with expiration aligning to window boundary
+		if self._r:
+			try:
+				pipe = self._r.pipeline()
+				pipe.incr(key, 1)
+				pipe.ttl(key)
+				current, ttl = pipe.execute()
+				if ttl == -1:
+					# set expiry to next minute boundary
+					now = int(time.time())
+					reset_at = (now - (now % 60)) + 60
+					self._r.expireat(key, reset_at)
+					ttl = reset_at - now
+				else:
+					now = int(time.time())
+					reset_at = now + ttl if ttl > 0 else now + 60
+				remaining = max(0, self.limit - int(current))
+				return (current <= self.limit, remaining, reset_at)
+			except Exception:
+				pass  # fall back to memory
+		# In-memory path
+		bucket_key = key
+		with _global_lock:
+			bucket = _buckets.get(bucket_key)
+			if not bucket:
+				bucket = _InMemoryBucket(self.limit)
+				_buckets[bucket_key] = bucket
+		allowed, remaining, reset_at = bucket.take()
+		return allowed, remaining, reset_at

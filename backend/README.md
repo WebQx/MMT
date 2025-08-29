@@ -17,6 +17,7 @@ Features implemented:
  - Prometheus metrics endpoint `/metrics` & optional partial streaming (`ENABLE_PARTIAL_STREAMING=1`)
  - Persistent transcript storage (MySQL via TRANSCRIPTS_DB_* env or fallback SQLite)
  - Rate limiting middleware & basic source tagging
+- Rate limit response headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`)
  - DLQ publishing for failed consumer messages (`openemr_transcriptions_dlq`)
 - DLQ reprocessor service (`dlq_reprocessor.py`) with exponential backoff and Prometheus metrics
  - Multi-stage Dockerfile with pre-fetched Whisper model & non-root user
@@ -39,6 +40,69 @@ Features implemented:
 - Async transcription task offload with bounded worker pool & queue (metrics: async_tasks_started_total, async_tasks_completed_total, async_tasks_failed_total, async_task_duration_seconds, async_task_queue_size, async_tasks_purged_total)
 - Circuit breaker on publish with metrics breaker_open_total, breaker_fallback_persist_total
 - Drain mode metric drain_start_total and 503 rejection of new transcription requests while draining
+ - Optional clinical chart templates & structured parsing endpoints (enable with `ENABLE_CHART_TEMPLATES=1`)
+
+### Clinical Chart Templates & Structured Notes
+
+Feature flag: `ENABLE_CHART_TEMPLATES=1`
+
+Endpoints:
+
+1. `GET /chart/templates` — list available templates (initial: `general_soap`).
+2. `GET /chart/prompt/{template_key}` — returns an instructional prompt guiding high‑quality structured capture (useful for front-end UI hints or AI augmentation).
+3. `POST /chart/parse` — naive rule-based extraction of fields from a raw transcript body.
+
+Template structure (example `general_soap`):
+
+```
+{
+    "key": "general_soap",
+    "sections": [
+        {"key":"subjective","fields":[{"key":"chief_complaint"}, {"key":"hpi"}, {"key":"ros"}]},
+        {"key":"objective","fields":[{"key":"vitals"}, {"key":"exam"}]},
+        {"key":"assessment","fields":[{"key":"impression"}]},
+        {"key":"plan","fields":[{"key":"tests"},{"key":"treatment"},{"key":"follow_up"}]}
+    ]
+}
+```
+
+Example prompt retrieval:
+```
+curl -s http://localhost:9000/chart/prompt/general_soap | jq -r .prompt
+```
+
+Example parse (guest token in dev):
+```
+TOKEN=$GUEST_SECRET
+curl -s -H "Authorization: Bearer $TOKEN" \
+    -H 'Content-Type: application/json' \
+    -d '{"text":"Chief Complaint: cough 3 days\nHPI: Dry cough worse at night","template_key":"general_soap"}' \
+    http://localhost:9000/chart/parse | jq
+```
+
+Output (simplified):
+```
+{
+    "template": "general_soap",
+    "fields": {
+        "chief_complaint": "cough 3 days",
+        "hpi": "Dry cough worse at night",
+        "ros": null,
+        "vitals": null,
+        "exam": null,
+        "impression": null,
+        "tests": null,
+        "treatment": null,
+        "follow_up": null
+    }
+}
+```
+
+Notes / roadmap:
+- Current parser is heuristic (header: value lines). Upgrade path: embedding similarity, NER, or LLM extraction.
+- Add additional specialty templates (e.g., urgent care, cardiology) by registering in `chart_templates.py`.
+- Frontend can pre-load prompt to guide dictation UI or provide inline hints.
+
 ### Helm Deployment
 Helm chart located at `deploy/helm/mmt`.
 
