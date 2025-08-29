@@ -72,6 +72,7 @@ from postprocess import normalize_text
 import threading
 import requests as _requests
 from threading import RLock
+from chart_templates import list_templates, parse_transcript, build_prompt
 
 # JWKS caching (external Keycloak)
 _jwks_lock = RLock()
@@ -1054,6 +1055,42 @@ def network_advice(bandwidth_kbps: float = 0):
     if bandwidth_kbps > 500:
         return {"mode": "real_time"}
     return {"mode": "chunked"}
+
+
+# ---------------------- Chart Template Endpoints ---------------------- #
+
+@app.get("/chart/templates")
+def chart_templates():
+    if not settings.enable_chart_templates:
+        raise HTTPException(status_code=404, detail="Chart templates disabled")
+    return {"templates": list_templates()}
+
+
+@app.post("/chart/parse")
+async def chart_parse(body: dict, current_user: dict = Depends(get_current_user)):
+    if not settings.enable_chart_templates:
+        raise HTTPException(status_code=404, detail="Chart templates disabled")
+    _require_scope(current_user, 'user/DocumentReference.read')
+    text = body.get('text')
+    template_key = body.get('template_key', 'general_soap')
+    if not text:
+        raise HTTPException(status_code=400, detail="Missing text")
+    try:
+        parsed = parse_transcript(text, template_key)
+    except ValueError as e:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"template": template_key, "fields": parsed}
+
+
+@app.get("/chart/prompt/{template_key}")
+def chart_prompt(template_key: str = 'general_soap'):
+    if not settings.enable_chart_templates:
+        raise HTTPException(status_code=404, detail="Chart templates disabled")
+    try:
+        prompt = build_prompt(template_key)
+    except ValueError as e:  # noqa: BLE001
+        raise HTTPException(status_code=404, detail=str(e))
+    return {"template": template_key, "prompt": prompt}
 
 
 # ---------------------- WebSocket Streaming (prototype) ---------------------- #

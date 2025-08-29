@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     enable_cloud_transcription: bool = Field(default=True, env="ENABLE_CLOUD_TRANSCRIPTION")
     enable_local_transcription: bool = Field(default=True, env="ENABLE_LOCAL_TRANSCRIPTION")
     enable_partial_streaming: bool = Field(default=False, env="ENABLE_PARTIAL_STREAMING")
+    # Chart templates / structured note prompts
+    enable_chart_templates: bool = Field(default=False, env="ENABLE_CHART_TEMPLATES")
 
     # OpenEMR FHIR integration (optional)
     openemr_fhir_base_url: str | None = Field(default=None, env="OPENEMR_FHIR_BASE_URL")
