@@ -286,7 +286,7 @@ async def lifespan(app: FastAPI):  # type: ignore
     _shutdown_flag = True
     _tx_executor.shutdown(wait=True, cancel_futures=False)
 
-app = FastAPI(title="MMT Transcription API", version="0.1.0", docs_url="/docs" if docs_enabled else None, redoc_url=None if not docs_enabled else "/redoc", lifespan=lifespan)
+app = FastAPI(title="MMT Transcription API", version="0.3.0", docs_url="/docs" if docs_enabled else None, redoc_url=None if not docs_enabled else "/redoc", lifespan=lifespan)
 
 @app.exception_handler(HTTPException)
 async def _http_exc_handler(request: Request, exc: HTTPException):  # type: ignore[override]
