@@ -7,7 +7,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: openemr
-      MYSQL_P    MYSQL_DATABASE: openemr
+      MYSQL_PASSWORD: openemr
+      MYSQL_DATABASE: openemr
     ports:
       - "3306:3306"
     volumes:
@@ -68,6 +69,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        INCLUDE_ML: 0
     image: mmt-backend:local
     restart: unless-stopped
     environment:
@@ -75,6 +78,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       RATE_LIMIT_PER_MINUTE: 120
       STORE_PHI: "true"
+      ENABLE_LOCAL_TRANSCRIPTION: 0
     depends_on:
       - rabbitmq
       - redis
