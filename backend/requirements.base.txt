@@ -12,7 +12,7 @@ structlog==25.4.0
 prometheus-client==0.22.1
 SQLAlchemy==2.0.43
 pymysql==1.1.1
-alembic==1.13.2
+alembic==1.16.5
 python-jose==3.5.0
 redis==6.4.0
 cryptography==45.0.6
