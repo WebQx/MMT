@@ -4,7 +4,10 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
+  flutter_secure_storage_windows
+  permission_handler_windows
   printing
+  sentry_flutter
   url_launcher_windows
 )
 

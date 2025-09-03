@@ -450,6 +450,11 @@ def save_session(session_id: str, scope: str, access_token: str, refresh_token: 
 
 
 def get_session(session_id: str) -> dict | None:
+    from security_fixes import validate_session_id
+    try:
+        validate_session_id(session_id)
+    except ValueError:
+        return None
     try:
         with SessionLocal() as session:
             row = session.execute(sessions.select().where(sessions.c.session_id == session_id)).mappings().first()
