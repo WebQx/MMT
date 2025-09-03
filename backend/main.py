@@ -767,7 +767,8 @@ async def transcribe_cloud_endpoint(
     current_user: dict = Depends(get_current_user)
 ):
     _require_scope(current_user, 'user/DocumentReference.write')
-    logger.info("cloud_transcribe_request", has_file=bool(file), user=current_user.get("role"))
+    from security_fixes import sanitize_log_input
+    logger.info("cloud_transcribe_request", has_file=bool(file), user=sanitize_log_input(current_user.get("role")))
     if not settings.enable_cloud_transcription:
         raise HTTPException(status_code=403, detail="Cloud transcription disabled")
     # File upload path
@@ -780,7 +781,7 @@ async def transcribe_cloud_endpoint(
             raise HTTPException(status_code=500, detail=f"Cloud transcription failed: {e}")
         text = normalize_text(text)
         _publish_transcription(file.filename, text, getattr(request.state, 'correlation_id', None) if request else None)
-        logger.info("cloud_transcribe_success", filename=file.filename, chars=len(text))
+        logger.info("cloud_transcribe_success", filename=sanitize_log_input(file.filename), chars=len(text))
         if settings.mask_phi_in_responses:
             return {"text": mask_phi_for_response(text)}
         return {"text": text}
@@ -823,7 +824,7 @@ async def transcribe_cloud_endpoint(
                 raise HTTPException(status_code=500, detail=f"Cloud transcription failed: {e}")
             text = normalize_text(text)
             _publish_transcription("inline", text, getattr(request.state, 'correlation_id', None))
-            logger.info("cloud_transcribe_success_inline", chars=len(text), language=language, temperature=temperature)
+            logger.info("cloud_transcribe_success_inline", chars=len(text), language=sanitize_log_input(language), temperature=temperature)
             if settings.mask_phi_in_responses:
                 return {"text": mask_phi_for_response(text)}
             return {"text": text}
@@ -861,7 +862,9 @@ async def upload_chunk(
     raw = await chunk.read()
     if len(raw) > settings.max_upload_bytes:
         raise HTTPException(status_code=413, detail="Chunk too large")
-    temp_path = os.path.join(UPLOAD_DIR, f"{upload_id}_{filename}")
+    from security_fixes import validate_filename
+    safe_filename = validate_filename(filename)
+    temp_path = os.path.join(UPLOAD_DIR, f"{upload_id}_{safe_filename}")
     mode = 'ab' if chunk_index > 0 else 'wb'
     current_size = os.path.getsize(temp_path) if os.path.exists(temp_path) else 0
     if current_size + len(raw) > settings.max_upload_bytes:
@@ -892,7 +895,7 @@ async def transcribe_local_endpoint(
     if _draining:
         raise HTTPException(status_code=503, detail="Service draining - new requests rejected")
     _require_scope(current_user, 'user/DocumentReference.write')
-    logger.info("local_transcribe_request", filename=file.filename, user=current_user.get("role"))
+    logger.info("local_transcribe_request", filename=sanitize_log_input(file.filename), user=sanitize_log_input(current_user.get("role")))
     if not settings.enable_local_transcription:
         raise HTTPException(status_code=403, detail="Local transcription disabled")
     mime_type = _get_mime(file)
@@ -933,7 +936,7 @@ async def transcribe_local_endpoint(
         raise HTTPException(status_code=500, detail=f"Local transcription failed: {e}")
     text = normalize_text(text)
     _publish_transcription(file.filename, text, getattr(request.state, 'correlation_id', None) if request else None)
-    logger.info("local_transcribe_success", filename=file.filename, chars=len(text))
+    logger.info("local_transcribe_success", filename=sanitize_log_input(file.filename), chars=len(text))
     if settings.mask_phi_in_responses:
         return {"text": mask_phi_for_response(text)}
     return {"text": text}
