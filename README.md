@@ -1,6 +1,25 @@
 # Multilingual Medical Transcription (MMT) - End-to-End Blueprint
 
 Current Version: **v0.3.0**
+## UI & Navigation Flow (Flutter)
+
+### Pages & Features
+- **Login Page:** Modern, centered card layout with logo, email/password fields, sign in, sign up, and guest login options.
+- **Passkey Intro Page:** After sign-up, users see a passkey benefits page with clear messaging and a continue button.
+- **Onboarding Page:** Account setup with user details (name, organization, role) and stepper/progress indicator.
+- **Note Preferences Page:** HPI format selector (Bulleted/Prose) with preview and user name in AppBar.
+- **Demo Page:** Microphone selection, welcome message, and button to start demo session.
+- **Encounter Page:** Modular layout with left (patient/metadata), middle (SOAP tabs, audio controls), and right (transcript, ICD-10 coding) panels.
+- **Upgrade Page:** 1-month free trial, tiered pricing (country-based), and free MUP access. Integrated with FastAPI tier assignment API.
+
+### Navigation
+Pages are connected using Flutter's Navigator. Data (e.g., user name, email, tier) is passed between pages as needed. The upgrade page calls the backend to auto-assign tiers using IP geolocation and Keycloak ID.
+
+### Integration Points
+- **Backend API:** FastAPI `/assign-tier` endpoint for tier assignment, called from the Upgrade Page.
+- **Frontend:** All UI pages use modern Flutter widgets and theming for a consistent experience.
+
+---
 
 ## Overview
 MMT is a secure, multilingual, healthcare-grade transcription platform supporting real-time, ambient, and offline transcription. It integrates with OpenAI Whisper (cloud), local Whisper, OpenEMR, and supports OAuth2 (Keycloak) and guest login. The app is deployable as a Flutter web app (e.g., Firebase Hosting / GitHub Pages) and as a mobile/desktop app.
@@ -30,6 +49,10 @@ Upgrade Notes:
 **Frontend:** Flutter (Web, Mobile, Desktop)
 - Multilingual UI (Flutter intl)
 - OAuth2 (Keycloak) & Guest login
+- Passkey onboarding flow
+- Account setup and note preferences
+- Demo and encounter documentation interfaces
+- Upgrade page with tier assignment
 - Audio recording, file picker, ambient mode
 - Print/email/share results
 
