@@ -96,16 +96,17 @@ def _refresh_jwks(initial: bool = False):
             _jwks_keys.extend(keys)
             jwks_keys_active.set(len(_jwks_keys))
         jwks_refresh_total.labels(status="success").inc()
-    except Exception:  # noqa: BLE001
+    except (_requests.RequestException, ValueError, KeyError) as e:
         jwks_refresh_total.labels(status="fail").inc()
+        structlog.get_logger(__name__).warning("jwks_refresh_failed", error=str(e))
 
 
 def _jwks_background_loop():  # pragma: no cover
     while True:
         try:
             _refresh_jwks()
-        except Exception:
-            pass
+        except (_requests.RequestException, ValueError) as e:
+            structlog.get_logger(__name__).warning("jwks_background_refresh_failed", error=str(e))
         time.sleep(max(30, settings.keycloak_jwks_refresh_seconds))
 
 __all__ = ["app", "issue_internal_jwt"]
@@ -116,8 +117,10 @@ if settings.sentry_dsn:  # Sentry telemetry (optional)
     try:
         import sentry_sdk  # type: ignore
         sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment_name, release=settings.app_version, traces_sample_rate=settings.sentry_traces_sample_rate)
-    except Exception:  # noqa: BLE001
-        structlog.get_logger(__name__).warning("sentry/init_failed")
+    except ImportError:
+        structlog.get_logger(__name__).warning("sentry/not_available")
+    except Exception as e:
+        structlog.get_logger(__name__).warning("sentry/init_failed", error=str(e))
 
 def _load_rsa_keys_from_vault(initial: bool = False):
     if not settings.vault_addr or not settings.vault_rsa_secret_path:

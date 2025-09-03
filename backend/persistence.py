@@ -370,6 +370,13 @@ def store_transcript(
     source: str,
     fhir_document_id: str | None = None,
 ) -> int:
+    # Input validation
+    if not filename or not filename.strip():
+        raise ValueError("Filename cannot be empty")
+    if not text or not text.strip():
+        raise ValueError("Text cannot be empty")
+    if not source or not source.strip():
+        raise ValueError("Source cannot be empty")
     settings = get_settings()
     try:
         with SessionLocal() as session:

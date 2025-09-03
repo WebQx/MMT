@@ -49,8 +49,8 @@ def audit(event: str, **fields: Any) -> None:
     path = _settings.audit_log_file
     try:
         audit_events_total.labels(event=event).inc()
-    except Exception:  # pragma: no cover
-        pass
+    except (ImportError, AttributeError) as e:
+        _logger.warning("audit_metric_failed", error=str(e))
     rec_line = _line(event, **fields)
     if not path:
         # Fallback to structured logger if no file configured; rename to avoid structlog 'event' clash
@@ -59,8 +59,8 @@ def audit(event: str, **fields: Any) -> None:
     try:
         with open(path, "a", encoding="utf-8") as f:
             f.write(rec_line + "\n")
-    except Exception:  # noqa: BLE001
-        _logger.warning("audit/write-failed", event=event)
+    except (OSError, ValueError) as e:
+        _logger.warning("audit/write-failed", event=event, error=str(e))
         return
 
 

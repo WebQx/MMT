@@ -94,8 +94,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 					reset_at = now + ttl if ttl > 0 else now + 60
 				remaining = max(0, self.limit - int(current))
 				return (current <= self.limit, remaining, reset_at)
-			except Exception:
-				pass  # fall back to memory
+			except (redis.RedisError, ConnectionError, ValueError) as e:
+				import structlog
+				structlog.get_logger(__name__).warning("redis_rate_limit_failed", error=str(e))
 		# In-memory path
 		bucket_key = key
 		with _global_lock:

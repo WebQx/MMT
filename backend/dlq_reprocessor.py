@@ -62,10 +62,10 @@ def _handle_message(ch, method, properties, body):  # noqa: ANN001
 		span.set_attribute("main_queue", MAIN_QUEUE)
 		try:
 			msg = json.loads(body)
-		except Exception:  # noqa: BLE001
+		except (json.JSONDecodeError, ValueError) as e:
 			reprocessor_permanent_failure_total.inc()
 			ch.basic_ack(delivery_tag=method.delivery_tag)
-			logger.warning("drop_malformed", size=len(body))
+			logger.warning("drop_malformed", size=len(body), error=str(e))
 			return
 		attempts = int(msg.get("_dlq_attempts", 0)) + 1
 		span.set_attribute("attempt", attempts)
