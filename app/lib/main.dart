@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:printing/printing.dart';
+import 'passkey_intro_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -354,29 +355,115 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'MMT',
       home: Scaffold(
-        appBar: AppBar(title: const Text('MMT Transcription')),
+        backgroundColor: const Color(0xFFF5F6FA),
         body: Center(
           child: !_isLoggedIn
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Sign in to continue',
-                        style: TextStyle(fontSize: 18)),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _loginWithKeycloak,
-                      child: const Text('Login with Keycloak'),
+              ? SingleChildScrollView(
+                  child: Center(
+                    child: Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Logo or App Name
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 24.0),
+                              child: Column(
+                                children: [
+                                  // Replace with your logo if available
+                                  Icon(Icons.health_and_safety,
+                                      size: 48, color: Colors.blueAccent),
+                                  const SizedBox(height: 8),
+                                  Text('MMT Health',
+                                      style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blueAccent)),
+                                ],
+                              ),
+                            ),
+                            // Email Field
+                            TextField(
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Password Field
+                            TextField(
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blueAccent,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                ),
+                                onPressed: _loginWithKeycloak,
+                                child: const Text('Sign In',
+                                    style: TextStyle(fontSize: 16)),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PasskeyIntroPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text('Sign Up'),
+                                ),
+                                TextButton(
+                                  onPressed:
+                                      () {}, // TODO: Implement forgot password
+                                  child: const Text('Forgot Password?'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _loginAsGuest,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey[300],
+                                foregroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: const Text('Continue as Guest'),
+                            ),
+                            if (_result.isNotEmpty) ...[
+                              const SizedBox(height: 20),
+                              Text(_result,
+                                  style: const TextStyle(color: Colors.red)),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _loginAsGuest,
-                      child: const Text('Continue as Guest'),
-                    ),
-                    if (_result.isNotEmpty) ...[
-                      const SizedBox(height: 20),
-                      Text(_result, style: const TextStyle(color: Colors.red)),
-                    ],
-                  ],
+                  ),
                 )
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
