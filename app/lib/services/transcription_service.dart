@@ -133,4 +133,63 @@ class TranscriptionService {
       throw Exception('Network error during network advice: $e');
     }
   }
+
+  Future<Map<String, dynamic>> parseChart({
+    required String authToken,
+    required String text,
+    String templateKey = 'general_soap',
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/chart/parse'),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'text': text, 'template_key': templateKey}),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Chart parse failed: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Network error during chart parse: $e');
+    }
+  }
+
+  /// Web-friendly JSON upload using base64 audio for cloud transcription
+  Future<TranscriptionResult> transcribeCloudJson({
+    required Uint8List audioBytes,
+    required String authToken,
+    String language = 'auto',
+    String? prompt,
+  }) async {
+    try {
+      final body = {
+        'audio_b64': base64Encode(audioBytes),
+        'language': language,
+      };
+      if (prompt != null) body['prompt'] = prompt;
+
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/transcribe/cloud/'),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return TranscriptionResult.fromJson(data);
+      } else {
+        throw Exception('Cloud JSON transcription failed: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Network error during cloud JSON transcription: $e');
+    }
+  }
 }
