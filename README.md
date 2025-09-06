@@ -2,6 +2,7 @@
 
 Current Version: **v0.3.0**
 ## UI & Navigation Flow (Flutter)
+\n+## Automated Documentation for Medical Transcriptions\n+\n+🔹 **Automated Documentation Features:**\n+\n+• Capture patient-provider conversations and generate complete clinical notes\n+• Document history, examination, assessment, and plan\n+• Create comprehensive notes by the end of each visit\n+• Support both in-clinic and telehealth visits\n*** End Patch
 
 ### Pages & Features
 - **Login Page:** Modern, centered card layout with logo, email/password fields, sign in, sign up, and guest login options.
