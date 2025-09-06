@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        run: |
+          cd app
+          flutter pub get
+      - name: Analyze
+        run: |
+          cd app
+          flutter analyze --no-fatal-infos
+      - name: Run tests
+        run: |
+          cd app
+          flutter test --no-pub
+      - name: Build web
+        run: |
+          cd app
+          flutter build web --release
