@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 import '../models/transcription_result.dart';
@@ -161,7 +162,7 @@ class TranscriptionService {
 
   /// Web-friendly JSON upload using base64 audio for cloud transcription
   Future<TranscriptionResult> transcribeCloudJson({
-    required Uint8List audioBytes,
+  required Uint8List audioBytes,
     required String authToken,
     String language = 'auto',
     String? prompt,

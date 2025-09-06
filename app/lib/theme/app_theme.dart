@@ -46,13 +46,13 @@ class AppTheme {
         ),
         contentPadding: const EdgeInsets.all(Constants.padding),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(Constants.borderRadius),
         ),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarTheme(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Constants.primaryColor,
         unselectedItemColor: Colors.grey,
@@ -104,13 +104,13 @@ class AppTheme {
         ),
         contentPadding: const EdgeInsets.all(Constants.padding),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(Constants.borderRadius),
         ),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarTheme(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Constants.primaryColor,
         unselectedItemColor: Colors.grey,

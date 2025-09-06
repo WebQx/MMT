@@ -6,7 +6,7 @@ import 'package:path/path.dart' as path;
 import '../utils/constants.dart';
 
 class AudioService {
-  final AudioRecorder _recorder = AudioRecorder();
+  final Record _recorder = Record();
   final AudioPlayer _player = AudioPlayer();
   
   bool _isRecording = false;
@@ -34,16 +34,15 @@ class AudioService {
     try {
       // Generate output path if not provided
       outputPath ??= await _generateRecordingPath();
-      
+
+      // Start recording using Record package
       await _recorder.start(
-        const RecordConfig(
-          encoder: AudioEncoder.wav,
-          bitRate: 128000,
-          sampleRate: 44100,
-        ),
         path: outputPath,
+        encoder: AudioEncoder.wav,
+        bitRate: 128000,
+        samplingRate: 44100,
       );
-      
+
       _isRecording = true;
       _currentRecordingPath = outputPath;
     } catch (e) {
@@ -55,9 +54,9 @@ class AudioService {
     if (!_isRecording) return null;
 
     try {
-      final recordingPath = await _recorder.stop();
+      await _recorder.stop();
       _isRecording = false;
-      return recordingPath;
+      return _currentRecordingPath;
     } catch (e) {
       throw Exception('Failed to stop recording: $e');
     }
@@ -166,7 +165,10 @@ class AudioService {
   }
 
   void dispose() {
-    _recorder.dispose();
+    // Record does not expose dispose; stop if active.
+    if (_isRecording) {
+      _recorder.stop();
+    }
     _player.dispose();
   }
 }
