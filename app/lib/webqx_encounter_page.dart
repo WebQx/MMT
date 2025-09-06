@@ -1,4 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+// ...existing imports...
+
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/services.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+
+import 'services/transcription_service.dart';
+import 'utils/constants.dart';
+import 'models/transcription_result.dart';
 
 class WebQxEncounterPage extends StatelessWidget {
   @override
@@ -35,26 +49,56 @@ class LeftPanel extends StatelessWidget {
           Text('Status: Completed'),
           Text('Sep 13, 2023 • 2:01 PM'),
           SizedBox(height: 16),
-          Row(
-            children: [
-              Text('Visit Type:'),
-              SizedBox(width: 8),
-              DropdownButton<String>(
-                value: 'In-Clinic',
-                items: [
-                  DropdownMenuItem(
-                      value: 'In-Clinic', child: Text('In-Clinic')),
-                  DropdownMenuItem(
-                      value: 'Telehealth', child: Text('Telehealth'))
-                ],
-                onChanged: (v) {},
-              ),
-            ],
-          ),
+          VisitTypeSelector(),
           SizedBox(height: 16),
           ElevatedButton(onPressed: () {}, child: Text('Retry Demo')),
         ],
       ),
+    );
+  }
+}
+
+class VisitTypeSelector extends StatefulWidget {
+  @override
+  _VisitTypeSelectorState createState() => _VisitTypeSelectorState();
+}
+
+class _VisitTypeSelectorState extends State<VisitTypeSelector> {
+  String _visitType = 'In-Clinic';
+  final _videoLinkController = TextEditingController();
+  final _connectionNotesController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('Visit Type:'),
+            SizedBox(width: 8),
+            DropdownButton<String>(
+              value: _visitType,
+              items: [
+                DropdownMenuItem(value: 'In-Clinic', child: Text('In-Clinic')),
+                DropdownMenuItem(
+                    value: 'Telehealth', child: Text('Telehealth')),
+              ],
+              onChanged: (v) => setState(() => _visitType = v ?? 'In-Clinic'),
+            ),
+          ],
+        ),
+        if (_visitType == 'Telehealth') ...[
+          SizedBox(height: 8),
+          TextField(
+              controller: _videoLinkController,
+              decoration: InputDecoration(labelText: 'Video link (optional)')),
+          SizedBox(height: 8),
+          TextField(
+              controller: _connectionNotesController,
+              decoration: InputDecoration(labelText: 'Connection notes')),
+        ]
+      ],
     );
   }
 }
@@ -70,6 +114,13 @@ class _MiddlePanelState extends State<MiddlePanel> {
   String objective = '';
   String assessment = '';
   String plan = '';
+  // Live speech recognition / transcription
+  late stt.SpeechToText _speech;
+  bool _speechAvailable = false;
+  bool _isListening = false;
+  String _liveTranscript = '';
+  final _transcriptionService = TranscriptionService();
+  final _secureStorage = const FlutterSecureStorage();
 
   Widget getNoteSection(String tab) {
     switch (tab) {
@@ -113,7 +164,138 @@ class _MiddlePanelState extends State<MiddlePanel> {
           ],
         );
       case 'Dictate':
-        return Text('Dictation tools go here.');
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Live Recognition',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            if (kIsWeb)
+              Text(
+                  'Live recognition is not available on Web. Use "Upload audio file" below.')
+            else ...[
+              ElevatedButton.icon(
+                icon: Icon(_isListening ? Icons.stop : Icons.mic),
+                label: Text(_isListening
+                    ? 'Stop Live Recognition'
+                    : 'Start Live Recognition'),
+                onPressed: () async {
+                  if (!_speechAvailable) {
+                    _speechAvailable = await _speech.initialize(
+                        onStatus: (s) {}, onError: (e) {});
+                  }
+                  if (_isListening) {
+                    _speech.stop();
+                    setState(() => _isListening = false);
+                  } else {
+                    _speech.listen(onResult: (r) {
+                      setState(() {
+                        _liveTranscript = r.recognizedWords;
+                      });
+                    });
+                    setState(() => _isListening = true);
+                  }
+                },
+              ),
+              SizedBox(height: 8),
+              Text('Live transcript:'),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                color: Colors.white,
+                child: Text(_liveTranscript.isNotEmpty ? _liveTranscript : '—'),
+              ),
+            ],
+            SizedBox(height: 16),
+            Text('Upload audio file for backend transcription',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            ElevatedButton.icon(
+              icon: Icon(Icons.upload_file),
+              label: Text('Pick audio file'),
+              onPressed: () async {
+                try {
+                  final result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: Constants.supportedAudioFormats);
+                  if (result == null) return;
+                  final authToken =
+                      await _secureStorage.read(key: Constants.authTokenKey);
+                  if (authToken == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Auth token missing. Please login.')));
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Uploading and transcribing...')));
+                  TranscriptionResult tr;
+                  if (kIsWeb) {
+                    final bytes = result.files.single.bytes;
+                    if (bytes == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              Text('Unable to read file bytes in browser.')));
+                      return;
+                    }
+                    tr = await _transcriptionService.transcribeCloudJson(
+                        audioBytes: bytes, authToken: authToken);
+                  } else {
+                    final path = result.files.single.path;
+                    if (path == null) return;
+                    final file = File(path);
+                    tr = await _transcriptionService.transcribeLocal(
+                        audioFile: file, authToken: authToken);
+                  }
+                  setState(() {
+                    // place transcription into live transcript and into subjective by default
+                    _liveTranscript = tr.text;
+                    subjective = subjective.isEmpty ? tr.text : subjective;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Transcription complete')));
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Transcription failed: $e')));
+                }
+              },
+            ),
+            SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: Icon(Icons.auto_fix_high),
+              label: Text('Auto-populate SOAP from Transcript'),
+              onPressed: _liveTranscript.isEmpty
+                  ? null
+                  : () async {
+                      final authToken = await _secureStorage.read(
+                          key: Constants.authTokenKey);
+                      if (authToken == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content:
+                                Text('Auth token missing. Please login.')));
+                        return;
+                      }
+                      try {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Parsing transcript...')));
+                        final Map<String, dynamic> parsed =
+                            await _transcriptionService.parseChart(
+                                authToken: authToken, text: _liveTranscript);
+                        setState(() {
+                          subjective = parsed['subjective'] ?? subjective;
+                          objective = parsed['objective'] ?? objective;
+                          assessment = parsed['assessment'] ?? assessment;
+                          plan = parsed['plan'] ?? plan;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('SOAP fields updated')));
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Parsing failed: $e')));
+                      }
+                    },
+            ),
+          ],
+        );
       case 'Documents':
         return Text('Attached documents will appear here.');
       default:
@@ -165,8 +347,22 @@ class _MiddlePanelState extends State<MiddlePanel> {
                           child: Text('Close'),
                         ),
                         TextButton(
-                          onPressed: () {
-                            // TODO: Implement export/print/share
+                          onPressed: () async {
+                            // Copy to clipboard
+                            await Clipboard.setData(ClipboardData(text: note));
+                            // Create a simple PDF and offer print/share
+                            try {
+                              final doc = pw.Document();
+                              doc.addPage(pw.Page(
+                                  build: (pw.Context c) => pw.Text(note)));
+                              final bytes = await doc.save();
+                              await Printing.layoutPdf(
+                                  onLayout: (_) async => bytes);
+                            } catch (e) {
+                              // If PDF generation fails, still close and notify
+                              ScaffoldMessenger.of(ctx).showSnackBar(
+                                  SnackBar(content: Text('Export failed: $e')));
+                            }
                             Navigator.pop(ctx);
                           },
                           child: Text('Export'),
