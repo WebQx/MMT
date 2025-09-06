@@ -14,19 +14,31 @@ import 'services/transcription_service.dart';
 import 'utils/constants.dart';
 import 'models/transcription_result.dart';
 
-class WebQxEncounterPage extends StatelessWidget {
+class WebQxEncounterPage extends StatefulWidget {
+  @override
+  _WebQxEncounterPageState createState() => _WebQxEncounterPageState();
+}
+
+class _WebQxEncounterPageState extends State<WebQxEncounterPage> {
+  String _transcript = '';
+  String _icd10Codes = 'No codes assigned.';
+
+  void _handleTranscriptUpdate(String t) {
+    setState(() => _transcript = t);
+  }
+
+  void _handleIcdUpdate(String codes) {
+    setState(() => _icd10Codes = codes.isNotEmpty ? codes : 'No codes assigned.');
+  }
+
   @override
   Widget build(BuildContext context) {
-    // For demo, pass empty transcript and codes; will be connected to MiddlePanel state later
     return Scaffold(
       body: Row(
         children: [
           Expanded(flex: 2, child: LeftPanel()),
-          Expanded(flex: 5, child: MiddlePanel()),
-          Expanded(
-              flex: 3,
-              child:
-                  RightPanel(transcript: '', icd10Codes: 'No codes assigned.')),
+          Expanded(flex: 5, child: MiddlePanel(onTranscript: _handleTranscriptUpdate, onIcdCodes: _handleIcdUpdate)),
+          Expanded(flex: 3, child: RightPanel(transcript: _transcript, icd10Codes: _icd10Codes)),
         ],
       ),
     );
@@ -104,6 +116,10 @@ class _VisitTypeSelectorState extends State<VisitTypeSelector> {
 }
 
 class MiddlePanel extends StatefulWidget {
+  final void Function(String)? onTranscript;
+  final void Function(String)? onIcdCodes;
+  MiddlePanel({this.onTranscript, this.onIcdCodes});
+
   @override
   _MiddlePanelState createState() => _MiddlePanelState();
 }
@@ -251,6 +267,8 @@ class _MiddlePanelState extends State<MiddlePanel> {
                     _liveTranscript = tr.text;
                     subjective = subjective.isEmpty ? tr.text : subjective;
                   });
+                  // notify parent
+                  if (widget.onTranscript != null) widget.onTranscript!(_liveTranscript);
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Transcription complete')));
                 } catch (e) {
@@ -286,6 +304,10 @@ class _MiddlePanelState extends State<MiddlePanel> {
                           assessment = parsed['assessment'] ?? assessment;
                           plan = parsed['plan'] ?? plan;
                         });
+                        if (parsed.containsKey('icd10') && widget.onIcdCodes != null) {
+                          final codes = (parsed['icd10'] is List) ? (parsed['icd10'] as List).join(', ') : parsed['icd10'].toString();
+                          widget.onIcdCodes!(codes);
+                        }
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('SOAP fields updated')));
                       } catch (e) {
