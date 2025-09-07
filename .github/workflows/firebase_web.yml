@@ -22,6 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Fail fast if required secrets missing
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           missing=0
           for var in FIREBASE_SERVICE_ACCOUNT FIREBASE_PROJECT_ID PROD_BASE_URL KEYCLOAK_ISSUER; do
