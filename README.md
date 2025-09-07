@@ -121,6 +121,40 @@ Configure `flutter build web --base-href /` if deploying at root hosting site.
 
 ---
 
+## Deploying to GitHub Pages (frontend) + Render (backend)
+
+This repo includes CI workflows to build and publish the Flutter frontend to GitHub Pages and to build/publish the backend Docker image to GitHub Container Registry. Below are concise steps to get a working public deployment.
+
+1. Add required GitHub Secrets (Settings → Secrets → Actions):
+	- `BACKEND_URL` — the public HTTPS URL of your backend (e.g. https://mmt-backend.onrender.com)
+	- `RENDER_API_KEY` — optional, only if you want Actions to trigger Render deploys
+	- `RENDER_SERVICE_ID` — optional, Render service id for the API trigger
+
+2. Enable GitHub Pages
+	- Settings → Pages → Source: `gh-pages` branch (the `deploy_frontend.yml` action will publish here)
+
+3. Configure Render (recommended for backend)
+	- Create a new Web Service on Render.
+	- Option A: Connect your GitHub repo and choose the `backend/` folder; Render will build the Dockerfile.
+	- Option B: Configure the service to pull the image `ghcr.io/<owner>/mmt-backend:latest` (image is published by CI).
+	- Add environment variables required by the backend from `backend/.env.example` in the Render dashboard.
+	- Once the service is live, copy the public URL to the `BACKEND_URL` secret.
+
+4. Push to `main` (or `feat/ci-flutter`) to trigger CI
+	- The backend image will be built and pushed to GHCR.
+	- If configured, Render will be triggered to redeploy using the new image.
+	- The frontend will be built and published to GitHub Pages with `BASE_URL` set to `BACKEND_URL`.
+
+5. Verify
+	- Visit your GitHub Pages URL (shown in Settings → Pages) and test API flows (guest login, /health).
+
+Notes
+	- GitHub Pages is static-only. The backend must be hosted separately (Render, Railway, Fly, Cloud Run, etc.).
+	- Use GitHub Actions secrets for credentials and do not commit secrets to the repo.
+
+
+---
+
 ### Example Environment (Backend `.env` excerpt)
 ```env
 OPENAI_API_KEY=sk-...
