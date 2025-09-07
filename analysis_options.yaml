@@ -1,0 +1,12 @@
+analyzer:
+  exclude:
+    # Exclude the embedded Flutter SDK and its package tests which are not part
+    # of this project's source. The CI should analyze the `app/` package only.
+    - flutter/**
+    - '**/flutter/**'
+    # Exclude IDE / tool scratch directories if present
+    - .dart_tool/**
+    - build/**
+
+# Optional: keep standard lints for the app package (you can customize later)
+include: package:flutter_lints/flutter.yaml
