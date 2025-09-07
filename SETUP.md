@@ -94,6 +94,21 @@ See `backend/.env.example` for all required configuration options:
 - `RABBITMQ_URL`: RabbitMQ connection string
 - `FRONTEND_DOMAIN`: Allowed frontend domain for CORS
 
+### Local / Dev Login
+
+To enable a simple email/password login useful for local development and demos:
+
+- Set `ALLOW_LOCAL_LOGIN=true` in your backend environment (defaults to true in non-prod).
+- Provide `LOCAL_LOGIN_USERS` as a comma-separated list of email:password pairs, for example:
+
+```
+LOCAL_LOGIN_USERS=alice@example.com:alicepass,bob@example.com:bobpass
+```
+
+The backend exposes `POST /login/local` which accepts JSON `{ "email": "...", "password": "..." }` and returns an internal JWT when credentials match.
+
+Use this only for development and demos; do not enable in production.
+
 ### API Endpoints
 
 - `GET /`: Health check

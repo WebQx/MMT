@@ -39,8 +39,16 @@ jobs:
 
       - name: Build Flutter web
         working-directory: app
+        env:
+          PUBLIC_BACKEND_URL: ${{ secrets.PUBLIC_BACKEND_URL }}
         run: |
-          flutter build web --base-href /MMT/
+          if [ -n "$PUBLIC_BACKEND_URL" ]; then
+            echo "Building with PUBLIC_BACKEND_URL=$PUBLIC_BACKEND_URL"
+            flutter build web --base-href /MMT/ --dart-define=BASE_URL=$PUBLIC_BACKEND_URL
+          else
+            echo "Building with default BASE_URL (localhost)"
+            flutter build web --base-href /MMT/
+          fi
 
       - name: Create .nojekyll (prevent GitHub Pages ignoring files)
         run: |
