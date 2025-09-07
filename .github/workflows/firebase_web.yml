@@ -49,11 +49,13 @@ jobs:
         working-directory: app
         run: flutter pub get
       - name: Build web (production defines)
+        if: ${{ github.event_name != 'pull_request' }}
         working-directory: app
         env:
           PROD_BASE_URL: ${{ secrets.PROD_BASE_URL }}
           KEYCLOAK_ISSUER: ${{ secrets.KEYCLOAK_ISSUER }}
         run: |
+          # Only run production build when not triggered by a pull request
           if [ -z "$PROD_BASE_URL" ]; then echo "PROD_BASE_URL secret not set"; exit 1; fi
           if [ -z "$KEYCLOAK_ISSUER" ]; then echo "KEYCLOAK_ISSUER secret not set"; exit 1; fi
           flutter build web --release --base-href "/" \

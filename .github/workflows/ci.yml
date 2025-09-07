@@ -28,6 +28,7 @@ jobs:
           cd app
           flutter test --no-pub
       - name: Build web
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           cd app
           flutter build web --release

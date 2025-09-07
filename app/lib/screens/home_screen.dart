@@ -395,13 +395,14 @@ class _StatusItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  // Avoid deprecated withOpacity by constructing ARGB color
-                  color: Color.fromARGB((0.1 * 255).round(), color.red, color.green, color.blue),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              // Avoid deprecated withOpacity by constructing ARGB color
+              color: Color.fromARGB(
+                  (0.1 * 255).round(), color.red, color.green, color.blue),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Text(
               status,
               style: TextStyle(
