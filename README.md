@@ -124,7 +124,7 @@ Configure `flutter build web --base-href /` if deploying at root hosting site.
 
 ### Example Environment (Backend `.env` excerpt)
 ```env
-OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=sk-REDACTED
 KEYCLOAK_ISSUER=https://keycloak.example/realms/mmt
 KEYCLOAK_JWKS_URL=https://keycloak.example/realms/mmt/protocol/openid-connect/certs
 GUEST_SECRET=changeme-guest
@@ -370,7 +370,7 @@ Prometheus Alerts (Helm): P95 latency, duplicate spike, consumer failure ratio.
 
 ## Example .env
 ```env
-OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=sk-REDACTED
 KEYCLOAK_PUBLIC_KEY=...
 KEYCLOAK_ISSUER=...
 GUEST_SECRET=guestsecret
