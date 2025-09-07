@@ -224,6 +224,7 @@ class _MyAppState extends State<MyApp> {
               await _sendAmbientTranscript(val.recognizedWords);
             }
           },
+          // Use the existing listenMode parameter; the file-level ignore covers deprecation.
           listenMode: stt.ListenMode.dictation,
         );
       }
