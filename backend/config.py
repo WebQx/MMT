@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     keycloak_reader_role: str | None = Field(default="reader", env="KEYCLOAK_READER_ROLE")
     keycloak_admin_role: str | None = Field(default="admin", env="KEYCLOAK_ADMIN_ROLE")
     guest_secret: str = Field(default="guestsecret", env="GUEST_SECRET")
+    # Local/dev email/password login (format: "user@example.com:pass,other:pass")
+    allow_local_login: bool = Field(default_factory=lambda: os.environ.get("ENV", "dev") != "prod", env="ALLOW_LOCAL_LOGIN")
+    local_login_users: str | None = Field(default=None, env="LOCAL_LOGIN_USERS")
 
     # RabbitMQ / Queues
     rabbitmq_url: str = Field(default="amqp://guest:guest@localhost:5672/", env="RABBITMQ_URL")

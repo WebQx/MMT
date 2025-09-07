@@ -610,6 +610,40 @@ async def login_guest():
     return {"access_token": settings.guest_secret, "token_type": "bearer"}
 
 
+@app.post("/login/local")
+def login_local(creds: dict):
+    """Simple email/password dev login.
+
+    Expects JSON: {"email": "user@example.com", "password": "pa55"}
+    Looks up users from settings.local_login_users which is a comma-separated
+    list of email:password pairs. Only enabled when settings.allow_local_login is true.
+    Returns an internal JWT via issue_internal_jwt(session_id, scope).
+    """
+    if not settings.allow_local_login:
+        raise HTTPException(status_code=403, detail="Local login disabled")
+    email = creds.get('email') if isinstance(creds, dict) else None
+    password = creds.get('password') if isinstance(creds, dict) else None
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Missing email or password")
+    users_raw = settings.local_login_users or ''
+    pairs = [p.strip() for p in users_raw.split(',') if p.strip()]
+    match = False
+    for p in pairs:
+        if ':' not in p:
+            continue
+        u, pw = p.split(':', 1)
+        if secrets.compare_digest(u.strip(), email.strip()) and secrets.compare_digest(pw, password):
+            match = True
+            break
+    if not match:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    # For local users grant writer scope for convenience
+    session_id = secrets.token_urlsafe(16)
+    token = issue_internal_jwt(session_id, 'user/DocumentReference.write user/DocumentReference.read')
+    audit(AuditEvent.GUEST_LOGIN)
+    return {"access_token": token, "token_type": "bearer"}
+
+
 @app.get("/auth/fhir/authorize")
 def smart_authorize():
     url = build_authorize_url()
