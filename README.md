@@ -1,4 +1,5 @@
 # Multilingual Medical Transcription (MMT) - End-to-End Blueprint
+![Deploy Flutter web to GitHub Pages](https://github.com/WebQx/MMT/actions/workflows/deploy-gh-pages.yml/badge.svg)
 
 Current Version: **v0.3.0**
 ## UI & Navigation Flow (Flutter)

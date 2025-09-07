@@ -76,6 +76,7 @@ flutter build web --base-href /MMT/
 ```
 
 2. Deploy to GitHub Pages (automated via GitHub Actions)
+	- A GitHub Actions workflow is included at `.github/workflows/deploy-gh-pages.yml` which builds the web app and deploys to the `gh-pages` branch on push to `main`.
 
 #### Full Stack Deployment
 
