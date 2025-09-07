@@ -162,7 +162,7 @@ class TranscriptionService {
 
   /// Web-friendly JSON upload using base64 audio for cloud transcription
   Future<TranscriptionResult> transcribeCloudJson({
-  required Uint8List audioBytes,
+    required Uint8List audioBytes,
     required String authToken,
     String language = 'auto',
     String? prompt,

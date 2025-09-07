@@ -8,11 +8,11 @@ import '../utils/constants.dart';
 class AudioService {
   final Record _recorder = Record();
   final AudioPlayer _player = AudioPlayer();
-  
+
   bool _isRecording = false;
   bool _isPlaying = false;
   String? _currentRecordingPath;
-  
+
   // Getters
   bool get isRecording => _isRecording;
   bool get isPlaying => _isPlaying;
@@ -88,7 +88,7 @@ class AudioService {
     try {
       await _player.play(DeviceFileSource(filePath));
       _isPlaying = true;
-      
+
       // Listen for completion
       _player.onPlayerComplete.listen((_) {
         _isPlaying = false;
@@ -149,7 +149,7 @@ class AudioService {
   Future<String> _generateRecordingPath() async {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final fileName = 'recording_$timestamp.wav';
-    
+
     // For mobile, use app documents directory
     // For web, this will be handled differently
     if (Platform.isAndroid || Platform.isIOS) {

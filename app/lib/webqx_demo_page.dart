@@ -65,7 +65,7 @@ class _DemoModalState extends State<DemoModal> {
             ),
             SizedBox(height: 24),
             DropdownButtonFormField<String>(
-              value: selectedMic,
+              initialValue: selectedMic,
               items: widget.microphoneOptions
                   .map((mic) => DropdownMenuItem(value: mic, child: Text(mic)))
                   .toList(),

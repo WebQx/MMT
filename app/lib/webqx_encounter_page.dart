@@ -28,7 +28,8 @@ class _WebQxEncounterPageState extends State<WebQxEncounterPage> {
   }
 
   void _handleIcdUpdate(String codes) {
-    setState(() => _icd10Codes = codes.isNotEmpty ? codes : 'No codes assigned.');
+    setState(
+        () => _icd10Codes = codes.isNotEmpty ? codes : 'No codes assigned.');
   }
 
   @override
@@ -37,8 +38,15 @@ class _WebQxEncounterPageState extends State<WebQxEncounterPage> {
       body: Row(
         children: [
           Expanded(flex: 2, child: LeftPanel()),
-          Expanded(flex: 5, child: MiddlePanel(onTranscript: _handleTranscriptUpdate, onIcdCodes: _handleIcdUpdate)),
-          Expanded(flex: 3, child: RightPanel(transcript: _transcript, icd10Codes: _icd10Codes)),
+          Expanded(
+              flex: 5,
+              child: MiddlePanel(
+                  onTranscript: _handleTranscriptUpdate,
+                  onIcdCodes: _handleIcdUpdate)),
+          Expanded(
+              flex: 3,
+              child:
+                  RightPanel(transcript: _transcript, icd10Codes: _icd10Codes)),
         ],
       ),
     );
@@ -268,7 +276,8 @@ class _MiddlePanelState extends State<MiddlePanel> {
                     subjective = subjective.isEmpty ? tr.text : subjective;
                   });
                   // notify parent
-                  if (widget.onTranscript != null) widget.onTranscript!(_liveTranscript);
+                  if (widget.onTranscript != null)
+                    widget.onTranscript!(_liveTranscript);
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Transcription complete')));
                 } catch (e) {
@@ -304,8 +313,11 @@ class _MiddlePanelState extends State<MiddlePanel> {
                           assessment = parsed['assessment'] ?? assessment;
                           plan = parsed['plan'] ?? plan;
                         });
-                        if (parsed.containsKey('icd10') && widget.onIcdCodes != null) {
-                          final codes = (parsed['icd10'] is List) ? (parsed['icd10'] as List).join(', ') : parsed['icd10'].toString();
+                        if (parsed.containsKey('icd10') &&
+                            widget.onIcdCodes != null) {
+                          final codes = (parsed['icd10'] is List)
+                              ? (parsed['icd10'] as List).join(', ')
+                              : parsed['icd10'].toString();
                           widget.onIcdCodes!(codes);
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
