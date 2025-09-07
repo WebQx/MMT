@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
@@ -35,9 +36,9 @@ class HomeScreen extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              appState.userType == 'guest' 
-                                ? Icons.person 
-                                : Icons.verified_user,
+                              appState.userType == 'guest'
+                                  ? Icons.person
+                                  : Icons.verified_user,
                               color: Constants.primaryColor,
                             ),
                             const SizedBox(width: 8),
@@ -59,9 +60,9 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Quick Actions
                 const Text(
                   'Quick Actions',
@@ -71,7 +72,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 Row(
                   children: [
                     Expanded(
@@ -95,9 +96,9 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Transcription Settings
                 const Text(
                   'Transcription Settings',
@@ -107,7 +108,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(Constants.padding),
@@ -129,9 +130,9 @@ class HomeScreen extends StatelessWidget {
                         const Divider(),
                         _SettingsTile(
                           title: 'Language',
-                          subtitle: appState.selectedLanguage == 'auto' 
-                            ? 'Auto-detect' 
-                            : appState.selectedLanguage,
+                          subtitle: appState.selectedLanguage == 'auto'
+                              ? 'Auto-detect'
+                              : appState.selectedLanguage,
                           icon: Icons.language,
                           onTap: () => _showLanguageDialog(context),
                         ),
@@ -139,9 +140,9 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Status Card
                 Card(
                   child: Padding(
@@ -201,7 +202,7 @@ class HomeScreen extends StatelessWidget {
 
   void _showTranscriptionTypeDialog(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context, listen: false);
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -228,7 +229,7 @@ class HomeScreen extends StatelessWidget {
 
   void _showNetworkModeDialog(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context, listen: false);
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -255,8 +256,20 @@ class HomeScreen extends StatelessWidget {
 
   void _showLanguageDialog(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context, listen: false);
-    final languages = ['auto', 'en', 'es', 'fr', 'de', 'ar', 'zh', 'ja', 'ko', 'hi', 'pt'];
-    
+    final languages = [
+      'auto',
+      'en',
+      'es',
+      'fr',
+      'de',
+      'ar',
+      'zh',
+      'ja',
+      'ko',
+      'hi',
+      'pt'
+    ];
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

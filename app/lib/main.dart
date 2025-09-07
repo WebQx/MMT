@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use, unused_field, unused_element
+
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;

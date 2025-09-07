@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
@@ -24,19 +25,19 @@ class SettingsScreen extends StatelessWidget {
                   children: [
                     ListTile(
                       leading: Icon(
-                        appState.userType == 'guest' 
-                          ? Icons.person 
-                          : Icons.verified_user,
+                        appState.userType == 'guest'
+                            ? Icons.person
+                            : Icons.verified_user,
                       ),
                       title: Text(
-                        appState.userType == 'guest' 
-                          ? 'Guest User' 
-                          : 'Authenticated User',
+                        appState.userType == 'guest'
+                            ? 'Guest User'
+                            : 'Authenticated User',
                       ),
                       subtitle: Text(
                         appState.userType == 'guest'
-                          ? 'Limited functionality'
-                          : 'Full access',
+                            ? 'Limited functionality'
+                            : 'Full access',
                       ),
                     ),
                     const Divider(height: 1),
@@ -48,9 +49,9 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Appearance Section
               _SectionHeader(title: 'Appearance'),
               Card(
@@ -72,9 +73,9 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Transcription Settings
               _SectionHeader(title: 'Transcription'),
               Card(
@@ -98,18 +99,18 @@ class SettingsScreen extends StatelessWidget {
                       leading: const Icon(Icons.translate),
                       title: const Text('Default Language'),
                       subtitle: Text(
-                        appState.selectedLanguage == 'auto' 
-                          ? 'Auto-detect' 
-                          : appState.selectedLanguage.toUpperCase(),
+                        appState.selectedLanguage == 'auto'
+                            ? 'Auto-detect'
+                            : appState.selectedLanguage.toUpperCase(),
                       ),
                       onTap: () => _showTranscriptionLanguageDialog(context),
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Privacy & Security
               _SectionHeader(title: 'Privacy & Security'),
               Card(
@@ -131,9 +132,9 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // About Section
               _SectionHeader(title: 'About'),
               Card(
@@ -161,9 +162,9 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Footer
               const Center(
                 child: Text(
@@ -233,9 +234,11 @@ class SettingsScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              final appState = Provider.of<AppStateProvider>(context, listen: false);
+              final appState =
+                  Provider.of<AppStateProvider>(context, listen: false);
               appState.logout();
-              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/login', (route) => false);
             },
             child: const Text('Logout'),
           ),
@@ -246,7 +249,7 @@ class SettingsScreen extends StatelessWidget {
 
   void _showThemeDialog(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context, listen: false);
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -273,7 +276,7 @@ class SettingsScreen extends StatelessWidget {
 
   void _showLanguageDialog(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context, listen: false);
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -303,7 +306,7 @@ class SettingsScreen extends StatelessWidget {
 
   void _showTranscriptionTypeDialog(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context, listen: false);
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -330,7 +333,7 @@ class SettingsScreen extends StatelessWidget {
 
   void _showNetworkModeDialog(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context, listen: false);
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -357,8 +360,20 @@ class SettingsScreen extends StatelessWidget {
 
   void _showTranscriptionLanguageDialog(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context, listen: false);
-    final languages = ['auto', 'en', 'es', 'fr', 'de', 'ar', 'zh', 'ja', 'ko', 'hi', 'pt'];
-    
+    final languages = [
+      'auto',
+      'en',
+      'es',
+      'fr',
+      'de',
+      'ar',
+      'zh',
+      'ja',
+      'ko',
+      'hi',
+      'pt'
+    ];
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -369,7 +384,8 @@ class SettingsScreen extends StatelessWidget {
             shrinkWrap: true,
             children: languages.map((lang) {
               return RadioListTile<String>(
-                title: Text(lang == 'auto' ? 'Auto-detect' : lang.toUpperCase()),
+                title:
+                    Text(lang == 'auto' ? 'Auto-detect' : lang.toUpperCase()),
                 value: lang,
                 groupValue: appState.selectedLanguage,
                 onChanged: (value) {
@@ -396,7 +412,8 @@ class SettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('MMT is designed with healthcare-grade security and compliance:'),
+              Text(
+                  'MMT is designed with healthcare-grade security and compliance:'),
               SizedBox(height: 16),
               Text('• GDPR compliant data handling'),
               Text('• HIPAA ready for healthcare environments'),
@@ -405,7 +422,8 @@ class SettingsScreen extends StatelessWidget {
               Text('• Data minimization principles'),
               Text('• Audit logging for compliance'),
               SizedBox(height: 16),
-              Text('Your data is processed securely and never stored without consent.'),
+              Text(
+                  'Your data is processed securely and never stored without consent.'),
             ],
           ),
         ),
@@ -424,7 +442,8 @@ class SettingsScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Local Data'),
-        content: const Text('This will remove all cached files, recordings, and reset settings to defaults. This action cannot be undone.'),
+        content: const Text(
+            'This will remove all cached files, recordings, and reset settings to defaults. This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

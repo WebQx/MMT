@@ -5,9 +5,11 @@
 # IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
 # invoked from the command line by running `flutter analyze`.
 
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
-include: package:flutter_lints/flutter.yaml
+# The recommended Flutter lint set can be enabled once dependencies are
+# resolved (run `flutter pub get` inside `app/`). If `package:flutter_lints`
+# isn't available the analyzer emits an "include file not found" warning.
+# Uncomment the next line after running `flutter pub get` in `app/`.
+# include: package:flutter_lints/flutter.yaml
 
 linter:
   # The lint rules applied to this project can be customized in the
@@ -26,3 +28,16 @@ linter:
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
+
+# Exclude embedded Flutter SDK and workspace tool dirs when analyzing from the
+# `app/` package. Without this the analyzer will recurse into the checked-in
+# Flutter engine/tooling and report hundreds of unrelated errors (seen in CI).
+analyzer:
+  exclude:
+  # Exclude the embedded Flutter SDK that lives inside the `app/` folder
+  # (this project keeps a checked-in SDK at `app/flutter/`). Also exclude
+  # nested flutter directories, tool dirs and build outputs.
+  - flutter/**
+  - '**/flutter/**'
+  - .dart_tool/**
+  - build/**

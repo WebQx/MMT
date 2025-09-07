@@ -8,5 +8,10 @@ analyzer:
     - .dart_tool/**
     - build/**
 
-# Optional: keep standard lints for the app package (you can customize later)
-include: package:flutter_lints/flutter.yaml
+# NOTE: we intentionally don't include `package:flutter_lints/flutter.yaml` here
+# because the root workspace isn't a resolvable Dart package (and running
+# `flutter pub get` at the repo root isn't required). To enable the Flutter
+# recommended lints for the `app/` package, run `flutter pub get` inside
+# `app/` and add the include into `app/analysis_options.yaml` (or re-enable
+# the line below once package resolution is available).
+# include: package:flutter_lints/flutter.yaml
