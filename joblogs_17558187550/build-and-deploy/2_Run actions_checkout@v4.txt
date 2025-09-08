@@ -1,0 +1,98 @@
+﻿2025-09-08T16:55:12.2614361Z ##[group]Run actions/checkout@v4
+2025-09-08T16:55:12.2615607Z with:
+2025-09-08T16:55:12.2616326Z   submodules: false
+2025-09-08T16:55:12.2617079Z   fetch-depth: 0
+2025-09-08T16:55:12.2617837Z   repository: WebQx/MMT
+2025-09-08T16:55:12.2618868Z   token: ***
+2025-09-08T16:55:12.2619566Z   ssh-strict: true
+2025-09-08T16:55:12.2620302Z   ssh-user: git
+2025-09-08T16:55:12.2621057Z   persist-credentials: true
+2025-09-08T16:55:12.2621895Z   clean: true
+2025-09-08T16:55:12.2622804Z   sparse-checkout-cone-mode: true
+2025-09-08T16:55:12.2623719Z   fetch-tags: false
+2025-09-08T16:55:12.2624461Z   show-progress: true
+2025-09-08T16:55:12.2625226Z   lfs: false
+2025-09-08T16:55:12.2625942Z   set-safe-directory: true
+2025-09-08T16:55:12.2627055Z ##[endgroup]
+2025-09-08T16:55:12.3761667Z Syncing repository: WebQx/MMT
+2025-09-08T16:55:12.3764362Z ##[group]Getting Git version info
+2025-09-08T16:55:12.3765494Z Working directory is '/home/runner/work/MMT/MMT'
+2025-09-08T16:55:12.3767094Z [command]/usr/bin/git version
+2025-09-08T16:55:12.3768032Z git version 2.51.0
+2025-09-08T16:55:12.3770655Z ##[endgroup]
+2025-09-08T16:55:12.3776516Z Temporarily overriding HOME='/home/runner/work/_temp/e8a058c8-da4d-4403-a318-521bd155f98e' before making global git config changes
+2025-09-08T16:55:12.3779347Z Adding repository directory to the temporary git global config as a safe directory
+2025-09-08T16:55:12.3781219Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MMT/MMT
+2025-09-08T16:55:12.3789593Z Deleting the contents of '/home/runner/work/MMT/MMT'
+2025-09-08T16:55:12.3793553Z ##[group]Initializing the repository
+2025-09-08T16:55:12.3796990Z [command]/usr/bin/git init /home/runner/work/MMT/MMT
+2025-09-08T16:55:12.3853859Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-09-08T16:55:12.3857141Z hint: is subject to change. To configure the initial branch name to use in all
+2025-09-08T16:55:12.3858824Z hint: of your new repositories, which will suppress this warning, call:
+2025-09-08T16:55:12.3860071Z hint:
+2025-09-08T16:55:12.3861096Z hint: 	git config --global init.defaultBranch <name>
+2025-09-08T16:55:12.3862962Z hint:
+2025-09-08T16:55:12.3863983Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-09-08T16:55:12.3865630Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-09-08T16:55:12.3867399Z hint:
+2025-09-08T16:55:12.3868102Z hint: 	git branch -m <name>
+2025-09-08T16:55:12.3868918Z hint:
+2025-09-08T16:55:12.3870005Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-09-08T16:55:12.3871665Z Initialized empty Git repository in /home/runner/work/MMT/MMT/.git/
+2025-09-08T16:55:12.3874627Z [command]/usr/bin/git remote add origin https://github.com/WebQx/MMT
+2025-09-08T16:55:12.3899632Z ##[endgroup]
+2025-09-08T16:55:12.3900926Z ##[group]Disabling automatic garbage collection
+2025-09-08T16:55:12.3902903Z [command]/usr/bin/git config --local gc.auto 0
+2025-09-08T16:55:12.3931088Z ##[endgroup]
+2025-09-08T16:55:12.3932615Z ##[group]Setting up auth
+2025-09-08T16:55:12.3937167Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-09-08T16:55:12.3967089Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-09-08T16:55:12.4215055Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-09-08T16:55:12.4245765Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-09-08T16:55:12.4459712Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-09-08T16:55:12.4492885Z ##[endgroup]
+2025-09-08T16:55:12.4494479Z ##[group]Fetching the repository
+2025-09-08T16:55:12.4503541Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +3a1c238cd5a8f97baf212c7ead61cb93088e3c98:refs/remotes/pull/16/merge
+2025-09-08T16:55:12.8680588Z From https://github.com/WebQx/MMT
+2025-09-08T16:55:12.8684845Z  * [new branch]      copilot/fix-079c752c-2905-41e1-b39a-ab6e03e6e5ee -> origin/copilot/fix-079c752c-2905-41e1-b39a-ab6e03e6e5ee
+2025-09-08T16:55:12.8689689Z  * [new branch]      copilot/fix-1075b84c-a81f-4697-8f0d-c0dec466749d -> origin/copilot/fix-1075b84c-a81f-4697-8f0d-c0dec466749d
+2025-09-08T16:55:12.8694662Z  * [new branch]      dependabot/pip/backend/alembic-1.16.5    -> origin/dependabot/pip/backend/alembic-1.16.5
+2025-09-08T16:55:12.8698616Z  * [new branch]      dependabot/pip/backend/flake8-7.3.0      -> origin/dependabot/pip/backend/flake8-7.3.0
+2025-09-08T16:55:12.8702658Z  * [new branch]      dependabot/pip/backend/locust-2.34.0     -> origin/dependabot/pip/backend/locust-2.34.0
+2025-09-08T16:55:12.8706515Z  * [new branch]      dependabot/pip/backend/mypy-1.17.1       -> origin/dependabot/pip/backend/mypy-1.17.1
+2025-09-08T16:55:12.8710321Z  * [new branch]      dependabot/pip/backend/pyjwt-2.10.1      -> origin/dependabot/pip/backend/pyjwt-2.10.1
+2025-09-08T16:55:12.8713524Z  * [new branch]      dependabot/pip/backend/pymysql-1.1.2     -> origin/dependabot/pip/backend/pymysql-1.1.2
+2025-09-08T16:55:12.8715456Z  * [new branch]      feat/ci-flutter                          -> origin/feat/ci-flutter
+2025-09-08T16:55:12.8717158Z  * [new branch]      gh-pages                                 -> origin/gh-pages
+2025-09-08T16:55:12.8718561Z  * [new branch]      main                                     -> origin/main
+2025-09-08T16:55:12.8720061Z  * [new tag]         v0.2.0                                   -> v0.2.0
+2025-09-08T16:55:12.8721256Z  * [new tag]         v0.3.0                                   -> v0.3.0
+2025-09-08T16:55:12.8723043Z  * [new ref]         3a1c238cd5a8f97baf212c7ead61cb93088e3c98 -> pull/16/merge
+2025-09-08T16:55:12.8748896Z ##[endgroup]
+2025-09-08T16:55:12.8750920Z ##[group]Determining the checkout info
+2025-09-08T16:55:12.8753168Z ##[endgroup]
+2025-09-08T16:55:12.8757556Z [command]/usr/bin/git sparse-checkout disable
+2025-09-08T16:55:12.8798415Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-09-08T16:55:12.8828820Z ##[group]Checking out the ref
+2025-09-08T16:55:12.8833268Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/16/merge
+2025-09-08T16:55:12.9975524Z Note: switching to 'refs/remotes/pull/16/merge'.
+2025-09-08T16:55:12.9977662Z 
+2025-09-08T16:55:12.9978728Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-09-08T16:55:12.9980431Z changes and commit them, and you can discard any commits you make in this
+2025-09-08T16:55:12.9982259Z state without impacting any branches by switching back to a branch.
+2025-09-08T16:55:12.9983734Z 
+2025-09-08T16:55:12.9984797Z If you want to create a new branch to retain commits you create, you may
+2025-09-08T16:55:12.9987238Z do so (now or later) by using -c with the switch command. Example:
+2025-09-08T16:55:12.9988633Z 
+2025-09-08T16:55:12.9989257Z   git switch -c <new-branch-name>
+2025-09-08T16:55:12.9990275Z 
+2025-09-08T16:55:12.9990864Z Or undo this operation with:
+2025-09-08T16:55:12.9991762Z 
+2025-09-08T16:55:12.9992451Z   git switch -
+2025-09-08T16:55:12.9993207Z 
+2025-09-08T16:55:12.9994383Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-09-08T16:55:12.9996168Z 
+2025-09-08T16:55:12.9998067Z HEAD is now at 3a1c238 Merge ccdb0510af91228641eccb666e11cc01418f3bf1 into 9731bfb33f75973d3a3868f9b4f7d74d78844284
+2025-09-08T16:55:13.0003002Z ##[endgroup]
+2025-09-08T16:55:13.0030277Z [command]/usr/bin/git log -1 --format=%H
+2025-09-08T16:55:13.0053300Z 3a1c238cd5a8f97baf212c7ead61cb93088e3c98

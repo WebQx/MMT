@@ -1,0 +1,44 @@
+﻿2025-09-08T16:55:13.0059111Z ##[group]Run subosito/flutter-action@v2
+2025-09-08T16:55:13.0060287Z with:
+2025-09-08T16:55:13.0061061Z   flutter-version: 3.16.0
+2025-09-08T16:55:13.0061980Z   channel: stable
+2025-09-08T16:55:13.0062783Z   architecture: X64
+2025-09-08T16:55:13.0063586Z   cache: false
+2025-09-08T16:55:13.0064373Z   pub-cache-path: default
+2025-09-08T16:55:13.0065252Z   dry-run: false
+2025-09-08T16:55:13.0066217Z   git-source: https://github.com/flutter/flutter.git
+2025-09-08T16:55:13.0067371Z ##[endgroup]
+2025-09-08T16:55:13.0204718Z ##[group]Run chmod +x "$GITHUB_ACTION_PATH/setup.sh"
+2025-09-08T16:55:13.0206079Z [36;1mchmod +x "$GITHUB_ACTION_PATH/setup.sh"[0m
+2025-09-08T16:55:13.0265257Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-09-08T16:55:13.0266532Z ##[endgroup]
+2025-09-08T16:55:13.0435061Z ##[group]Run $GITHUB_ACTION_PATH/setup.sh -p \
+2025-09-08T16:55:13.0436286Z [36;1m$GITHUB_ACTION_PATH/setup.sh -p \[0m
+2025-09-08T16:55:13.0437353Z [36;1m  -n '3.16.0' \[0m
+2025-09-08T16:55:13.0438439Z [36;1m  -f '' \[0m
+2025-09-08T16:55:13.0439296Z [36;1m  -a 'X64' \[0m
+2025-09-08T16:55:13.0440099Z [36;1m  -k '' \[0m
+2025-09-08T16:55:13.0440880Z [36;1m  -c '' \[0m
+2025-09-08T16:55:13.0441657Z [36;1m  -l '' \[0m
+2025-09-08T16:55:13.0442447Z [36;1m  -d 'default' \[0m
+2025-09-08T16:55:13.0443534Z [36;1m  -g 'https://github.com/flutter/flutter.git' \[0m
+2025-09-08T16:55:13.0444684Z [36;1m  stable[0m
+2025-09-08T16:55:13.0474731Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-09-08T16:55:13.0475958Z ##[endgroup]
+2025-09-08T16:55:13.2374134Z ##[group]Run $GITHUB_ACTION_PATH/setup.sh \
+2025-09-08T16:55:13.2375283Z [36;1m$GITHUB_ACTION_PATH/setup.sh \[0m
+2025-09-08T16:55:13.2376286Z [36;1m  -n '3.16.0' \[0m
+2025-09-08T16:55:13.2377102Z [36;1m  -a 'x64' \[0m
+2025-09-08T16:55:13.2378251Z [36;1m  -c '/opt/hostedtoolcache/flutter/stable-3.16.0-x64' \[0m
+2025-09-08T16:55:13.2379534Z [36;1m  -d '/home/runner/.pub-cache' \[0m
+2025-09-08T16:55:13.2380512Z [36;1m  stable[0m
+2025-09-08T16:55:13.2413133Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-09-08T16:55:13.2414328Z ##[endgroup]
+2025-09-08T16:55:13.3928609Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2025-09-08T16:55:13.3930379Z                                  Dload  Upload   Total   Spent    Left  Speed
+2025-09-08T16:55:13.3931457Z 
+2025-09-08T16:55:13.5035438Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2025-09-08T16:55:14.5037898Z   1  627M    1 11.7M    0     0   106M      0  0:00:05 --:--:--  0:00:05  105M
+2025-09-08T16:55:15.5040864Z  42  627M   42  266M    0     0   239M      0  0:00:02  0:00:01  0:00:01  239M
+2025-09-08T16:55:15.8458873Z  86  627M   86  541M    0     0   256M      0  0:00:02  0:00:02 --:--:--  256M
+2025-09-08T16:55:15.8460539Z 100  627M  100  627M    0     0   255M      0  0:00:02  0:00:02 --:--:--  255M

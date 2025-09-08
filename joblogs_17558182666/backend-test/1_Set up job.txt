@@ -1,0 +1,30 @@
+﻿2025-09-08T16:54:59.5150549Z Current runner version: '2.328.0'
+2025-09-08T16:54:59.5175820Z ##[group]Runner Image Provisioner
+2025-09-08T16:54:59.5176873Z Hosted Compute Agent
+2025-09-08T16:54:59.5177509Z Version: 20250829.383
+2025-09-08T16:54:59.5178103Z Commit: 27cb235aab5b0e52e153a26cd86b4742e89dac5d
+2025-09-08T16:54:59.5178832Z Build Date: 2025-08-29T13:48:48Z
+2025-09-08T16:54:59.5179386Z ##[endgroup]
+2025-09-08T16:54:59.5180032Z ##[group]Operating System
+2025-09-08T16:54:59.5180578Z Ubuntu
+2025-09-08T16:54:59.5181048Z 24.04.3
+2025-09-08T16:54:59.5181561Z LTS
+2025-09-08T16:54:59.5182055Z ##[endgroup]
+2025-09-08T16:54:59.5182514Z ##[group]Runner Image
+2025-09-08T16:54:59.5183113Z Image: ubuntu-24.04
+2025-09-08T16:54:59.5183633Z Version: 20250831.1.0
+2025-09-08T16:54:59.5184618Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250831.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-09-08T16:54:59.5186198Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250831.1
+2025-09-08T16:54:59.5187385Z ##[endgroup]
+2025-09-08T16:54:59.5188538Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T16:54:59.5190773Z Contents: read
+2025-09-08T16:54:59.5191357Z Metadata: read
+2025-09-08T16:54:59.5191897Z Packages: read
+2025-09-08T16:54:59.5192352Z ##[endgroup]
+2025-09-08T16:54:59.5195244Z Secret source: Actions
+2025-09-08T16:54:59.5196633Z Prepare workflow directory
+2025-09-08T16:54:59.5524485Z Prepare all required actions
+2025-09-08T16:54:59.5564190Z Getting action download info
+2025-09-08T16:54:59.8931778Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T16:54:59.9803748Z Download action repository 'actions/setup-python@v4' (SHA:7f4fc3e22c37d6ff65e88745f38bd3157c663f7c)
+2025-09-08T16:55:00.1531016Z Complete job name: backend-test

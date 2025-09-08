@@ -1,0 +1,32 @@
+﻿2025-09-08T16:54:56.8263270Z Current runner version: '2.328.0'
+2025-09-08T16:54:56.8288524Z ##[group]Runner Image Provisioner
+2025-09-08T16:54:56.8289344Z Hosted Compute Agent
+2025-09-08T16:54:56.8289955Z Version: 20250829.383
+2025-09-08T16:54:56.8290577Z Commit: 27cb235aab5b0e52e153a26cd86b4742e89dac5d
+2025-09-08T16:54:56.8291270Z Build Date: 2025-08-29T13:48:48Z
+2025-09-08T16:54:56.8291911Z ##[endgroup]
+2025-09-08T16:54:56.8292413Z ##[group]Operating System
+2025-09-08T16:54:56.8292965Z Ubuntu
+2025-09-08T16:54:56.8293479Z 24.04.3
+2025-09-08T16:54:56.8293926Z LTS
+2025-09-08T16:54:56.8294411Z ##[endgroup]
+2025-09-08T16:54:56.8294843Z ##[group]Runner Image
+2025-09-08T16:54:56.8295454Z Image: ubuntu-24.04
+2025-09-08T16:54:56.8296125Z Version: 20250831.1.0
+2025-09-08T16:54:56.8297104Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250831.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-09-08T16:54:56.8298517Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250831.1
+2025-09-08T16:54:56.8299748Z ##[endgroup]
+2025-09-08T16:54:56.8300775Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T16:54:56.8302533Z Contents: read
+2025-09-08T16:54:56.8303231Z Metadata: read
+2025-09-08T16:54:56.8303735Z Packages: read
+2025-09-08T16:54:56.8304206Z ##[endgroup]
+2025-09-08T16:54:56.8306502Z Secret source: Actions
+2025-09-08T16:54:56.8307191Z Prepare workflow directory
+2025-09-08T16:54:56.8636239Z Prepare all required actions
+2025-09-08T16:54:56.8674718Z Getting action download info
+2025-09-08T16:54:57.2056474Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T16:54:57.6807712Z Download action repository 'subosito/flutter-action@v2' (SHA:fd55f4c5af5b953cc57a2be44cb082c8f6635e8e)
+2025-09-08T16:54:57.9412084Z Getting action download info
+2025-09-08T16:54:58.0610170Z Download action repository 'actions/cache@v4' (SHA:0400d5f644dc74513175e3cd8d07132dd4860809)
+2025-09-08T16:54:58.2628183Z Complete job name: frontend-test

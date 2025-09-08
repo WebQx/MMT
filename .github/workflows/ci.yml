@@ -19,10 +19,46 @@ jobs:
         with:
           flutter-version: '3.16.0'
           channel: stable
-      - name: Install dependencies
-        run: |
-          cd app
-          flutter pub get
+    - name: Inspect pubspec
+    run: |
+      echo '--- effective app/pubspec.yaml ---'
+      sed -n '1,200p' app/pubspec.yaml || true
+      echo '--- checking for duplicate mapping keys (python) ---'
+      python3 - <<'PY'
+import sys, yaml
+from collections import defaultdict
+
+def detect_duplicates(stream):
+  class DupDetector(yaml.SafeLoader):
+    pass
+
+  def construct_mapping(loader, node, deep=False):
+    mapping = {}
+    for key_node, value_node in node.value:
+      key = loader.construct_object(key_node, deep=deep)
+      if key in mapping:
+        print(f'Duplicate key detected: {key}', file=sys.stdout)
+      mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
+
+  DupDetector.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+    construct_mapping
+  )
+
+  try:
+    yaml.load(stream, Loader=DupDetector)
+  except Exception as e:
+    print('YAML parse error:', e, file=sys.stdout)
+
+with open('app/pubspec.yaml', 'r', encoding='utf-8') as f:
+  detect_duplicates(f)
+PY
+
+    - name: Install dependencies
+    run: |
+      cd app
+      flutter pub get
       - name: Analyze
         run: |
           cd app

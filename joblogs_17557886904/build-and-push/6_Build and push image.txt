@@ -1,0 +1,117 @@
+﻿2025-09-08T16:43:02.1241742Z ##[group]Run docker/build-push-action@v4
+2025-09-08T16:43:02.1242039Z with:
+2025-09-08T16:43:02.1242215Z   context: ./backend
+2025-09-08T16:43:02.1242409Z   file: ./backend/Dockerfile
+2025-09-08T16:43:02.1242614Z   push: true
+2025-09-08T16:43:02.1242820Z   tags: ghcr.io/WebQx/mmt-backend:latest
+2025-09-08T16:43:02.1243071Z   load: false
+2025-09-08T16:43:02.1243234Z   no-cache: false
+2025-09-08T16:43:02.1243418Z   pull: false
+2025-09-08T16:43:02.1243789Z   github-token: ***
+2025-09-08T16:43:02.1243972Z ##[endgroup]
+2025-09-08T16:43:02.2678654Z ##[group]GitHub Actions runtime token ACs
+2025-09-08T16:43:02.2692723Z refs/heads/feat/ci-flutter: read/write
+2025-09-08T16:43:02.2693615Z refs/heads/main: read
+2025-09-08T16:43:02.2694833Z ##[endgroup]
+2025-09-08T16:43:02.2695967Z ##[group]Docker info
+2025-09-08T16:43:02.2748687Z [command]/usr/bin/docker version
+2025-09-08T16:43:02.2942995Z Client: Docker Engine - Community
+2025-09-08T16:43:02.2945938Z  Version:           28.0.4
+2025-09-08T16:43:02.2946826Z  API version:       1.48
+2025-09-08T16:43:02.2947296Z  Go version:        go1.23.7
+2025-09-08T16:43:02.2947661Z  Git commit:        b8034c0
+2025-09-08T16:43:02.2948017Z  Built:             Tue Mar 25 15:07:16 2025
+2025-09-08T16:43:02.2948441Z  OS/Arch:           linux/amd64
+2025-09-08T16:43:02.2948786Z  Context:           default
+2025-09-08T16:43:02.2948996Z 
+2025-09-08T16:43:02.2949144Z Server: Docker Engine - Community
+2025-09-08T16:43:02.2949504Z  Engine:
+2025-09-08T16:43:02.2949765Z   Version:          28.0.4
+2025-09-08T16:43:02.2950142Z   API version:      1.48 (minimum version 1.24)
+2025-09-08T16:43:02.2950468Z   Go version:       go1.23.7
+2025-09-08T16:43:02.2950694Z   Git commit:       6430e49
+2025-09-08T16:43:02.2950905Z   Built:            Tue Mar 25 15:07:16 2025
+2025-09-08T16:43:02.2951421Z   OS/Arch:          linux/amd64
+2025-09-08T16:43:02.2951655Z   Experimental:     false
+2025-09-08T16:43:02.2951858Z  containerd:
+2025-09-08T16:43:02.2952033Z   Version:          1.7.27
+2025-09-08T16:43:02.2952276Z   GitCommit:        05044ec0a9a75232cad458027ca83437aae3f4da
+2025-09-08T16:43:02.2952554Z  runc:
+2025-09-08T16:43:02.2952705Z   Version:          1.2.5
+2025-09-08T16:43:02.2952907Z   GitCommit:        v1.2.5-0-g59923ef
+2025-09-08T16:43:02.2953492Z  docker-init:
+2025-09-08T16:43:02.2953666Z   Version:          0.19.0
+2025-09-08T16:43:02.2953856Z   GitCommit:        de40ad0
+2025-09-08T16:43:02.2998701Z [command]/usr/bin/docker info
+2025-09-08T16:43:02.3472037Z Client: Docker Engine - Community
+2025-09-08T16:43:02.3472546Z  Version:    28.0.4
+2025-09-08T16:43:02.3472879Z  Context:    default
+2025-09-08T16:43:02.3473213Z  Debug Mode: false
+2025-09-08T16:43:02.3473516Z  Plugins:
+2025-09-08T16:43:02.3473834Z   buildx: Docker Buildx (Docker Inc.)
+2025-09-08T16:43:02.3474243Z     Version:  v0.27.0
+2025-09-08T16:43:02.3474663Z     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+2025-09-08T16:43:02.3475170Z   compose: Docker Compose (Docker Inc.)
+2025-09-08T16:43:02.3475572Z     Version:  v2.38.2
+2025-09-08T16:43:02.3476055Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+2025-09-08T16:43:02.3476445Z 
+2025-09-08T16:43:02.3476565Z Server:
+2025-09-08T16:43:02.3476848Z  Containers: 1
+2025-09-08T16:43:02.3477162Z   Running: 1
+2025-09-08T16:43:02.3477478Z   Paused: 0
+2025-09-08T16:43:02.3477761Z   Stopped: 0
+2025-09-08T16:43:02.3478044Z  Images: 2
+2025-09-08T16:43:02.3478342Z  Server Version: 28.0.4
+2025-09-08T16:43:02.3497989Z  Storage Driver: overlay2
+2025-09-08T16:43:02.3498458Z   Backing Filesystem: extfs
+2025-09-08T16:43:02.3498859Z   Supports d_type: true
+2025-09-08T16:43:02.3499216Z   Using metacopy: false
+2025-09-08T16:43:02.3499577Z   Native Overlay Diff: false
+2025-09-08T16:43:02.3499927Z   userxattr: false
+2025-09-08T16:43:02.3500262Z  Logging Driver: json-file
+2025-09-08T16:43:02.3500628Z  Cgroup Driver: systemd
+2025-09-08T16:43:02.3501534Z  Cgroup Version: 2
+2025-09-08T16:43:02.3501893Z  Plugins:
+2025-09-08T16:43:02.3502194Z   Volume: local
+2025-09-08T16:43:02.3502580Z   Network: bridge host ipvlan macvlan null overlay
+2025-09-08T16:43:02.3503820Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+2025-09-08T16:43:02.3504438Z  Swarm: inactive
+2025-09-08T16:43:02.3504801Z  Runtimes: io.containerd.runc.v2 runc
+2025-09-08T16:43:02.3505271Z  Default Runtime: runc
+2025-09-08T16:43:02.3505625Z  Init Binary: docker-init
+2025-09-08T16:43:02.3506125Z  containerd version: 05044ec0a9a75232cad458027ca83437aae3f4da
+2025-09-08T16:43:02.3506756Z  runc version: v1.2.5-0-g59923ef
+2025-09-08T16:43:02.3507164Z  init version: de40ad0
+2025-09-08T16:43:02.3507491Z  Security Options:
+2025-09-08T16:43:02.3507809Z   apparmor
+2025-09-08T16:43:02.3508084Z   seccomp
+2025-09-08T16:43:02.3508367Z    Profile: builtin
+2025-09-08T16:43:02.3508690Z   cgroupns
+2025-09-08T16:43:02.3508978Z  Kernel Version: 6.11.0-1018-azure
+2025-09-08T16:43:02.3509399Z  Operating System: Ubuntu 24.04.3 LTS
+2025-09-08T16:43:02.3509804Z  OSType: linux
+2025-09-08T16:43:02.3510119Z  Architecture: x86_64
+2025-09-08T16:43:02.3510432Z  CPUs: 4
+2025-09-08T16:43:02.3510742Z  Total Memory: 15.62GiB
+2025-09-08T16:43:02.3511338Z  Name: pkrvm7jw40e0xgp
+2025-09-08T16:43:02.3511728Z  ID: 33a18c03-7dc8-4ab9-bfe1-99342b7c1aaf
+2025-09-08T16:43:02.3512177Z  Docker Root Dir: /var/lib/docker
+2025-09-08T16:43:02.3512579Z  Debug Mode: false
+2025-09-08T16:43:02.3512906Z  Username: githubactions
+2025-09-08T16:43:02.3513262Z  Experimental: false
+2025-09-08T16:43:02.3513598Z  Insecure Registries:
+2025-09-08T16:43:02.3513947Z   ::1/128
+2025-09-08T16:43:02.3514220Z   127.0.0.0/8
+2025-09-08T16:43:02.3514521Z  Live Restore Enabled: false
+2025-09-08T16:43:02.3514775Z 
+2025-09-08T16:43:02.3515212Z ##[endgroup]
+2025-09-08T16:43:02.3515773Z ##[group]Proxy configuration
+2025-09-08T16:43:02.3516174Z No proxy configuration found
+2025-09-08T16:43:02.3516777Z ##[endgroup]
+2025-09-08T16:43:02.4112134Z ##[group]Buildx version
+2025-09-08T16:43:02.4140882Z [command]/usr/bin/docker buildx version
+2025-09-08T16:43:02.4743735Z github.com/docker/buildx v0.27.0 bac71def78b077ee6a2607119f88e291861b18ac
+2025-09-08T16:43:02.4776846Z ##[endgroup]
+2025-09-08T16:43:02.8803216Z [command]/usr/bin/docker buildx build --file ./backend/Dockerfile --iidfile /tmp/docker-actions-toolkit-FrhG5U/iidfile --tag ghcr.io/WebQx/mmt-backend:latest --metadata-file /tmp/docker-actions-toolkit-FrhG5U/metadata-file --push ./backend
+2025-09-08T16:43:03.0069443Z ERROR: failed to build: invalid tag "ghcr.io/WebQx/mmt-backend:latest": repository name must be lowercase
+2025-09-08T16:43:03.0129839Z ##[error]buildx failed with: ERROR: failed to build: invalid tag "ghcr.io/WebQx/mmt-backend:latest": repository name must be lowercase

@@ -1,0 +1,715 @@
+﻿2025-09-08T16:54:59.5151105Z Current runner version: '2.328.0'
+2025-09-08T16:54:59.5176029Z ##[group]Runner Image Provisioner
+2025-09-08T16:54:59.5176878Z Hosted Compute Agent
+2025-09-08T16:54:59.5177514Z Version: 20250829.383
+2025-09-08T16:54:59.5178107Z Commit: 27cb235aab5b0e52e153a26cd86b4742e89dac5d
+2025-09-08T16:54:59.5178835Z Build Date: 2025-08-29T13:48:48Z
+2025-09-08T16:54:59.5179388Z ##[endgroup]
+2025-09-08T16:54:59.5180035Z ##[group]Operating System
+2025-09-08T16:54:59.5180581Z Ubuntu
+2025-09-08T16:54:59.5181051Z 24.04.3
+2025-09-08T16:54:59.5181564Z LTS
+2025-09-08T16:54:59.5182058Z ##[endgroup]
+2025-09-08T16:54:59.5182518Z ##[group]Runner Image
+2025-09-08T16:54:59.5183117Z Image: ubuntu-24.04
+2025-09-08T16:54:59.5183636Z Version: 20250831.1.0
+2025-09-08T16:54:59.5184622Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250831.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-09-08T16:54:59.5186428Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250831.1
+2025-09-08T16:54:59.5187389Z ##[endgroup]
+2025-09-08T16:54:59.5188543Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T16:54:59.5190793Z Contents: read
+2025-09-08T16:54:59.5191362Z Metadata: read
+2025-09-08T16:54:59.5191901Z Packages: read
+2025-09-08T16:54:59.5192355Z ##[endgroup]
+2025-09-08T16:54:59.5195277Z Secret source: Actions
+2025-09-08T16:54:59.5196647Z Prepare workflow directory
+2025-09-08T16:54:59.5524527Z Prepare all required actions
+2025-09-08T16:54:59.5564239Z Getting action download info
+2025-09-08T16:54:59.8931817Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T16:54:59.9803785Z Download action repository 'actions/setup-python@v4' (SHA:7f4fc3e22c37d6ff65e88745f38bd3157c663f7c)
+2025-09-08T16:55:00.1531048Z Complete job name: backend-test
+2025-09-08T16:55:00.2249236Z ##[group]Run actions/checkout@v4
+2025-09-08T16:55:00.2250057Z with:
+2025-09-08T16:55:00.2250434Z   submodules: false
+2025-09-08T16:55:00.2250828Z   fetch-depth: 0
+2025-09-08T16:55:00.2251217Z   repository: WebQx/MMT
+2025-09-08T16:55:00.2251881Z   token: ***
+2025-09-08T16:55:00.2252245Z   ssh-strict: true
+2025-09-08T16:55:00.2252626Z   ssh-user: git
+2025-09-08T16:55:00.2253011Z   persist-credentials: true
+2025-09-08T16:55:00.2253565Z   clean: true
+2025-09-08T16:55:00.2253958Z   sparse-checkout-cone-mode: true
+2025-09-08T16:55:00.2254433Z   fetch-tags: false
+2025-09-08T16:55:00.2254820Z   show-progress: true
+2025-09-08T16:55:00.2255223Z   lfs: false
+2025-09-08T16:55:00.2255587Z   set-safe-directory: true
+2025-09-08T16:55:00.2256443Z ##[endgroup]
+2025-09-08T16:55:00.3357492Z Syncing repository: WebQx/MMT
+2025-09-08T16:55:00.3359602Z ##[group]Getting Git version info
+2025-09-08T16:55:00.3360260Z Working directory is '/home/runner/work/MMT/MMT'
+2025-09-08T16:55:00.3361317Z [command]/usr/bin/git version
+2025-09-08T16:55:00.3444936Z git version 2.51.0
+2025-09-08T16:55:00.3471998Z ##[endgroup]
+2025-09-08T16:55:00.3487142Z Temporarily overriding HOME='/home/runner/work/_temp/db7dfadc-d550-4206-bcdb-49bd862c9ffd' before making global git config changes
+2025-09-08T16:55:00.3489278Z Adding repository directory to the temporary git global config as a safe directory
+2025-09-08T16:55:00.3492432Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MMT/MMT
+2025-09-08T16:55:00.3531657Z Deleting the contents of '/home/runner/work/MMT/MMT'
+2025-09-08T16:55:00.3536218Z ##[group]Initializing the repository
+2025-09-08T16:55:00.3540113Z [command]/usr/bin/git init /home/runner/work/MMT/MMT
+2025-09-08T16:55:00.3628060Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-09-08T16:55:00.3629323Z hint: is subject to change. To configure the initial branch name to use in all
+2025-09-08T16:55:00.3630261Z hint: of your new repositories, which will suppress this warning, call:
+2025-09-08T16:55:00.3631211Z hint:
+2025-09-08T16:55:00.3631938Z hint: 	git config --global init.defaultBranch <name>
+2025-09-08T16:55:00.3632510Z hint:
+2025-09-08T16:55:00.3633038Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-09-08T16:55:00.3634211Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-09-08T16:55:00.3634909Z hint:
+2025-09-08T16:55:00.3635282Z hint: 	git branch -m <name>
+2025-09-08T16:55:00.3635764Z hint:
+2025-09-08T16:55:00.3636486Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-09-08T16:55:00.3637600Z Initialized empty Git repository in /home/runner/work/MMT/MMT/.git/
+2025-09-08T16:55:00.3644128Z [command]/usr/bin/git remote add origin https://github.com/WebQx/MMT
+2025-09-08T16:55:00.3684460Z ##[endgroup]
+2025-09-08T16:55:00.3685165Z ##[group]Disabling automatic garbage collection
+2025-09-08T16:55:00.3688891Z [command]/usr/bin/git config --local gc.auto 0
+2025-09-08T16:55:00.3717074Z ##[endgroup]
+2025-09-08T16:55:00.3717754Z ##[group]Setting up auth
+2025-09-08T16:55:00.3724357Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-09-08T16:55:00.3755113Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-09-08T16:55:00.4106780Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-09-08T16:55:00.4137712Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-09-08T16:55:00.4363397Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-09-08T16:55:00.4402107Z ##[endgroup]
+2025-09-08T16:55:00.4403410Z ##[group]Fetching the repository
+2025-09-08T16:55:00.4413296Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +5f29ccc2733e8a8fd835ee25635ae496a3042b7d:refs/remotes/pull/16/merge
+2025-09-08T16:55:00.8709139Z From https://github.com/WebQx/MMT
+2025-09-08T16:55:00.8711103Z  * [new branch]      copilot/fix-079c752c-2905-41e1-b39a-ab6e03e6e5ee -> origin/copilot/fix-079c752c-2905-41e1-b39a-ab6e03e6e5ee
+2025-09-08T16:55:00.8713359Z  * [new branch]      copilot/fix-1075b84c-a81f-4697-8f0d-c0dec466749d -> origin/copilot/fix-1075b84c-a81f-4697-8f0d-c0dec466749d
+2025-09-08T16:55:00.8715388Z  * [new branch]      dependabot/pip/backend/alembic-1.16.5    -> origin/dependabot/pip/backend/alembic-1.16.5
+2025-09-08T16:55:00.8717610Z  * [new branch]      dependabot/pip/backend/flake8-7.3.0      -> origin/dependabot/pip/backend/flake8-7.3.0
+2025-09-08T16:55:00.8719725Z  * [new branch]      dependabot/pip/backend/locust-2.34.0     -> origin/dependabot/pip/backend/locust-2.34.0
+2025-09-08T16:55:00.8721936Z  * [new branch]      dependabot/pip/backend/mypy-1.17.1       -> origin/dependabot/pip/backend/mypy-1.17.1
+2025-09-08T16:55:00.8724228Z  * [new branch]      dependabot/pip/backend/pyjwt-2.10.1      -> origin/dependabot/pip/backend/pyjwt-2.10.1
+2025-09-08T16:55:00.8726842Z  * [new branch]      dependabot/pip/backend/pymysql-1.1.2     -> origin/dependabot/pip/backend/pymysql-1.1.2
+2025-09-08T16:55:00.8728878Z  * [new branch]      feat/ci-flutter                          -> origin/feat/ci-flutter
+2025-09-08T16:55:00.8730471Z  * [new branch]      gh-pages                                 -> origin/gh-pages
+2025-09-08T16:55:00.8731923Z  * [new branch]      main                                     -> origin/main
+2025-09-08T16:55:00.8733303Z  * [new tag]         v0.2.0                                   -> v0.2.0
+2025-09-08T16:55:00.8734597Z  * [new tag]         v0.3.0                                   -> v0.3.0
+2025-09-08T16:55:00.8736229Z  * [new ref]         5f29ccc2733e8a8fd835ee25635ae496a3042b7d -> pull/16/merge
+2025-09-08T16:55:00.8767445Z ##[endgroup]
+2025-09-08T16:55:00.8769206Z ##[group]Determining the checkout info
+2025-09-08T16:55:00.8770749Z ##[endgroup]
+2025-09-08T16:55:00.8774045Z [command]/usr/bin/git sparse-checkout disable
+2025-09-08T16:55:00.8819341Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-09-08T16:55:00.8849077Z ##[group]Checking out the ref
+2025-09-08T16:55:00.8852448Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/16/merge
+2025-09-08T16:55:01.0002522Z Note: switching to 'refs/remotes/pull/16/merge'.
+2025-09-08T16:55:01.0004212Z 
+2025-09-08T16:55:01.0005437Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-09-08T16:55:01.0008935Z changes and commit them, and you can discard any commits you make in this
+2025-09-08T16:55:01.0011621Z state without impacting any branches by switching back to a branch.
+2025-09-08T16:55:01.0012954Z 
+2025-09-08T16:55:01.0014102Z If you want to create a new branch to retain commits you create, you may
+2025-09-08T16:55:01.0016643Z do so (now or later) by using -c with the switch command. Example:
+2025-09-08T16:55:01.0017854Z 
+2025-09-08T16:55:01.0018441Z   git switch -c <new-branch-name>
+2025-09-08T16:55:01.0019451Z 
+2025-09-08T16:55:01.0019988Z Or undo this operation with:
+2025-09-08T16:55:01.0020768Z 
+2025-09-08T16:55:01.0021194Z   git switch -
+2025-09-08T16:55:01.0021753Z 
+2025-09-08T16:55:01.0022694Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-09-08T16:55:01.0024131Z 
+2025-09-08T16:55:01.0025796Z HEAD is now at 5f29ccc Merge 2b8bbdc95e9ba9d0cdbcb10f919980877fa0337b into 9731bfb33f75973d3a3868f9b4f7d74d78844284
+2025-09-08T16:55:01.0030794Z ##[endgroup]
+2025-09-08T16:55:01.0055644Z [command]/usr/bin/git log -1 --format=%H
+2025-09-08T16:55:01.0077289Z 5f29ccc2733e8a8fd835ee25635ae496a3042b7d
+2025-09-08T16:55:01.0380769Z ##[group]Run actions/setup-python@v4
+2025-09-08T16:55:01.0381971Z with:
+2025-09-08T16:55:01.0382794Z   python-version: 3.11
+2025-09-08T16:55:01.0383761Z   check-latest: false
+2025-09-08T16:55:01.0384940Z   token: ***
+2025-09-08T16:55:01.0385807Z   update-environment: true
+2025-09-08T16:55:01.0387059Z   allow-prereleases: false
+2025-09-08T16:55:01.0388079Z ##[endgroup]
+2025-09-08T16:55:01.2079664Z ##[group]Installed versions
+2025-09-08T16:55:01.2200738Z Successfully set up CPython (3.11.13)
+2025-09-08T16:55:01.2203747Z ##[endgroup]
+2025-09-08T16:55:01.2356306Z ##[group]Run cd backend
+2025-09-08T16:55:01.2357344Z [36;1mcd backend[0m
+2025-09-08T16:55:01.2358350Z [36;1mpython -m pip install --upgrade pip[0m
+2025-09-08T16:55:01.2359607Z [36;1mpip install -r requirements.txt[0m
+2025-09-08T16:55:01.2428917Z shell: /usr/bin/bash -e {0}
+2025-09-08T16:55:01.2429868Z env:
+2025-09-08T16:55:01.2430899Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:55:01.2432934Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-09-08T16:55:01.2434645Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:55:01.2436724Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:55:01.2438319Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:55:01.2440275Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-09-08T16:55:01.2441565Z ##[endgroup]
+2025-09-08T16:55:01.9410506Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages (25.2)
+2025-09-08T16:55:02.5860676Z Collecting gunicorn==23.0.0 (from -r requirements.txt (line 1))
+2025-09-08T16:55:02.6316490Z   Downloading gunicorn-23.0.0-py3-none-any.whl.metadata (4.4 kB)
+2025-09-08T16:55:02.6867715Z Collecting fastapi==0.116.1 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 1))
+2025-09-08T16:55:02.6947091Z   Downloading fastapi-0.116.1-py3-none-any.whl.metadata (28 kB)
+2025-09-08T16:55:02.7448023Z Collecting uvicorn==0.35.0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 2))
+2025-09-08T16:55:02.7522861Z   Downloading uvicorn-0.35.0-py3-none-any.whl.metadata (6.5 kB)
+2025-09-08T16:55:02.7708088Z Collecting python-multipart==0.0.20 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 4))
+2025-09-08T16:55:02.7784322Z   Downloading python_multipart-0.0.20-py3-none-any.whl.metadata (1.8 kB)
+2025-09-08T16:55:02.8910402Z Collecting pydantic==2.11.7 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 5))
+2025-09-08T16:55:02.8984955Z   Downloading pydantic-2.11.7-py3-none-any.whl.metadata (67 kB)
+2025-09-08T16:55:02.9243204Z Collecting pydantic-settings==2.10.1 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 6))
+2025-09-08T16:55:02.9317162Z   Downloading pydantic_settings-2.10.1-py3-none-any.whl.metadata (3.4 kB)
+2025-09-08T16:55:02.9525155Z Collecting python-dotenv==1.1.1 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 7))
+2025-09-08T16:55:02.9597178Z   Downloading python_dotenv-1.1.1-py3-none-any.whl.metadata (24 kB)
+2025-09-08T16:55:02.9896196Z Collecting requests==2.32.5 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 8))
+2025-09-08T16:55:02.9968186Z   Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+2025-09-08T16:55:03.0204996Z Collecting httpx==0.28.1 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 9))
+2025-09-08T16:55:03.0275498Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+2025-09-08T16:55:03.0486043Z Collecting tenacity==9.1.2 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 10))
+2025-09-08T16:55:03.0558094Z   Downloading tenacity-9.1.2-py3-none-any.whl.metadata (1.2 kB)
+2025-09-08T16:55:03.0765535Z Collecting structlog==25.4.0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 11))
+2025-09-08T16:55:03.0838449Z   Downloading structlog-25.4.0-py3-none-any.whl.metadata (7.6 kB)
+2025-09-08T16:55:03.1029521Z Collecting prometheus-client==0.22.1 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 12))
+2025-09-08T16:55:03.1108884Z   Downloading prometheus_client-0.22.1-py3-none-any.whl.metadata (1.9 kB)
+2025-09-08T16:55:03.3650142Z Collecting SQLAlchemy==2.0.43 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 13))
+2025-09-08T16:55:03.3728861Z   Downloading sqlalchemy-2.0.43-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+2025-09-08T16:55:03.4172651Z Collecting pymysql==1.1.1 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 14))
+2025-09-08T16:55:03.4242226Z   Downloading PyMySQL-1.1.1-py3-none-any.whl.metadata (4.4 kB)
+2025-09-08T16:55:03.4496527Z Collecting alembic==1.13.2 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 15))
+2025-09-08T16:55:03.4576702Z   Downloading alembic-1.13.2-py3-none-any.whl.metadata (7.4 kB)
+2025-09-08T16:55:03.4763197Z Collecting python-jose==3.5.0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 16))
+2025-09-08T16:55:03.4837149Z   Downloading python_jose-3.5.0-py2.py3-none-any.whl.metadata (5.5 kB)
+2025-09-08T16:55:03.5169634Z Collecting redis==6.4.0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 17))
+2025-09-08T16:55:03.5265549Z   Downloading redis-6.4.0-py3-none-any.whl.metadata (10 kB)
+2025-09-08T16:55:03.6937794Z Collecting cryptography==45.0.6 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 18))
+2025-09-08T16:55:03.7013868Z   Downloading cryptography-45.0.6-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (5.7 kB)
+2025-09-08T16:55:03.7289747Z Collecting opentelemetry-sdk==1.36.0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 19))
+2025-09-08T16:55:03.7366329Z   Downloading opentelemetry_sdk-1.36.0-py3-none-any.whl.metadata (1.5 kB)
+2025-09-08T16:55:03.7602427Z Collecting opentelemetry-api==1.36.0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 20))
+2025-09-08T16:55:03.7676186Z   Downloading opentelemetry_api-1.36.0-py3-none-any.whl.metadata (1.5 kB)
+2025-09-08T16:55:03.7898895Z Collecting opentelemetry-exporter-otlp==1.36.0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 21))
+2025-09-08T16:55:03.7977735Z   Downloading opentelemetry_exporter_otlp-1.36.0-py3-none-any.whl.metadata (2.4 kB)
+2025-09-08T16:55:03.8208953Z Collecting opentelemetry-instrumentation-fastapi==0.57b0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 22))
+2025-09-08T16:55:03.8283812Z   Downloading opentelemetry_instrumentation_fastapi-0.57b0-py3-none-any.whl.metadata (2.2 kB)
+2025-09-08T16:55:03.8517811Z Collecting opentelemetry-instrumentation-requests==0.57b0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 23))
+2025-09-08T16:55:03.8590835Z   Downloading opentelemetry_instrumentation_requests-0.57b0-py3-none-any.whl.metadata (2.6 kB)
+2025-09-08T16:55:03.8819859Z Collecting opentelemetry-instrumentation-sqlalchemy==0.57b0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 24))
+2025-09-08T16:55:03.8904697Z   Downloading opentelemetry_instrumentation_sqlalchemy-0.57b0-py3-none-any.whl.metadata (2.2 kB)
+2025-09-08T16:55:03.9125056Z Collecting opentelemetry-instrumentation-pika==0.57b0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 25))
+2025-09-08T16:55:03.9212496Z   Downloading opentelemetry_instrumentation_pika-0.57b0-py3-none-any.whl.metadata (1.9 kB)
+2025-09-08T16:55:03.9427292Z Collecting PyJWT==2.9.0 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 26))
+2025-09-08T16:55:03.9511818Z   Downloading PyJWT-2.9.0-py3-none-any.whl.metadata (3.0 kB)
+2025-09-08T16:55:03.9712521Z Collecting pika==1.3.2 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 27))
+2025-09-08T16:55:03.9785592Z   Downloading pika-1.3.2-py3-none-any.whl.metadata (13 kB)
+2025-09-08T16:55:03.9962791Z Collecting passlib==1.7.4 (from passlib[bcrypt]==1.7.4->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 28))
+2025-09-08T16:55:04.0036719Z   Downloading passlib-1.7.4-py2.py3-none-any.whl.metadata (1.7 kB)
+2025-09-08T16:55:04.0573908Z Collecting openai==1.3.7 (from -r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 29))
+2025-09-08T16:55:04.0723888Z   Downloading openai-1.3.7-py3-none-any.whl.metadata (17 kB)
+2025-09-08T16:55:04.0868371Z Collecting openai-whisper==20231117 (from -r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:04.0947300Z   Downloading openai-whisper-20231117.tar.gz (798 kB)
+2025-09-08T16:55:04.1122760Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 798.6/798.6 kB 56.9 MB/s  0:00:00
+2025-09-08T16:55:04.1442122Z   Installing build dependencies: started
+2025-09-08T16:55:05.0275573Z   Installing build dependencies: finished with status 'done'
+2025-09-08T16:55:05.0281532Z   Getting requirements to build wheel: started
+2025-09-08T16:55:05.4178865Z   Getting requirements to build wheel: finished with status 'done'
+2025-09-08T16:55:05.4187790Z   Preparing metadata (pyproject.toml): started
+2025-09-08T16:55:05.6228137Z   Preparing metadata (pyproject.toml): finished with status 'done'
+2025-09-08T16:55:05.6438589Z Collecting presidio-analyzer==2.2.354 (from -r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:05.6517691Z   Downloading presidio_analyzer-2.2.354-py3-none-any.whl.metadata (2.6 kB)
+2025-09-08T16:55:05.6747860Z Collecting packaging (from gunicorn==23.0.0->-r requirements.txt (line 1))
+2025-09-08T16:55:05.6821250Z   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+2025-09-08T16:55:05.7178019Z Collecting starlette<0.48.0,>=0.40.0 (from fastapi==0.116.1->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 1))
+2025-09-08T16:55:05.7251196Z   Downloading starlette-0.47.3-py3-none-any.whl.metadata (6.2 kB)
+2025-09-08T16:55:05.7678721Z Collecting typing-extensions>=4.8.0 (from fastapi==0.116.1->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 1))
+2025-09-08T16:55:05.7752256Z   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+2025-09-08T16:55:05.7924881Z Collecting annotated-types>=0.6.0 (from pydantic==2.11.7->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 5))
+2025-09-08T16:55:05.7997449Z   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+2025-09-08T16:55:06.4985265Z Collecting pydantic-core==2.33.2 (from pydantic==2.11.7->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 5))
+2025-09-08T16:55:06.5086938Z   Downloading pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+2025-09-08T16:55:06.5299146Z Collecting typing-inspection>=0.4.0 (from pydantic==2.11.7->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 5))
+2025-09-08T16:55:06.5380399Z   Downloading typing_inspection-0.4.1-py3-none-any.whl.metadata (2.6 kB)
+2025-09-08T16:55:06.5616459Z Collecting click>=7.0 (from uvicorn==0.35.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 2))
+2025-09-08T16:55:06.5692322Z   Downloading click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+2025-09-08T16:55:06.5879655Z Collecting h11>=0.8 (from uvicorn==0.35.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 2))
+2025-09-08T16:55:06.5957140Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+2025-09-08T16:55:06.7038170Z Collecting charset_normalizer<4,>=2 (from requests==2.32.5->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 8))
+2025-09-08T16:55:06.7124334Z   Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (36 kB)
+2025-09-08T16:55:06.7340044Z Collecting idna<4,>=2.5 (from requests==2.32.5->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 8))
+2025-09-08T16:55:06.7423548Z   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+2025-09-08T16:55:06.7768653Z Collecting urllib3<3,>=1.21.1 (from requests==2.32.5->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 8))
+2025-09-08T16:55:06.7848755Z   Downloading urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
+2025-09-08T16:55:06.8109502Z Collecting certifi>=2017.4.17 (from requests==2.32.5->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 8))
+2025-09-08T16:55:06.8189307Z   Downloading certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
+2025-09-08T16:55:06.8427202Z Collecting anyio (from httpx==0.28.1->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 9))
+2025-09-08T16:55:06.8506366Z   Downloading anyio-4.10.0-py3-none-any.whl.metadata (4.0 kB)
+2025-09-08T16:55:06.8757979Z Collecting httpcore==1.* (from httpx==0.28.1->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 9))
+2025-09-08T16:55:06.8858262Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+2025-09-08T16:55:07.0134292Z Collecting greenlet>=1 (from SQLAlchemy==2.0.43->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 13))
+2025-09-08T16:55:07.0213982Z   Downloading greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (4.1 kB)
+2025-09-08T16:55:07.0631984Z Collecting Mako (from alembic==1.13.2->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 15))
+2025-09-08T16:55:07.0728049Z   Downloading mako-1.3.10-py3-none-any.whl.metadata (2.9 kB)
+2025-09-08T16:55:07.0968831Z Collecting ecdsa!=0.15 (from python-jose==3.5.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 16))
+2025-09-08T16:55:07.1052021Z   Downloading ecdsa-0.19.1-py2.py3-none-any.whl.metadata (29 kB)
+2025-09-08T16:55:07.1282496Z Collecting rsa!=4.1.1,!=4.4,<5.0,>=4.0 (from python-jose==3.5.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 16))
+2025-09-08T16:55:07.1357450Z   Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+2025-09-08T16:55:07.1606163Z Collecting pyasn1>=0.5.0 (from python-jose==3.5.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 16))
+2025-09-08T16:55:07.1677919Z   Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
+2025-09-08T16:55:07.3354683Z Collecting cffi>=1.14 (from cryptography==45.0.6->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 18))
+2025-09-08T16:55:07.3437132Z   Downloading cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:07.3669992Z Collecting opentelemetry-semantic-conventions==0.57b0 (from opentelemetry-sdk==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 19))
+2025-09-08T16:55:07.3745610Z   Downloading opentelemetry_semantic_conventions-0.57b0-py3-none-any.whl.metadata (2.4 kB)
+2025-09-08T16:55:07.4179707Z Collecting importlib-metadata<8.8.0,>=6.0 (from opentelemetry-api==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 20))
+2025-09-08T16:55:07.4254310Z   Downloading importlib_metadata-8.7.0-py3-none-any.whl.metadata (4.8 kB)
+2025-09-08T16:55:07.4522538Z Collecting opentelemetry-exporter-otlp-proto-grpc==1.36.0 (from opentelemetry-exporter-otlp==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 21))
+2025-09-08T16:55:07.4599385Z   Downloading opentelemetry_exporter_otlp_proto_grpc-1.36.0-py3-none-any.whl.metadata (2.4 kB)
+2025-09-08T16:55:07.4807997Z Collecting opentelemetry-exporter-otlp-proto-http==1.36.0 (from opentelemetry-exporter-otlp==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 21))
+2025-09-08T16:55:07.4889482Z   Downloading opentelemetry_exporter_otlp_proto_http-1.36.0-py3-none-any.whl.metadata (2.3 kB)
+2025-09-08T16:55:07.5154641Z Collecting opentelemetry-instrumentation-asgi==0.57b0 (from opentelemetry-instrumentation-fastapi==0.57b0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 22))
+2025-09-08T16:55:07.5229031Z   Downloading opentelemetry_instrumentation_asgi-0.57b0-py3-none-any.whl.metadata (2.0 kB)
+2025-09-08T16:55:07.5467115Z Collecting opentelemetry-instrumentation==0.57b0 (from opentelemetry-instrumentation-fastapi==0.57b0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 22))
+2025-09-08T16:55:07.5542006Z   Downloading opentelemetry_instrumentation-0.57b0-py3-none-any.whl.metadata (6.7 kB)
+2025-09-08T16:55:07.5764526Z Collecting opentelemetry-util-http==0.57b0 (from opentelemetry-instrumentation-fastapi==0.57b0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 22))
+2025-09-08T16:55:07.5839659Z   Downloading opentelemetry_util_http-0.57b0-py3-none-any.whl.metadata (2.6 kB)
+2025-09-08T16:55:07.6914744Z Collecting wrapt>=1.11.2 (from opentelemetry-instrumentation-sqlalchemy==0.57b0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 24))
+2025-09-08T16:55:07.6995441Z   Downloading wrapt-1.17.3-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.4 kB)
+2025-09-08T16:55:07.7283703Z Collecting anyio (from httpx==0.28.1->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 9))
+2025-09-08T16:55:07.7357924Z   Downloading anyio-3.7.1-py3-none-any.whl.metadata (4.7 kB)
+2025-09-08T16:55:07.7545342Z Collecting distro<2,>=1.7.0 (from openai==1.3.7->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 29))
+2025-09-08T16:55:07.7622557Z   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+2025-09-08T16:55:07.7998392Z Collecting sniffio (from openai==1.3.7->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 29))
+2025-09-08T16:55:07.8072599Z   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+2025-09-08T16:55:07.8488006Z Collecting tqdm>4 (from openai==1.3.7->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 29))
+2025-09-08T16:55:07.8566412Z   Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+2025-09-08T16:55:07.8920108Z Collecting triton<3,>=2.0.0 (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:07.8994616Z   Downloading triton-2.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.4 kB)
+2025-09-08T16:55:07.9913628Z Collecting numba (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:07.9992581Z   Downloading numba-0.61.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.8 kB)
+2025-09-08T16:55:08.2367446Z Collecting numpy (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:08.2443866Z   Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+2025-09-08T16:55:08.3037220Z Collecting torch (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:08.3122024Z   Downloading torch-2.8.0-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (30 kB)
+2025-09-08T16:55:08.3385196Z Collecting more-itertools (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:08.3458153Z   Downloading more_itertools-10.8.0-py3-none-any.whl.metadata (39 kB)
+2025-09-08T16:55:08.3866979Z Collecting tiktoken (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:08.3944539Z   Downloading tiktoken-0.11.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+2025-09-08T16:55:08.5065685Z Collecting spacy<4.0.0,>=3.4.4 (from presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:08.5141435Z   Downloading spacy-3.8.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (27 kB)
+2025-09-08T16:55:08.8378839Z Collecting regex (from presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:08.8459705Z   Downloading regex-2025.9.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+2025-09-08T16:55:08.8690239Z Collecting tldextract (from presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:08.8764730Z   Downloading tldextract-5.3.0-py3-none-any.whl.metadata (11 kB)
+2025-09-08T16:55:08.9185070Z Collecting pyyaml (from presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:08.9263554Z   Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+2025-09-08T16:55:08.9810615Z Collecting phonenumbers<9.0.0,>=8.12 (from presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:08.9885355Z   Downloading phonenumbers-8.13.55-py2.py3-none-any.whl.metadata (11 kB)
+2025-09-08T16:55:09.0153641Z Collecting googleapis-common-protos~=1.57 (from opentelemetry-exporter-otlp-proto-grpc==1.36.0->opentelemetry-exporter-otlp==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 21))
+2025-09-08T16:55:09.0231477Z   Downloading googleapis_common_protos-1.70.0-py3-none-any.whl.metadata (9.3 kB)
+2025-09-08T16:55:09.5701323Z Collecting grpcio<2.0.0,>=1.63.2 (from opentelemetry-exporter-otlp-proto-grpc==1.36.0->opentelemetry-exporter-otlp==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 21))
+2025-09-08T16:55:09.5776107Z   Downloading grpcio-1.74.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.8 kB)
+2025-09-08T16:55:09.6040811Z Collecting opentelemetry-exporter-otlp-proto-common==1.36.0 (from opentelemetry-exporter-otlp-proto-grpc==1.36.0->opentelemetry-exporter-otlp==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 21))
+2025-09-08T16:55:09.6112863Z   Downloading opentelemetry_exporter_otlp_proto_common-1.36.0-py3-none-any.whl.metadata (1.8 kB)
+2025-09-08T16:55:09.6347319Z Collecting opentelemetry-proto==1.36.0 (from opentelemetry-exporter-otlp-proto-grpc==1.36.0->opentelemetry-exporter-otlp==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 21))
+2025-09-08T16:55:09.6423407Z   Downloading opentelemetry_proto-1.36.0-py3-none-any.whl.metadata (2.3 kB)
+2025-09-08T16:55:09.7064214Z Collecting asgiref~=3.0 (from opentelemetry-instrumentation-asgi==0.57b0->opentelemetry-instrumentation-fastapi==0.57b0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 22))
+2025-09-08T16:55:09.7137364Z   Downloading asgiref-3.9.1-py3-none-any.whl.metadata (9.3 kB)
+2025-09-08T16:55:09.8779337Z Collecting protobuf<7.0,>=5.0 (from opentelemetry-proto==1.36.0->opentelemetry-exporter-otlp-proto-grpc==1.36.0->opentelemetry-exporter-otlp==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 21))
+2025-09-08T16:55:09.8851785Z   Downloading protobuf-6.32.0-cp39-abi3-manylinux2014_x86_64.whl.metadata (593 bytes)
+2025-09-08T16:55:09.9341510Z Collecting bcrypt>=3.1.0 (from passlib[bcrypt]==1.7.4->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 28))
+2025-09-08T16:55:09.9427034Z   Downloading bcrypt-4.3.0-cp39-abi3-manylinux_2_34_x86_64.whl.metadata (10 kB)
+2025-09-08T16:55:10.0133117Z Collecting zipp>=3.20 (from importlib-metadata<8.8.0,>=6.0->opentelemetry-api==1.36.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 20))
+2025-09-08T16:55:10.0206056Z   Downloading zipp-3.23.0-py3-none-any.whl.metadata (3.6 kB)
+2025-09-08T16:55:10.0463224Z Collecting spacy-legacy<3.1.0,>=3.0.11 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.0540068Z   Downloading spacy_legacy-3.0.12-py2.py3-none-any.whl.metadata (2.8 kB)
+2025-09-08T16:55:10.0684078Z Collecting spacy-loggers<2.0.0,>=1.0.0 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.0754474Z   Downloading spacy_loggers-1.0.5-py3-none-any.whl.metadata (23 kB)
+2025-09-08T16:55:10.1117842Z Collecting murmurhash<1.1.0,>=0.28.0 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.1201229Z   Downloading murmurhash-1.0.13-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.2 kB)
+2025-09-08T16:55:10.1549995Z Collecting cymem<2.1.0,>=2.0.2 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.1625780Z   Downloading cymem-2.0.11-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (8.5 kB)
+2025-09-08T16:55:10.1962120Z Collecting preshed<3.1.0,>=3.0.2 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.2042132Z   Downloading preshed-3.0.10-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.4 kB)
+2025-09-08T16:55:10.4410378Z Collecting thinc<8.4.0,>=8.3.4 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.4487035Z   Downloading thinc-8.3.6-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (15 kB)
+2025-09-08T16:55:10.4772069Z Collecting wasabi<1.2.0,>=0.9.1 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.4843189Z   Downloading wasabi-1.1.3-py3-none-any.whl.metadata (28 kB)
+2025-09-08T16:55:10.5336397Z Collecting srsly<3.0.0,>=2.4.3 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.5408428Z   Downloading srsly-2.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
+2025-09-08T16:55:10.5587224Z Collecting catalogue<2.1.0,>=2.0.6 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.5660943Z   Downloading catalogue-2.0.10-py3-none-any.whl.metadata (14 kB)
+2025-09-08T16:55:10.5840500Z Collecting weasel<0.5.0,>=0.1.0 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.5921390Z   Downloading weasel-0.4.1-py3-none-any.whl.metadata (4.6 kB)
+2025-09-08T16:55:10.6181816Z Collecting typer<1.0.0,>=0.3.0 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.6255402Z   Downloading typer-0.17.4-py3-none-any.whl.metadata (15 kB)
+2025-09-08T16:55:10.6765256Z Collecting jinja2 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.6836435Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+2025-09-08T16:55:10.6890556Z Requirement already satisfied: setuptools in /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2)) (65.5.0)
+2025-09-08T16:55:10.7035629Z Collecting langcodes<4.0.0,>=3.2.0 (from spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.7109103Z   Downloading langcodes-3.5.0-py3-none-any.whl.metadata (29 kB)
+2025-09-08T16:55:10.7337786Z Collecting language-data>=1.2 (from langcodes<4.0.0,>=3.2.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.7460849Z   Downloading language_data-1.3.0-py3-none-any.whl.metadata (4.3 kB)
+2025-09-08T16:55:10.8240384Z Collecting blis<1.4.0,>=1.3.0 (from thinc<8.4.0,>=8.3.4->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.8313035Z   Downloading blis-1.3.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.4 kB)
+2025-09-08T16:55:10.8595021Z Collecting confection<1.0.0,>=0.0.1 (from thinc<8.4.0,>=8.3.4->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.8672811Z   Downloading confection-0.1.5-py3-none-any.whl.metadata (19 kB)
+2025-09-08T16:55:10.9308684Z Collecting filelock (from triton<3,>=2.0.0->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:10.9379949Z   Downloading filelock-3.19.1-py3-none-any.whl.metadata (2.1 kB)
+2025-09-08T16:55:10.9700066Z Collecting shellingham>=1.3.0 (from typer<1.0.0,>=0.3.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:10.9769608Z   Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+2025-09-08T16:55:11.0215104Z Collecting rich>=10.11.0 (from typer<1.0.0,>=0.3.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.0292073Z   Downloading rich-14.1.0-py3-none-any.whl.metadata (18 kB)
+2025-09-08T16:55:11.0616914Z Collecting cloudpathlib<1.0.0,>=0.7.0 (from weasel<0.5.0,>=0.1.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.0690811Z   Downloading cloudpathlib-0.22.0-py3-none-any.whl.metadata (16 kB)
+2025-09-08T16:55:11.0931207Z Collecting smart-open<8.0.0,>=5.2.1 (from weasel<0.5.0,>=0.1.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.1004035Z   Downloading smart_open-7.3.1-py3-none-any.whl.metadata (24 kB)
+2025-09-08T16:55:11.1361792Z Collecting pycparser (from cffi>=1.14->cryptography==45.0.6->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 18))
+2025-09-08T16:55:11.1431919Z   Downloading pycparser-2.22-py3-none-any.whl.metadata (943 bytes)
+2025-09-08T16:55:11.1692314Z Collecting six>=1.9.0 (from ecdsa!=0.15->python-jose==3.5.0->-r /home/runner/work/MMT/MMT/backend/requirements.base.txt (line 16))
+2025-09-08T16:55:11.1773767Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+2025-09-08T16:55:11.2397943Z Collecting marisa-trie>=1.1.0 (from language-data>=1.2->langcodes<4.0.0,>=3.2.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.2475128Z   Downloading marisa_trie-1.3.1-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (10 kB)
+2025-09-08T16:55:11.2852673Z Collecting markdown-it-py>=2.2.0 (from rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.2925195Z   Downloading markdown_it_py-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+2025-09-08T16:55:11.3217565Z Collecting pygments<3.0.0,>=2.13.0 (from rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.3289359Z   Downloading pygments-2.19.2-py3-none-any.whl.metadata (2.5 kB)
+2025-09-08T16:55:11.3501018Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.3582945Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+2025-09-08T16:55:11.4401710Z Collecting MarkupSafe>=2.0 (from jinja2->spacy<4.0.0,>=3.4.4->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.4475533Z   Downloading MarkupSafe-3.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.0 kB)
+2025-09-08T16:55:11.5222629Z Collecting llvmlite<0.45,>=0.44.0dev0 (from numba->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.5297048Z   Downloading llvmlite-0.44.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.8 kB)
+2025-09-08T16:55:11.5437897Z Collecting numpy (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.5512729Z   Downloading numpy-2.2.6-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)
+2025-09-08T16:55:11.6222960Z Collecting requests-file>=1.4 (from tldextract->presidio-analyzer==2.2.354->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 2))
+2025-09-08T16:55:11.6297155Z   Downloading requests_file-2.1.0-py2.py3-none-any.whl.metadata (1.7 kB)
+2025-09-08T16:55:11.6671665Z Collecting sympy>=1.13.3 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.6746252Z   Downloading sympy-1.14.0-py3-none-any.whl.metadata (12 kB)
+2025-09-08T16:55:11.7023449Z Collecting networkx (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.7099353Z   Downloading networkx-3.5-py3-none-any.whl.metadata (6.3 kB)
+2025-09-08T16:55:11.7406808Z Collecting fsspec (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.7480857Z   Downloading fsspec-2025.9.0-py3-none-any.whl.metadata (10 kB)
+2025-09-08T16:55:11.7878990Z Collecting nvidia-cuda-nvrtc-cu12==12.8.93 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.7961096Z   Downloading nvidia_cuda_nvrtc_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:11.8147362Z Collecting nvidia-cuda-runtime-cu12==12.8.90 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.8224486Z   Downloading nvidia_cuda_runtime_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:11.8409328Z Collecting nvidia-cuda-cupti-cu12==12.8.90 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.8486101Z   Downloading nvidia_cuda_cupti_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:11.8684873Z Collecting nvidia-cudnn-cu12==9.10.2.21 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.8758938Z   Downloading nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_x86_64.whl.metadata (1.8 kB)
+2025-09-08T16:55:11.8935099Z Collecting nvidia-cublas-cu12==12.8.4.1 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.9009207Z   Downloading nvidia_cublas_cu12-12.8.4.1-py3-none-manylinux_2_27_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:11.9195509Z Collecting nvidia-cufft-cu12==11.3.3.83 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.9273564Z   Downloading nvidia_cufft_cu12-11.3.3.83-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:11.9452519Z Collecting nvidia-curand-cu12==10.3.9.90 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.9528656Z   Downloading nvidia_curand_cu12-10.3.9.90-py3-none-manylinux_2_27_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:11.9713053Z Collecting nvidia-cusolver-cu12==11.7.3.90 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:11.9789106Z   Downloading nvidia_cusolver_cu12-11.7.3.90-py3-none-manylinux_2_27_x86_64.whl.metadata (1.8 kB)
+2025-09-08T16:55:11.9973836Z Collecting nvidia-cusparse-cu12==12.5.8.93 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.0047956Z   Downloading nvidia_cusparse_cu12-12.5.8.93-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.8 kB)
+2025-09-08T16:55:12.0211275Z Collecting nvidia-cusparselt-cu12==0.7.1 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.0302714Z   Downloading nvidia_cusparselt_cu12-0.7.1-py3-none-manylinux2014_x86_64.whl.metadata (7.0 kB)
+2025-09-08T16:55:12.0479974Z Collecting nvidia-nccl-cu12==2.27.3 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.0556085Z   Downloading nvidia_nccl_cu12-2.27.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.0 kB)
+2025-09-08T16:55:12.0735485Z Collecting nvidia-nvtx-cu12==12.8.90 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.0811153Z   Downloading nvidia_nvtx_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.8 kB)
+2025-09-08T16:55:12.0990645Z Collecting nvidia-nvjitlink-cu12==12.8.93 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.1067232Z   Downloading nvidia_nvjitlink_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:12.1216994Z Collecting nvidia-cufile-cu12==1.13.1.3 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.1296131Z   Downloading nvidia_cufile_cu12-1.13.1.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:12.1338679Z INFO: pip is looking at multiple versions of torch to determine which version is compatible with other requirements. This could take a while.
+2025-09-08T16:55:12.1343623Z Collecting torch (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.1427669Z   Downloading torch-2.7.1-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (29 kB)
+2025-09-08T16:55:12.1541688Z Collecting nvidia-cuda-nvrtc-cu12==12.6.77 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.1617372Z   Downloading nvidia_cuda_nvrtc_cu12-12.6.77-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.1669286Z Collecting nvidia-cuda-runtime-cu12==12.6.77 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.1743078Z   Downloading nvidia_cuda_runtime_cu12-12.6.77-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.1792362Z Collecting nvidia-cuda-cupti-cu12==12.6.80 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.1865018Z   Downloading nvidia_cuda_cupti_cu12-12.6.80-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.1914446Z Collecting nvidia-cudnn-cu12==9.5.1.17 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.1984472Z   Downloading nvidia_cudnn_cu12-9.5.1.17-py3-none-manylinux_2_28_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.2035566Z Collecting nvidia-cublas-cu12==12.6.4.1 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.2111979Z   Downloading nvidia_cublas_cu12-12.6.4.1-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.2161836Z Collecting nvidia-cufft-cu12==11.3.0.4 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.2275677Z   Downloading nvidia_cufft_cu12-11.3.0.4-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.2324912Z Collecting nvidia-curand-cu12==10.3.7.77 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.2401044Z   Downloading nvidia_curand_cu12-10.3.7.77-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.2453783Z Collecting nvidia-cusolver-cu12==11.7.1.2 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.2529904Z   Downloading nvidia_cusolver_cu12-11.7.1.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.2587080Z Collecting nvidia-cusparse-cu12==12.5.4.2 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.2666691Z   Downloading nvidia_cusparse_cu12-12.5.4.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.2726235Z Collecting nvidia-cusparselt-cu12==0.6.3 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.2807771Z   Downloading nvidia_cusparselt_cu12-0.6.3-py3-none-manylinux2014_x86_64.whl.metadata (6.8 kB)
+2025-09-08T16:55:12.2856863Z Collecting nvidia-nccl-cu12==2.26.2 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.2931320Z   Downloading nvidia_nccl_cu12-2.26.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.0 kB)
+2025-09-08T16:55:12.2978834Z Collecting nvidia-nvtx-cu12==12.6.77 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.3051046Z   Downloading nvidia_nvtx_cu12-12.6.77-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.3101092Z Collecting nvidia-nvjitlink-cu12==12.6.85 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.3180644Z   Downloading nvidia_nvjitlink_cu12-12.6.85-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.3224749Z Collecting nvidia-cufile-cu12==1.11.1.6 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.3296448Z   Downloading nvidia_cufile_cu12-1.11.1.6-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.3340481Z Collecting torch (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.3427790Z   Downloading torch-2.7.0-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (29 kB)
+2025-09-08T16:55:12.3629649Z   Downloading torch-2.6.0-cp311-cp311-manylinux1_x86_64.whl.metadata (28 kB)
+2025-09-08T16:55:12.3758377Z Collecting nvidia-cuda-nvrtc-cu12==12.4.127 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.3834027Z   Downloading nvidia_cuda_nvrtc_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.3883621Z Collecting nvidia-cuda-runtime-cu12==12.4.127 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.3956305Z   Downloading nvidia_cuda_runtime_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.4008579Z Collecting nvidia-cuda-cupti-cu12==12.4.127 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.4082336Z   Downloading nvidia_cuda_cupti_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.4133777Z Collecting nvidia-cudnn-cu12==9.1.0.70 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.4206538Z   Downloading nvidia_cudnn_cu12-9.1.0.70-py3-none-manylinux2014_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.4257743Z Collecting nvidia-cublas-cu12==12.4.5.8 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.4332252Z   Downloading nvidia_cublas_cu12-12.4.5.8-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.4383579Z Collecting nvidia-cufft-cu12==11.2.1.3 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.4456718Z   Downloading nvidia_cufft_cu12-11.2.1.3-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.4515392Z Collecting nvidia-curand-cu12==10.3.5.147 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.4585406Z   Downloading nvidia_curand_cu12-10.3.5.147-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.4638838Z Collecting nvidia-cusolver-cu12==11.6.1.9 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.4712508Z   Downloading nvidia_cusolver_cu12-11.6.1.9-py3-none-manylinux2014_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.4764236Z Collecting nvidia-cusparse-cu12==12.3.1.170 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.4836761Z   Downloading nvidia_cusparse_cu12-12.3.1.170-py3-none-manylinux2014_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.4884116Z Collecting nvidia-cusparselt-cu12==0.6.2 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.4959968Z   Downloading nvidia_cusparselt_cu12-0.6.2-py3-none-manylinux2014_x86_64.whl.metadata (6.8 kB)
+2025-09-08T16:55:12.5012601Z Collecting nvidia-nccl-cu12==2.21.5 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.5090170Z   Downloading nvidia_nccl_cu12-2.21.5-py3-none-manylinux2014_x86_64.whl.metadata (1.8 kB)
+2025-09-08T16:55:12.5143146Z Collecting nvidia-nvtx-cu12==12.4.127 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.5218699Z   Downloading nvidia_nvtx_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:12.5271675Z Collecting nvidia-nvjitlink-cu12==12.4.127 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.5344986Z   Downloading nvidia_nvjitlink_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.5395565Z Collecting torch (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.5469411Z   Downloading torch-2.5.1-cp311-cp311-manylinux1_x86_64.whl.metadata (28 kB)
+2025-09-08T16:55:12.5683854Z   Downloading torch-2.5.0-cp311-cp311-manylinux1_x86_64.whl.metadata (28 kB)
+2025-09-08T16:55:12.5862015Z   Downloading torch-2.4.1-cp311-cp311-manylinux1_x86_64.whl.metadata (26 kB)
+2025-09-08T16:55:12.6017839Z Collecting nvidia-cuda-nvrtc-cu12==12.1.105 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.6096907Z   Downloading nvidia_cuda_nvrtc_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.6144735Z Collecting nvidia-cuda-runtime-cu12==12.1.105 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.6238732Z   Downloading nvidia_cuda_runtime_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.6287409Z Collecting nvidia-cuda-cupti-cu12==12.1.105 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.6362893Z   Downloading nvidia_cuda_cupti_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.6410308Z Collecting nvidia-cublas-cu12==12.1.3.1 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.6488966Z   Downloading nvidia_cublas_cu12-12.1.3.1-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.6537497Z Collecting nvidia-cufft-cu12==11.0.2.54 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.6610937Z   Downloading nvidia_cufft_cu12-11.0.2.54-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.6657659Z Collecting nvidia-curand-cu12==10.3.2.106 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.6731012Z   Downloading nvidia_curand_cu12-10.3.2.106-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+2025-09-08T16:55:12.6780849Z Collecting nvidia-cusolver-cu12==11.4.5.107 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.6854294Z   Downloading nvidia_cusolver_cu12-11.4.5.107-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.6905405Z Collecting nvidia-cusparse-cu12==12.1.0.106 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.6978384Z   Downloading nvidia_cusparse_cu12-12.1.0.106-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.7047923Z Collecting nvidia-nccl-cu12==2.20.5 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.7122546Z   Downloading nvidia_nccl_cu12-2.20.5-py3-none-manylinux2014_x86_64.whl.metadata (1.8 kB)
+2025-09-08T16:55:12.7170625Z Collecting nvidia-nvtx-cu12==12.1.105 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.7246203Z   Downloading nvidia_nvtx_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:12.7292112Z Collecting torch (from openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.7387798Z   Downloading torch-2.4.0-cp311-cp311-manylinux1_x86_64.whl.metadata (26 kB)
+2025-09-08T16:55:12.7482490Z INFO: pip is still looking at multiple versions of torch to determine which version is compatible with other requirements. This could take a while.
+2025-09-08T16:55:12.7559752Z   Downloading torch-2.3.1-cp311-cp311-manylinux1_x86_64.whl.metadata (26 kB)
+2025-09-08T16:55:12.7674084Z Collecting nvidia-cudnn-cu12==8.9.2.26 (from torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.7751010Z   Downloading nvidia_cudnn_cu12-8.9.2.26-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+2025-09-08T16:55:12.8067466Z Collecting nvidia-nvjitlink-cu12 (from nvidia-cusolver-cu12==11.4.5.107->torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.8154641Z   Downloading nvidia_nvjitlink_cu12-12.9.86-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl.metadata (1.7 kB)
+2025-09-08T16:55:12.8585115Z Collecting mpmath<1.4,>=1.1.0 (from sympy>=1.13.3->torch->openai-whisper==20231117->-r /home/runner/work/MMT/MMT/backend/requirements.ml.txt (line 1))
+2025-09-08T16:55:12.8659370Z   Downloading mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+2025-09-08T16:55:12.8817343Z Downloading gunicorn-23.0.0-py3-none-any.whl (85 kB)
+2025-09-08T16:55:12.8925372Z Downloading fastapi-0.116.1-py3-none-any.whl (95 kB)
+2025-09-08T16:55:12.9027117Z Downloading pydantic-2.11.7-py3-none-any.whl (444 kB)
+2025-09-08T16:55:12.9139270Z Downloading uvicorn-0.35.0-py3-none-any.whl (66 kB)
+2025-09-08T16:55:12.9239663Z Downloading python_multipart-0.0.20-py3-none-any.whl (24 kB)
+2025-09-08T16:55:12.9374524Z Downloading pydantic_settings-2.10.1-py3-none-any.whl (45 kB)
+2025-09-08T16:55:12.9472181Z Downloading python_dotenv-1.1.1-py3-none-any.whl (20 kB)
+2025-09-08T16:55:12.9569766Z Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+2025-09-08T16:55:12.9669596Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+2025-09-08T16:55:12.9774686Z Downloading tenacity-9.1.2-py3-none-any.whl (28 kB)
+2025-09-08T16:55:12.9875211Z Downloading structlog-25.4.0-py3-none-any.whl (68 kB)
+2025-09-08T16:55:12.9976128Z Downloading prometheus_client-0.22.1-py3-none-any.whl (58 kB)
+2025-09-08T16:55:13.0082101Z Downloading sqlalchemy-2.0.43-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+2025-09-08T16:55:13.0320021Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 143.9 MB/s  0:00:00
+2025-09-08T16:55:13.0408800Z Downloading PyMySQL-1.1.1-py3-none-any.whl (44 kB)
+2025-09-08T16:55:13.0541181Z Downloading alembic-1.13.2-py3-none-any.whl (232 kB)
+2025-09-08T16:55:13.0648605Z Downloading python_jose-3.5.0-py2.py3-none-any.whl (34 kB)
+2025-09-08T16:55:13.0747523Z Downloading redis-6.4.0-py3-none-any.whl (279 kB)
+2025-09-08T16:55:13.0856767Z Downloading cryptography-45.0.6-cp311-abi3-manylinux_2_34_x86_64.whl (4.5 MB)
+2025-09-08T16:55:13.1127419Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 172.3 MB/s  0:00:00
+2025-09-08T16:55:13.1204178Z Downloading opentelemetry_sdk-1.36.0-py3-none-any.whl (119 kB)
+2025-09-08T16:55:13.1308875Z Downloading opentelemetry_api-1.36.0-py3-none-any.whl (65 kB)
+2025-09-08T16:55:13.1406271Z Downloading opentelemetry_exporter_otlp-1.36.0-py3-none-any.whl (7.0 kB)
+2025-09-08T16:55:13.1513999Z Downloading opentelemetry_instrumentation_fastapi-0.57b0-py3-none-any.whl (12 kB)
+2025-09-08T16:55:13.1609868Z Downloading opentelemetry_instrumentation_requests-0.57b0-py3-none-any.whl (12 kB)
+2025-09-08T16:55:13.1706576Z Downloading opentelemetry_instrumentation_sqlalchemy-0.57b0-py3-none-any.whl (14 kB)
+2025-09-08T16:55:13.1817405Z Downloading opentelemetry_instrumentation_pika-0.57b0-py3-none-any.whl (13 kB)
+2025-09-08T16:55:13.1914460Z Downloading PyJWT-2.9.0-py3-none-any.whl (22 kB)
+2025-09-08T16:55:13.2012175Z Downloading pika-1.3.2-py3-none-any.whl (155 kB)
+2025-09-08T16:55:13.2113566Z Downloading passlib-1.7.4-py2.py3-none-any.whl (525 kB)
+2025-09-08T16:55:13.2175474Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 525.6/525.6 kB 73.4 MB/s  0:00:00
+2025-09-08T16:55:13.2317806Z Downloading openai-1.3.7-py3-none-any.whl (221 kB)
+2025-09-08T16:55:13.2431642Z Downloading presidio_analyzer-2.2.354-py3-none-any.whl (92 kB)
+2025-09-08T16:55:13.2531994Z Downloading opentelemetry_exporter_otlp_proto_grpc-1.36.0-py3-none-any.whl (18 kB)
+2025-09-08T16:55:13.2643053Z Downloading opentelemetry_exporter_otlp_proto_common-1.36.0-py3-none-any.whl (18 kB)
+2025-09-08T16:55:13.2757838Z Downloading opentelemetry_exporter_otlp_proto_http-1.36.0-py3-none-any.whl (18 kB)
+2025-09-08T16:55:13.2860439Z Downloading opentelemetry_instrumentation-0.57b0-py3-none-any.whl (32 kB)
+2025-09-08T16:55:13.2955052Z Downloading opentelemetry_instrumentation_asgi-0.57b0-py3-none-any.whl (16 kB)
+2025-09-08T16:55:13.3052370Z Downloading opentelemetry_proto-1.36.0-py3-none-any.whl (72 kB)
+2025-09-08T16:55:13.3146567Z Downloading opentelemetry_semantic_conventions-0.57b0-py3-none-any.whl (201 kB)
+2025-09-08T16:55:13.3253515Z Downloading opentelemetry_util_http-0.57b0-py3-none-any.whl (7.6 kB)
+2025-09-08T16:55:13.3348189Z Downloading pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
+2025-09-08T16:55:13.3471514Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 174.7 MB/s  0:00:00
+2025-09-08T16:55:13.3568307Z Downloading anyio-3.7.1-py3-none-any.whl (80 kB)
+2025-09-08T16:55:13.3664058Z Downloading asgiref-3.9.1-py3-none-any.whl (23 kB)
+2025-09-08T16:55:13.3772044Z Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (150 kB)
+2025-09-08T16:55:13.3878671Z Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+2025-09-08T16:55:13.3982393Z Downloading googleapis_common_protos-1.70.0-py3-none-any.whl (294 kB)
+2025-09-08T16:55:13.4088048Z Downloading grpcio-1.74.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (6.2 MB)
+2025-09-08T16:55:13.4374282Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.2/6.2 MB 231.6 MB/s  0:00:00
+2025-09-08T16:55:13.4448042Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+2025-09-08T16:55:13.4546472Z Downloading idna-3.10-py3-none-any.whl (70 kB)
+2025-09-08T16:55:13.4642942Z Downloading importlib_metadata-8.7.0-py3-none-any.whl (27 kB)
+2025-09-08T16:55:13.4774248Z Downloading phonenumbers-8.13.55-py2.py3-none-any.whl (2.6 MB)
+2025-09-08T16:55:13.4967010Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.6/2.6 MB 137.9 MB/s  0:00:00
+2025-09-08T16:55:13.5046525Z Downloading protobuf-6.32.0-cp39-abi3-manylinux2014_x86_64.whl (322 kB)
+2025-09-08T16:55:13.5156543Z Downloading rsa-4.9.1-py3-none-any.whl (34 kB)
+2025-09-08T16:55:13.5335292Z Downloading spacy-3.8.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (33.0 MB)
+2025-09-08T16:55:13.7186849Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 33.0/33.0 MB 179.6 MB/s  0:00:00
+2025-09-08T16:55:13.7262682Z Downloading catalogue-2.0.10-py3-none-any.whl (17 kB)
+2025-09-08T16:55:13.7361889Z Downloading cymem-2.0.11-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (218 kB)
+2025-09-08T16:55:13.7468104Z Downloading langcodes-3.5.0-py3-none-any.whl (182 kB)
+2025-09-08T16:55:13.7568444Z Downloading murmurhash-1.0.13-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (123 kB)
+2025-09-08T16:55:13.7665715Z Downloading preshed-3.0.10-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (842 kB)
+2025-09-08T16:55:13.7803293Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 842.9/842.9 kB 64.4 MB/s  0:00:00
+2025-09-08T16:55:13.7878057Z Downloading spacy_legacy-3.0.12-py2.py3-none-any.whl (29 kB)
+2025-09-08T16:55:13.7974662Z Downloading spacy_loggers-1.0.5-py3-none-any.whl (22 kB)
+2025-09-08T16:55:13.8070834Z Downloading srsly-2.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.1 MB)
+2025-09-08T16:55:13.8222158Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 84.9 MB/s  0:00:00
+2025-09-08T16:55:13.8295737Z Downloading starlette-0.47.3-py3-none-any.whl (72 kB)
+2025-09-08T16:55:13.8425245Z Downloading thinc-8.3.6-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.5 MB)
+2025-09-08T16:55:13.8666360Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 197.8 MB/s  0:00:00
+2025-09-08T16:55:13.8773683Z Downloading blis-1.3.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (11.7 MB)
+2025-09-08T16:55:13.9388483Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.7/11.7 MB 193.4 MB/s  0:00:00
+2025-09-08T16:55:13.9463375Z Downloading confection-0.1.5-py3-none-any.whl (35 kB)
+2025-09-08T16:55:13.9560247Z Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+2025-09-08T16:55:13.9701354Z Downloading triton-2.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (168.1 MB)
+2025-09-08T16:55:15.1457439Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 168.1/168.1 MB 143.1 MB/s  0:00:01
+2025-09-08T16:55:15.1535510Z Downloading typer-0.17.4-py3-none-any.whl (46 kB)
+2025-09-08T16:55:15.1648636Z Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+2025-09-08T16:55:15.1748203Z Downloading urllib3-2.5.0-py3-none-any.whl (129 kB)
+2025-09-08T16:55:15.1848554Z Downloading wasabi-1.1.3-py3-none-any.whl (27 kB)
+2025-09-08T16:55:15.1950300Z Downloading weasel-0.4.1-py3-none-any.whl (50 kB)
+2025-09-08T16:55:15.2049702Z Downloading cloudpathlib-0.22.0-py3-none-any.whl (61 kB)
+2025-09-08T16:55:15.2149440Z Downloading smart_open-7.3.1-py3-none-any.whl (61 kB)
+2025-09-08T16:55:15.2254041Z Downloading wrapt-1.17.3-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (82 kB)
+2025-09-08T16:55:15.2353010Z Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+2025-09-08T16:55:15.2452357Z Downloading bcrypt-4.3.0-cp39-abi3-manylinux_2_34_x86_64.whl (284 kB)
+2025-09-08T16:55:15.2561240Z Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
+2025-09-08T16:55:15.2665481Z Downloading cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (467 kB)
+2025-09-08T16:55:15.2786793Z Downloading click-8.2.1-py3-none-any.whl (102 kB)
+2025-09-08T16:55:15.2884360Z Downloading ecdsa-0.19.1-py2.py3-none-any.whl (150 kB)
+2025-09-08T16:55:15.2986965Z Downloading greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (587 kB)
+2025-09-08T16:55:15.3050075Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 587.7/587.7 kB 88.2 MB/s  0:00:00
+2025-09-08T16:55:15.3128347Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+2025-09-08T16:55:15.3235140Z Downloading language_data-1.3.0-py3-none-any.whl (5.4 MB)
+2025-09-08T16:55:15.3501639Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.4/5.4 MB 220.5 MB/s  0:00:00
+2025-09-08T16:55:15.3578959Z Downloading marisa_trie-1.3.1-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (1.3 MB)
+2025-09-08T16:55:15.3701478Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 133.0 MB/s  0:00:00
+2025-09-08T16:55:15.3778543Z Downloading packaging-25.0-py3-none-any.whl (66 kB)
+2025-09-08T16:55:15.3873797Z Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
+2025-09-08T16:55:15.3971075Z Downloading rich-14.1.0-py3-none-any.whl (243 kB)
+2025-09-08T16:55:15.4079764Z Downloading pygments-2.19.2-py3-none-any.whl (1.2 MB)
+2025-09-08T16:55:15.4170355Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 156.6 MB/s  0:00:00
+2025-09-08T16:55:15.4247804Z Downloading markdown_it_py-4.0.0-py3-none-any.whl (87 kB)
+2025-09-08T16:55:15.4346612Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+2025-09-08T16:55:15.4441716Z Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+2025-09-08T16:55:15.4533416Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+2025-09-08T16:55:15.4626811Z Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+2025-09-08T16:55:15.4721551Z Downloading typing_inspection-0.4.1-py3-none-any.whl (14 kB)
+2025-09-08T16:55:15.4814459Z Downloading zipp-3.23.0-py3-none-any.whl (10 kB)
+2025-09-08T16:55:15.4910185Z Downloading filelock-3.19.1-py3-none-any.whl (15 kB)
+2025-09-08T16:55:15.5005586Z Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+2025-09-08T16:55:15.5109573Z Downloading MarkupSafe-3.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (23 kB)
+2025-09-08T16:55:15.5210448Z Downloading mako-1.3.10-py3-none-any.whl (78 kB)
+2025-09-08T16:55:15.5315125Z Downloading more_itertools-10.8.0-py3-none-any.whl (69 kB)
+2025-09-08T16:55:15.5453916Z Downloading numba-0.61.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (3.8 MB)
+2025-09-08T16:55:15.5714144Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.8/3.8 MB 153.9 MB/s  0:00:00
+2025-09-08T16:55:15.5794415Z Downloading llvmlite-0.44.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (42.4 MB)
+2025-09-08T16:55:15.8102392Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.4/42.4 MB 185.0 MB/s  0:00:00
+2025-09-08T16:55:15.8180048Z Downloading numpy-2.2.6-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.8 MB)
+2025-09-08T16:55:15.9108221Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.8/16.8 MB 185.4 MB/s  0:00:00
+2025-09-08T16:55:15.9181884Z Downloading pycparser-2.22-py3-none-any.whl (117 kB)
+2025-09-08T16:55:15.9285236Z Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (762 kB)
+2025-09-08T16:55:15.9352555Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 763.0/763.0 kB 120.5 MB/s  0:00:00
+2025-09-08T16:55:15.9428971Z Downloading regex-2025.9.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (798 kB)
+2025-09-08T16:55:15.9496511Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 799.0/799.0 kB 124.6 MB/s  0:00:00
+2025-09-08T16:55:15.9575565Z Downloading tiktoken-0.11.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.2 MB)
+2025-09-08T16:55:15.9666519Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 141.6 MB/s  0:00:00
+2025-09-08T16:55:15.9751047Z Downloading tldextract-5.3.0-py3-none-any.whl (107 kB)
+2025-09-08T16:55:15.9848759Z Downloading requests_file-2.1.0-py2.py3-none-any.whl (4.2 kB)
+2025-09-08T16:55:15.9969702Z Downloading torch-2.3.1-cp311-cp311-manylinux1_x86_64.whl (779.2 MB)
+2025-09-08T16:55:22.8713786Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 779.2/779.2 MB 61.9 MB/s  0:00:06
+2025-09-08T16:55:22.8789128Z Downloading nvidia_cublas_cu12-12.1.3.1-py3-none-manylinux1_x86_64.whl (410.6 MB)
+2025-09-08T16:55:25.4909137Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 410.6/410.6 MB 118.3 MB/s  0:00:02
+2025-09-08T16:55:25.4986762Z Downloading nvidia_cuda_cupti_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (14.1 MB)
+2025-09-08T16:55:25.5602253Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 14.1/14.1 MB 237.0 MB/s  0:00:00
+2025-09-08T16:55:25.5677980Z Downloading nvidia_cuda_nvrtc_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (23.7 MB)
+2025-09-08T16:55:25.6696105Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 23.7/23.7 MB 237.0 MB/s  0:00:00
+2025-09-08T16:55:25.6777927Z Downloading nvidia_cuda_runtime_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (823 kB)
+2025-09-08T16:55:25.6873301Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 823.6/823.6 kB 80.2 MB/s  0:00:00
+2025-09-08T16:55:25.6948383Z Downloading nvidia_cudnn_cu12-8.9.2.26-py3-none-manylinux1_x86_64.whl (731.7 MB)
+2025-09-08T16:55:32.0569914Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 731.7/731.7 MB 55.9 MB/s  0:00:06
+2025-09-08T16:55:32.0651328Z Downloading nvidia_cufft_cu12-11.0.2.54-py3-none-manylinux1_x86_64.whl (121.6 MB)
+2025-09-08T16:55:32.5608749Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 121.6/121.6 MB 246.4 MB/s  0:00:00
+2025-09-08T16:55:32.5685613Z Downloading nvidia_curand_cu12-10.3.2.106-py3-none-manylinux1_x86_64.whl (56.5 MB)
+2025-09-08T16:55:32.8023755Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.5/56.5 MB 243.8 MB/s  0:00:00
+2025-09-08T16:55:32.8104032Z Downloading nvidia_cusolver_cu12-11.4.5.107-py3-none-manylinux1_x86_64.whl (124.2 MB)
+2025-09-08T16:55:33.3391467Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 124.2/124.2 MB 235.7 MB/s  0:00:00
+2025-09-08T16:55:33.3472644Z Downloading nvidia_cusparse_cu12-12.1.0.106-py3-none-manylinux1_x86_64.whl (196.0 MB)
+2025-09-08T16:55:34.3043403Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 196.0/196.0 MB 205.3 MB/s  0:00:00
+2025-09-08T16:55:34.3124486Z Downloading nvidia_nccl_cu12-2.20.5-py3-none-manylinux2014_x86_64.whl (176.2 MB)
+2025-09-08T16:55:35.1480735Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 176.2/176.2 MB 211.5 MB/s  0:00:00
+2025-09-08T16:55:35.1564884Z Downloading nvidia_nvtx_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (99 kB)
+2025-09-08T16:55:35.1666300Z Downloading fsspec-2025.9.0-py3-none-any.whl (199 kB)
+2025-09-08T16:55:35.1776501Z Downloading networkx-3.5-py3-none-any.whl (2.0 MB)
+2025-09-08T16:55:35.1931786Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 139.3 MB/s  0:00:00
+2025-09-08T16:55:35.2011105Z Downloading nvidia_nvjitlink_cu12-12.9.86-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl (39.7 MB)
+2025-09-08T16:55:35.3684028Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 39.7/39.7 MB 239.8 MB/s  0:00:00
+2025-09-08T16:55:35.3762464Z Downloading sympy-1.14.0-py3-none-any.whl (6.3 MB)
+2025-09-08T16:55:35.4075282Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.3/6.3 MB 211.3 MB/s  0:00:00
+2025-09-08T16:55:35.4155304Z Downloading mpmath-1.3.0-py3-none-any.whl (536 kB)
+2025-09-08T16:55:35.4219575Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 536.2/536.2 kB 70.8 MB/s  0:00:00
+2025-09-08T16:55:37.6979185Z Building wheels for collected packages: openai-whisper
+2025-09-08T16:55:37.6987713Z   Building wheel for openai-whisper (pyproject.toml): started
+2025-09-08T16:55:38.0462802Z   Building wheel for openai-whisper (pyproject.toml): finished with status 'done'
+2025-09-08T16:55:38.0475608Z   Created wheel for openai-whisper: filename=openai_whisper-20231117-py3-none-any.whl size=801443 sha256=2ceeefbd0bd86efba186d90de63430df9ddeef84d13f542538cf1b0ecf4a7920
+2025-09-08T16:55:38.0477871Z   Stored in directory: /home/runner/.cache/pip/wheels/55/5d/42/c296ab046d52caa0adc0e3f159e98f011b3994a022d6282105
+2025-09-08T16:55:38.0497124Z Successfully built openai-whisper
+2025-09-08T16:55:38.2961879Z Installing collected packages: phonenumbers, passlib, mpmath, cymem, zipp, wrapt, wasabi, urllib3, typing-extensions, tqdm, tenacity, sympy, structlog, spacy-loggers, spacy-legacy, sniffio, six, shellingham, regex, redis, pyyaml, python-multipart, python-dotenv, pymysql, PyJWT, pygments, pycparser, pyasn1, protobuf, prometheus-client, pika, packaging, opentelemetry-util-http, nvidia-nvtx-cu12, nvidia-nvjitlink-cu12, nvidia-nccl-cu12, nvidia-curand-cu12, nvidia-cufft-cu12, nvidia-cuda-runtime-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-cupti-cu12, nvidia-cublas-cu12, numpy, networkx, murmurhash, more-itertools, mdurl, MarkupSafe, marisa-trie, llvmlite, idna, h11, grpcio, greenlet, fsspec, filelock, distro, cloudpathlib, click, charset_normalizer, certifi, catalogue, bcrypt, asgiref, annotated-types, uvicorn, typing-inspection, triton, srsly, SQLAlchemy, smart-open, rsa, requests, pydantic-core, preshed, opentelemetry-proto, nvidia-cusparse-cu12, nvidia-cudnn-cu12, numba, markdown-it-py, Mako, language-data, jinja2, importlib-metadata, httpcore, gunicorn, googleapis-common-protos, ecdsa, cffi, blis, anyio, tiktoken, starlette, rich, requests-file, python-jose, pydantic, opentelemetry-exporter-otlp-proto-common, opentelemetry-api, nvidia-cusolver-cu12, langcodes, httpx, cryptography, alembic, typer, torch, tldextract, pydantic-settings, opentelemetry-semantic-conventions, openai, fastapi, confection, weasel, thinc, opentelemetry-sdk, opentelemetry-instrumentation, openai-whisper, spacy, opentelemetry-instrumentation-sqlalchemy, opentelemetry-instrumentation-requests, opentelemetry-instrumentation-pika, opentelemetry-instrumentation-asgi, opentelemetry-exporter-otlp-proto-http, opentelemetry-exporter-otlp-proto-grpc, presidio-analyzer, opentelemetry-instrumentation-fastapi, opentelemetry-exporter-otlp
+2025-09-08T16:56:33.9126358Z 
+2025-09-08T16:56:33.9194393Z Successfully installed Mako-1.3.10 MarkupSafe-3.0.2 PyJWT-2.9.0 SQLAlchemy-2.0.43 alembic-1.13.2 annotated-types-0.7.0 anyio-3.7.1 asgiref-3.9.1 bcrypt-4.3.0 blis-1.3.0 catalogue-2.0.10 certifi-2025.8.3 cffi-1.17.1 charset_normalizer-3.4.3 click-8.2.1 cloudpathlib-0.22.0 confection-0.1.5 cryptography-45.0.6 cymem-2.0.11 distro-1.9.0 ecdsa-0.19.1 fastapi-0.116.1 filelock-3.19.1 fsspec-2025.9.0 googleapis-common-protos-1.70.0 greenlet-3.2.4 grpcio-1.74.0 gunicorn-23.0.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.10 importlib-metadata-8.7.0 jinja2-3.1.6 langcodes-3.5.0 language-data-1.3.0 llvmlite-0.44.0 marisa-trie-1.3.1 markdown-it-py-4.0.0 mdurl-0.1.2 more-itertools-10.8.0 mpmath-1.3.0 murmurhash-1.0.13 networkx-3.5 numba-0.61.2 numpy-2.2.6 nvidia-cublas-cu12-12.1.3.1 nvidia-cuda-cupti-cu12-12.1.105 nvidia-cuda-nvrtc-cu12-12.1.105 nvidia-cuda-runtime-cu12-12.1.105 nvidia-cudnn-cu12-8.9.2.26 nvidia-cufft-cu12-11.0.2.54 nvidia-curand-cu12-10.3.2.106 nvidia-cusolver-cu12-11.4.5.107 nvidia-cusparse-cu12-12.1.0.106 nvidia-nccl-cu12-2.20.5 nvidia-nvjitlink-cu12-12.9.86 nvidia-nvtx-cu12-12.1.105 openai-1.3.7 openai-whisper-20231117 opentelemetry-api-1.36.0 opentelemetry-exporter-otlp-1.36.0 opentelemetry-exporter-otlp-proto-common-1.36.0 opentelemetry-exporter-otlp-proto-grpc-1.36.0 opentelemetry-exporter-otlp-proto-http-1.36.0 opentelemetry-instrumentation-0.57b0 opentelemetry-instrumentation-asgi-0.57b0 opentelemetry-instrumentation-fastapi-0.57b0 opentelemetry-instrumentation-pika-0.57b0 opentelemetry-instrumentation-requests-0.57b0 opentelemetry-instrumentation-sqlalchemy-0.57b0 opentelemetry-proto-1.36.0 opentelemetry-sdk-1.36.0 opentelemetry-semantic-conventions-0.57b0 opentelemetry-util-http-0.57b0 packaging-25.0 passlib-1.7.4 phonenumbers-8.13.55 pika-1.3.2 preshed-3.0.10 presidio-analyzer-2.2.354 prometheus-client-0.22.1 protobuf-6.32.0 pyasn1-0.6.1 pycparser-2.22 pydantic-2.11.7 pydantic-core-2.33.2 pydantic-settings-2.10.1 pygments-2.19.2 pymysql-1.1.1 python-dotenv-1.1.1 python-jose-3.5.0 python-multipart-0.0.20 pyyaml-6.0.2 redis-6.4.0 regex-2025.9.1 requests-2.32.5 requests-file-2.1.0 rich-14.1.0 rsa-4.9.1 shellingham-1.5.4 six-1.17.0 smart-open-7.3.1 sniffio-1.3.1 spacy-3.8.7 spacy-legacy-3.0.12 spacy-loggers-1.0.5 srsly-2.5.1 starlette-0.47.3 structlog-25.4.0 sympy-1.14.0 tenacity-9.1.2 thinc-8.3.6 tiktoken-0.11.0 tldextract-5.3.0 torch-2.3.1 tqdm-4.67.1 triton-2.3.1 typer-0.17.4 typing-extensions-4.15.0 typing-inspection-0.4.1 urllib3-2.5.0 uvicorn-0.35.0 wasabi-1.1.3 weasel-0.4.1 wrapt-1.17.3 zipp-3.23.0
+2025-09-08T16:56:35.3692122Z ##[group]Run cd backend
+2025-09-08T16:56:35.3692402Z [36;1mcd backend[0m
+2025-09-08T16:56:35.3692694Z [36;1mpython -m pytest tests/ -v || echo "No tests found"[0m
+2025-09-08T16:56:35.3725999Z shell: /usr/bin/bash -e {0}
+2025-09-08T16:56:35.3726228Z env:
+2025-09-08T16:56:35.3726476Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:56:35.3726883Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-09-08T16:56:35.3727262Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:56:35.3727596Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:56:35.3727950Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:56:35.3728297Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-09-08T16:56:35.3728582Z ##[endgroup]
+2025-09-08T16:56:35.3921717Z /opt/hostedtoolcache/Python/3.11.13/x64/bin/python: No module named pytest
+2025-09-08T16:56:35.3950380Z No tests found
+2025-09-08T16:56:35.4018162Z Post job cleanup.
+2025-09-08T16:56:35.5689421Z Post job cleanup.
+2025-09-08T16:56:35.6638079Z [command]/usr/bin/git version
+2025-09-08T16:56:35.6676219Z git version 2.51.0
+2025-09-08T16:56:35.6720446Z Temporarily overriding HOME='/home/runner/work/_temp/2c199736-19ab-4b5c-aee2-6d896512b802' before making global git config changes
+2025-09-08T16:56:35.6722371Z Adding repository directory to the temporary git global config as a safe directory
+2025-09-08T16:56:35.6734405Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MMT/MMT
+2025-09-08T16:56:35.6770021Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-09-08T16:56:35.6805439Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-09-08T16:56:35.7038524Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-09-08T16:56:35.7061184Z http.https://github.com/.extraheader
+2025-09-08T16:56:35.7074276Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-09-08T16:56:35.7106373Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-09-08T16:56:35.7454243Z Cleaning up orphan processes

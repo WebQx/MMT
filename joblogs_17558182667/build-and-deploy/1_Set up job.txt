@@ -1,0 +1,34 @@
+﻿2025-09-08T16:54:59.4298927Z Current runner version: '2.328.0'
+2025-09-08T16:54:59.4332908Z ##[group]Runner Image Provisioner
+2025-09-08T16:54:59.4334089Z Hosted Compute Agent
+2025-09-08T16:54:59.4334952Z Version: 20250829.383
+2025-09-08T16:54:59.4336068Z Commit: 27cb235aab5b0e52e153a26cd86b4742e89dac5d
+2025-09-08T16:54:59.4337245Z Build Date: 2025-08-29T13:48:48Z
+2025-09-08T16:54:59.4338519Z ##[endgroup]
+2025-09-08T16:54:59.4339418Z ##[group]Operating System
+2025-09-08T16:54:59.4340302Z Ubuntu
+2025-09-08T16:54:59.4341006Z 24.04.3
+2025-09-08T16:54:59.4341770Z LTS
+2025-09-08T16:54:59.4342645Z ##[endgroup]
+2025-09-08T16:54:59.4343447Z ##[group]Runner Image
+2025-09-08T16:54:59.4344514Z Image: ubuntu-24.04
+2025-09-08T16:54:59.4345351Z Version: 20250831.1.0
+2025-09-08T16:54:59.4347112Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250831.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-09-08T16:54:59.4349698Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250831.1
+2025-09-08T16:54:59.4351763Z ##[endgroup]
+2025-09-08T16:54:59.4353605Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T16:54:59.4356459Z Contents: read
+2025-09-08T16:54:59.4357460Z Metadata: read
+2025-09-08T16:54:59.4358663Z Packages: read
+2025-09-08T16:54:59.4359556Z ##[endgroup]
+2025-09-08T16:54:59.4362526Z Secret source: Actions
+2025-09-08T16:54:59.4363590Z Prepare workflow directory
+2025-09-08T16:54:59.4809958Z Prepare all required actions
+2025-09-08T16:54:59.4863928Z Getting action download info
+2025-09-08T16:54:59.8273204Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T16:54:59.9102146Z Download action repository 'actions/cache@v4' (SHA:0400d5f644dc74513175e3cd8d07132dd4860809)
+2025-09-08T16:55:00.0086184Z Download action repository 'subosito/flutter-action@v2' (SHA:fd55f4c5af5b953cc57a2be44cb082c8f6635e8e)
+2025-09-08T16:55:00.2532091Z Download action repository 'FirebaseExtended/action-hosting-deploy@v0' (SHA:e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c)
+2025-09-08T16:55:00.4505302Z Download action repository 'thollander/actions-comment-pull-request@v2' (SHA:fabd468d3a1a0b97feee5f6b9e499eab0dd903f6)
+2025-09-08T16:55:00.7232398Z Getting action download info
+2025-09-08T16:55:00.8912995Z Complete job name: build-and-deploy

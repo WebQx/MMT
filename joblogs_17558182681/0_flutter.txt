@@ -1,0 +1,246 @@
+﻿2025-09-08T16:54:59.4712781Z Current runner version: '2.328.0'
+2025-09-08T16:54:59.4736720Z ##[group]Runner Image Provisioner
+2025-09-08T16:54:59.4737529Z Hosted Compute Agent
+2025-09-08T16:54:59.4738043Z Version: 20250829.383
+2025-09-08T16:54:59.4738709Z Commit: 27cb235aab5b0e52e153a26cd86b4742e89dac5d
+2025-09-08T16:54:59.4739356Z Build Date: 2025-08-29T13:48:48Z
+2025-09-08T16:54:59.4739960Z ##[endgroup]
+2025-09-08T16:54:59.4740477Z ##[group]Operating System
+2025-09-08T16:54:59.4741568Z Ubuntu
+2025-09-08T16:54:59.4742051Z 24.04.3
+2025-09-08T16:54:59.4742524Z LTS
+2025-09-08T16:54:59.4742987Z ##[endgroup]
+2025-09-08T16:54:59.4743435Z ##[group]Runner Image
+2025-09-08T16:54:59.4744033Z Image: ubuntu-24.04
+2025-09-08T16:54:59.4744515Z Version: 20250831.1.0
+2025-09-08T16:54:59.4745505Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250831.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-09-08T16:54:59.4747044Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250831.1
+2025-09-08T16:54:59.4747990Z ##[endgroup]
+2025-09-08T16:54:59.4749108Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T16:54:59.4751171Z Contents: read
+2025-09-08T16:54:59.4751804Z Metadata: read
+2025-09-08T16:54:59.4752338Z Packages: read
+2025-09-08T16:54:59.4752804Z ##[endgroup]
+2025-09-08T16:54:59.4754918Z Secret source: Actions
+2025-09-08T16:54:59.4755601Z Prepare workflow directory
+2025-09-08T16:54:59.5084784Z Prepare all required actions
+2025-09-08T16:54:59.5122522Z Getting action download info
+2025-09-08T16:54:59.8017546Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T16:54:59.9975227Z Download action repository 'subosito/flutter-action@v2' (SHA:fd55f4c5af5b953cc57a2be44cb082c8f6635e8e)
+2025-09-08T16:55:00.2143957Z Getting action download info
+2025-09-08T16:55:00.3208246Z Download action repository 'actions/cache@v4' (SHA:0400d5f644dc74513175e3cd8d07132dd4860809)
+2025-09-08T16:55:00.5245893Z Complete job name: flutter
+2025-09-08T16:55:00.6018110Z ##[group]Run actions/checkout@v4
+2025-09-08T16:55:00.6019366Z with:
+2025-09-08T16:55:00.6020023Z   submodules: false
+2025-09-08T16:55:00.6020906Z   fetch-depth: 0
+2025-09-08T16:55:00.6021628Z   repository: WebQx/MMT
+2025-09-08T16:55:00.6022674Z   token: ***
+2025-09-08T16:55:00.6023350Z   ssh-strict: true
+2025-09-08T16:55:00.6024060Z   ssh-user: git
+2025-09-08T16:55:00.6024791Z   persist-credentials: true
+2025-09-08T16:55:00.6025605Z   clean: true
+2025-09-08T16:55:00.6026327Z   sparse-checkout-cone-mode: true
+2025-09-08T16:55:00.6027266Z   fetch-tags: false
+2025-09-08T16:55:00.6028016Z   show-progress: true
+2025-09-08T16:55:00.6028741Z   lfs: false
+2025-09-08T16:55:00.6029410Z   set-safe-directory: true
+2025-09-08T16:55:00.6030479Z ##[endgroup]
+2025-09-08T16:55:00.7100566Z Syncing repository: WebQx/MMT
+2025-09-08T16:55:00.7103201Z ##[group]Getting Git version info
+2025-09-08T16:55:00.7104282Z Working directory is '/home/runner/work/MMT/MMT'
+2025-09-08T16:55:00.7106059Z [command]/usr/bin/git version
+2025-09-08T16:55:00.7184030Z git version 2.51.0
+2025-09-08T16:55:00.7210091Z ##[endgroup]
+2025-09-08T16:55:00.7231468Z Temporarily overriding HOME='/home/runner/work/_temp/3d18e27c-b3ff-4712-8636-18ee9d483ae2' before making global git config changes
+2025-09-08T16:55:00.7234046Z Adding repository directory to the temporary git global config as a safe directory
+2025-09-08T16:55:00.7236365Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MMT/MMT
+2025-09-08T16:55:00.7271586Z Deleting the contents of '/home/runner/work/MMT/MMT'
+2025-09-08T16:55:00.7275124Z ##[group]Initializing the repository
+2025-09-08T16:55:00.7278788Z [command]/usr/bin/git init /home/runner/work/MMT/MMT
+2025-09-08T16:55:00.7379964Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-09-08T16:55:00.7382919Z hint: is subject to change. To configure the initial branch name to use in all
+2025-09-08T16:55:00.7385779Z hint: of your new repositories, which will suppress this warning, call:
+2025-09-08T16:55:00.7387222Z hint:
+2025-09-08T16:55:00.7388288Z hint: 	git config --global init.defaultBranch <name>
+2025-09-08T16:55:00.7389327Z hint:
+2025-09-08T16:55:00.7390562Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-09-08T16:55:00.7392582Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-09-08T16:55:00.7394009Z hint:
+2025-09-08T16:55:00.7394649Z hint: 	git branch -m <name>
+2025-09-08T16:55:00.7395713Z hint:
+2025-09-08T16:55:00.7397017Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-09-08T16:55:00.7398728Z Initialized empty Git repository in /home/runner/work/MMT/MMT/.git/
+2025-09-08T16:55:00.7401487Z [command]/usr/bin/git remote add origin https://github.com/WebQx/MMT
+2025-09-08T16:55:00.7432489Z ##[endgroup]
+2025-09-08T16:55:00.7433707Z ##[group]Disabling automatic garbage collection
+2025-09-08T16:55:00.7435715Z [command]/usr/bin/git config --local gc.auto 0
+2025-09-08T16:55:00.7464540Z ##[endgroup]
+2025-09-08T16:55:00.7465703Z ##[group]Setting up auth
+2025-09-08T16:55:00.7470474Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-09-08T16:55:00.7499716Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-09-08T16:55:00.7831402Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-09-08T16:55:00.7863395Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-09-08T16:55:00.8079666Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-09-08T16:55:00.8120549Z ##[endgroup]
+2025-09-08T16:55:00.8122848Z ##[group]Fetching the repository
+2025-09-08T16:55:00.8133512Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +5f29ccc2733e8a8fd835ee25635ae496a3042b7d:refs/remotes/pull/16/merge
+2025-09-08T16:55:01.2166178Z From https://github.com/WebQx/MMT
+2025-09-08T16:55:01.2170059Z  * [new branch]      copilot/fix-079c752c-2905-41e1-b39a-ab6e03e6e5ee -> origin/copilot/fix-079c752c-2905-41e1-b39a-ab6e03e6e5ee
+2025-09-08T16:55:01.2175432Z  * [new branch]      copilot/fix-1075b84c-a81f-4697-8f0d-c0dec466749d -> origin/copilot/fix-1075b84c-a81f-4697-8f0d-c0dec466749d
+2025-09-08T16:55:01.2181440Z  * [new branch]      dependabot/pip/backend/alembic-1.16.5    -> origin/dependabot/pip/backend/alembic-1.16.5
+2025-09-08T16:55:01.2185331Z  * [new branch]      dependabot/pip/backend/flake8-7.3.0      -> origin/dependabot/pip/backend/flake8-7.3.0
+2025-09-08T16:55:01.2189250Z  * [new branch]      dependabot/pip/backend/locust-2.34.0     -> origin/dependabot/pip/backend/locust-2.34.0
+2025-09-08T16:55:01.2193175Z  * [new branch]      dependabot/pip/backend/mypy-1.17.1       -> origin/dependabot/pip/backend/mypy-1.17.1
+2025-09-08T16:55:01.2196900Z  * [new branch]      dependabot/pip/backend/pyjwt-2.10.1      -> origin/dependabot/pip/backend/pyjwt-2.10.1
+2025-09-08T16:55:01.2200180Z  * [new branch]      dependabot/pip/backend/pymysql-1.1.2     -> origin/dependabot/pip/backend/pymysql-1.1.2
+2025-09-08T16:55:01.2202487Z  * [new branch]      feat/ci-flutter                          -> origin/feat/ci-flutter
+2025-09-08T16:55:01.2204269Z  * [new branch]      gh-pages                                 -> origin/gh-pages
+2025-09-08T16:55:01.2205685Z  * [new branch]      main                                     -> origin/main
+2025-09-08T16:55:01.2206960Z  * [new tag]         v0.2.0                                   -> v0.2.0
+2025-09-08T16:55:01.2208175Z  * [new tag]         v0.3.0                                   -> v0.3.0
+2025-09-08T16:55:01.2209579Z  * [new ref]         5f29ccc2733e8a8fd835ee25635ae496a3042b7d -> pull/16/merge
+2025-09-08T16:55:01.2232766Z ##[endgroup]
+2025-09-08T16:55:01.2234836Z ##[group]Determining the checkout info
+2025-09-08T16:55:01.2237252Z ##[endgroup]
+2025-09-08T16:55:01.2240480Z [command]/usr/bin/git sparse-checkout disable
+2025-09-08T16:55:01.2283102Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-09-08T16:55:01.2311591Z ##[group]Checking out the ref
+2025-09-08T16:55:01.2314494Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/16/merge
+2025-09-08T16:55:01.3455594Z Note: switching to 'refs/remotes/pull/16/merge'.
+2025-09-08T16:55:01.3458553Z 
+2025-09-08T16:55:01.3459799Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-09-08T16:55:01.3462599Z changes and commit them, and you can discard any commits you make in this
+2025-09-08T16:55:01.3464371Z state without impacting any branches by switching back to a branch.
+2025-09-08T16:55:01.3465468Z 
+2025-09-08T16:55:01.3466621Z If you want to create a new branch to retain commits you create, you may
+2025-09-08T16:55:01.3468497Z do so (now or later) by using -c with the switch command. Example:
+2025-09-08T16:55:01.3469424Z 
+2025-09-08T16:55:01.3469925Z   git switch -c <new-branch-name>
+2025-09-08T16:55:01.3470829Z 
+2025-09-08T16:55:01.3471311Z Or undo this operation with:
+2025-09-08T16:55:01.3471930Z 
+2025-09-08T16:55:01.3472264Z   git switch -
+2025-09-08T16:55:01.3472752Z 
+2025-09-08T16:55:01.3473506Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-09-08T16:55:01.3474588Z 
+2025-09-08T16:55:01.3475995Z HEAD is now at 5f29ccc Merge 2b8bbdc95e9ba9d0cdbcb10f919980877fa0337b into 9731bfb33f75973d3a3868f9b4f7d74d78844284
+2025-09-08T16:55:01.3479769Z ##[endgroup]
+2025-09-08T16:55:01.3507629Z [command]/usr/bin/git log -1 --format=%H
+2025-09-08T16:55:01.3529369Z 5f29ccc2733e8a8fd835ee25635ae496a3042b7d
+2025-09-08T16:55:01.3961640Z ##[group]Run subosito/flutter-action@v2
+2025-09-08T16:55:01.3962629Z with:
+2025-09-08T16:55:01.3963313Z   flutter-version: 3.16.0
+2025-09-08T16:55:01.3964137Z   channel: stable
+2025-09-08T16:55:01.3964865Z   architecture: X64
+2025-09-08T16:55:01.3965591Z   cache: false
+2025-09-08T16:55:01.3966310Z   pub-cache-path: default
+2025-09-08T16:55:01.3967107Z   dry-run: false
+2025-09-08T16:55:01.3967974Z   git-source: https://github.com/flutter/flutter.git
+2025-09-08T16:55:01.3969022Z ##[endgroup]
+2025-09-08T16:55:01.4166630Z ##[group]Run chmod +x "$GITHUB_ACTION_PATH/setup.sh"
+2025-09-08T16:55:01.4167845Z [36;1mchmod +x "$GITHUB_ACTION_PATH/setup.sh"[0m
+2025-09-08T16:55:01.4230574Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-09-08T16:55:01.4232021Z ##[endgroup]
+2025-09-08T16:55:01.4401403Z ##[group]Run $GITHUB_ACTION_PATH/setup.sh -p \
+2025-09-08T16:55:01.4402543Z [36;1m$GITHUB_ACTION_PATH/setup.sh -p \[0m
+2025-09-08T16:55:01.4403518Z [36;1m  -n '3.16.0' \[0m
+2025-09-08T16:55:01.4404341Z [36;1m  -f '' \[0m
+2025-09-08T16:55:01.4405063Z [36;1m  -a 'X64' \[0m
+2025-09-08T16:55:01.4405798Z [36;1m  -k '' \[0m
+2025-09-08T16:55:01.4406521Z [36;1m  -c '' \[0m
+2025-09-08T16:55:01.4407225Z [36;1m  -l '' \[0m
+2025-09-08T16:55:01.4407956Z [36;1m  -d 'default' \[0m
+2025-09-08T16:55:01.4408943Z [36;1m  -g 'https://github.com/flutter/flutter.git' \[0m
+2025-09-08T16:55:01.4409988Z [36;1m  stable[0m
+2025-09-08T16:55:01.4450989Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-09-08T16:55:01.4452858Z ##[endgroup]
+2025-09-08T16:55:01.6412606Z ##[group]Run $GITHUB_ACTION_PATH/setup.sh \
+2025-09-08T16:55:01.6413696Z [36;1m$GITHUB_ACTION_PATH/setup.sh \[0m
+2025-09-08T16:55:01.6414649Z [36;1m  -n '3.16.0' \[0m
+2025-09-08T16:55:01.6415444Z [36;1m  -a 'x64' \[0m
+2025-09-08T16:55:01.6416452Z [36;1m  -c '/opt/hostedtoolcache/flutter/stable-3.16.0-x64' \[0m
+2025-09-08T16:55:01.6417644Z [36;1m  -d '/home/runner/.pub-cache' \[0m
+2025-09-08T16:55:01.6418612Z [36;1m  stable[0m
+2025-09-08T16:55:01.6451963Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-09-08T16:55:01.6453102Z ##[endgroup]
+2025-09-08T16:55:01.8039747Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2025-09-08T16:55:01.8041705Z                                  Dload  Upload   Total   Spent    Left  Speed
+2025-09-08T16:55:01.8042470Z 
+2025-09-08T16:55:02.2721334Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2025-09-08T16:55:03.2718917Z  12  627M   12 80.9M    0     0   172M      0  0:00:03 --:--:--  0:00:03  172M
+2025-09-08T16:55:04.2721072Z  49  627M   49  311M    0     0   212M      0  0:00:02  0:00:01  0:00:01  212M
+2025-09-08T16:55:04.6075465Z  85  627M   85  539M    0     0   218M      0  0:00:02  0:00:02 --:--:--  218M
+2025-09-08T16:55:04.6076047Z 100  627M  100  627M    0     0   223M      0  0:00:02  0:00:02 --:--:--  223M
+2025-09-08T16:55:31.6125791Z ##[group]Run cd app
+2025-09-08T16:55:31.6126049Z [36;1mcd app[0m
+2025-09-08T16:55:31.6126242Z [36;1mflutter pub get[0m
+2025-09-08T16:55:31.6158661Z shell: /usr/bin/bash -e {0}
+2025-09-08T16:55:31.6158898Z env:
+2025-09-08T16:55:31.6159176Z   FLUTTER_ROOT: /opt/hostedtoolcache/flutter/stable-3.16.0-x64
+2025-09-08T16:55:31.6159526Z   PUB_CACHE: /home/runner/.pub-cache
+2025-09-08T16:55:31.6159766Z ##[endgroup]
+2025-09-08T16:55:31.8638932Z 
+2025-09-08T16:55:31.8652053Z   ╔════════════════════════════════════════════════════════════════════════════╗
+2025-09-08T16:55:31.8653177Z   ║                 Welcome to Flutter! - https://flutter.dev                  ║
+2025-09-08T16:55:31.8653919Z   ║                                                                            ║
+2025-09-08T16:55:31.8654665Z   ║ The Flutter tool uses Google Analytics to anonymously report feature usage ║
+2025-09-08T16:55:31.8655587Z   ║ statistics and basic crash reports. This data is used to help improve      ║
+2025-09-08T16:55:31.8656602Z   ║ Flutter tools over time.                                                   ║
+2025-09-08T16:55:31.8657357Z   ║                                                                            ║
+2025-09-08T16:55:31.8658173Z   ║ Flutter tool analytics are not sent on the very first run. To disable      ║
+2025-09-08T16:55:31.8659268Z   ║ reporting, type 'flutter config --no-analytics'. To display the current    ║
+2025-09-08T16:55:31.8660367Z   ║ setting, type 'flutter config'. If you opt out of analytics, an opt-out    ║
+2025-09-08T16:55:31.8661661Z   ║ event will be sent, and then no further information will be sent by the    ║
+2025-09-08T16:55:31.8662534Z   ║ Flutter tool.                                                              ║
+2025-09-08T16:55:31.8663218Z   ║                                                                            ║
+2025-09-08T16:55:31.8664027Z   ║ By downloading the Flutter SDK, you agree to the Google Terms of Service.  ║
+2025-09-08T16:55:31.8665094Z   ║ The Google Privacy Policy describes how data is handled in this service.   ║
+2025-09-08T16:55:31.8665949Z   ║                                                                            ║
+2025-09-08T16:55:31.8666843Z   ║ Moreover, Flutter includes the Dart SDK, which may send usage metrics and  ║
+2025-09-08T16:55:31.8667820Z   ║ crash reports to Google.                                                   ║
+2025-09-08T16:55:31.8668607Z   ║                                                                            ║
+2025-09-08T16:55:31.8669400Z   ║ Read about data we send with crash reports:                                ║
+2025-09-08T16:55:31.8670428Z   ║ https://flutter.dev/docs/reference/crash-reporting                         ║
+2025-09-08T16:55:31.8671606Z   ║                                                                            ║
+2025-09-08T16:55:31.8672421Z   ║ See Google's privacy policy:                                               ║
+2025-09-08T16:55:31.8673438Z   ║ https://policies.google.com/privacy                                        ║
+2025-09-08T16:55:31.8674365Z   ║                                                                            ║
+2025-09-08T16:55:31.8675229Z   ║ To disable animations in this tool, use 'flutter config --no-animations'.  ║
+2025-09-08T16:55:31.8676603Z   ╚════════════════════════════════════════════════════════════════════════════╝
+2025-09-08T16:55:31.8677018Z 
+2025-09-08T16:55:36.3188176Z Error detected in pubspec.yaml:
+2025-09-08T16:55:36.3337245Z Error on line 27, column 3: Duplicate mapping key.
+2025-09-08T16:55:36.3338009Z    ╷
+2025-09-08T16:55:36.3338443Z 27 │   shared_preferences: ^2.0.15
+2025-09-08T16:55:36.3338902Z    │   ^^^^^^^^^^^^^^^^^^
+2025-09-08T16:55:36.3339264Z    ╵
+2025-09-08T16:55:36.3455318Z Please correct the pubspec.yaml file at /home/runner/work/MMT/MMT/app/pubspec.yaml
+2025-09-08T16:55:36.3523356Z The Flutter CLI developer tool uses Google Analytics to report usage and diagnostic data
+2025-09-08T16:55:36.3524747Z along with package dependencies, and crash reporting to send basic crash reports.
+2025-09-08T16:55:36.3525684Z This data is used to help improve the Dart platform, Flutter framework, and related tools.
+2025-09-08T16:55:36.3526207Z 
+2025-09-08T16:55:36.3526367Z Telemetry is not sent on the very first run.
+2025-09-08T16:55:36.3526933Z To disable reporting of telemetry, run this terminal command:
+2025-09-08T16:55:36.3527336Z 
+2025-09-08T16:55:36.3527489Z flutter --disable-analytics.
+2025-09-08T16:55:36.3527949Z If you opt out of telemetry, an opt-out event will be sent,
+2025-09-08T16:55:36.3528488Z and then no further information will be sent.
+2025-09-08T16:55:36.3528969Z This data is collected in accordance with the
+2025-09-08T16:55:36.3529568Z Google Privacy Policy (https://policies.google.com/privacy).
+2025-09-08T16:55:36.3529999Z 
+2025-09-08T16:55:36.3585143Z ##[error]Process completed with exit code 1.
+2025-09-08T16:55:36.3771549Z Post job cleanup.
+2025-09-08T16:55:36.3851723Z Post job cleanup.
+2025-09-08T16:55:36.4884960Z [command]/usr/bin/git version
+2025-09-08T16:55:36.4920482Z git version 2.51.0
+2025-09-08T16:55:36.4964428Z Temporarily overriding HOME='/home/runner/work/_temp/7dd690a4-c044-492d-8b8e-fd5da075f16b' before making global git config changes
+2025-09-08T16:55:36.4965751Z Adding repository directory to the temporary git global config as a safe directory
+2025-09-08T16:55:36.4977412Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MMT/MMT
+2025-09-08T16:55:36.5288626Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-09-08T16:55:36.5328613Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-09-08T16:55:36.7394655Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-09-08T16:55:36.7421018Z http.https://github.com/.extraheader
+2025-09-08T16:55:36.7434827Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-09-08T16:55:36.7867668Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-09-08T16:55:36.8235608Z Cleaning up orphan processes

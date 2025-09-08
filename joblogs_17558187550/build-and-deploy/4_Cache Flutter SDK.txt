@@ -1,0 +1,12 @@
+﻿2025-09-08T16:55:13.0850508Z ##[group]Run actions/cache@v4
+2025-09-08T16:55:13.0851419Z with:
+2025-09-08T16:55:13.0852398Z   path: ~/.pub-cache
+2025-09-08T16:55:13.0853715Z   key: flutter-pub-a6cb9ea7056129457c7762b237812371e4ef74bfc2cefdd53bccf417cb811ee2
+2025-09-08T16:55:13.0855205Z   restore-keys: flutter-pub-
+
+2025-09-08T16:55:13.0856092Z   enableCrossOsArchive: false
+2025-09-08T16:55:13.0856956Z   fail-on-cache-miss: false
+2025-09-08T16:55:13.0857758Z   lookup-only: false
+2025-09-08T16:55:13.0858504Z   save-always: false
+2025-09-08T16:55:13.0859247Z ##[endgroup]
+2025-09-08T16:55:13.3026969Z Cache not found for input keys: flutter-pub-a6cb9ea7056129457c7762b237812371e4ef74bfc2cefdd53bccf417cb811ee2, flutter-pub-

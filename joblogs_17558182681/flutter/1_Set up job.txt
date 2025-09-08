@@ -1,0 +1,32 @@
+﻿2025-09-08T16:54:59.4712100Z Current runner version: '2.328.0'
+2025-09-08T16:54:59.4736696Z ##[group]Runner Image Provisioner
+2025-09-08T16:54:59.4737525Z Hosted Compute Agent
+2025-09-08T16:54:59.4738040Z Version: 20250829.383
+2025-09-08T16:54:59.4738704Z Commit: 27cb235aab5b0e52e153a26cd86b4742e89dac5d
+2025-09-08T16:54:59.4739353Z Build Date: 2025-08-29T13:48:48Z
+2025-09-08T16:54:59.4739957Z ##[endgroup]
+2025-09-08T16:54:59.4740474Z ##[group]Operating System
+2025-09-08T16:54:59.4741561Z Ubuntu
+2025-09-08T16:54:59.4742048Z 24.04.3
+2025-09-08T16:54:59.4742520Z LTS
+2025-09-08T16:54:59.4742984Z ##[endgroup]
+2025-09-08T16:54:59.4743431Z ##[group]Runner Image
+2025-09-08T16:54:59.4744030Z Image: ubuntu-24.04
+2025-09-08T16:54:59.4744512Z Version: 20250831.1.0
+2025-09-08T16:54:59.4745501Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250831.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-09-08T16:54:59.4746875Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250831.1
+2025-09-08T16:54:59.4747986Z ##[endgroup]
+2025-09-08T16:54:59.4749103Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T16:54:59.4751114Z Contents: read
+2025-09-08T16:54:59.4751800Z Metadata: read
+2025-09-08T16:54:59.4752298Z Packages: read
+2025-09-08T16:54:59.4752801Z ##[endgroup]
+2025-09-08T16:54:59.4754900Z Secret source: Actions
+2025-09-08T16:54:59.4755597Z Prepare workflow directory
+2025-09-08T16:54:59.5084752Z Prepare all required actions
+2025-09-08T16:54:59.5122493Z Getting action download info
+2025-09-08T16:54:59.8017514Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T16:54:59.9975198Z Download action repository 'subosito/flutter-action@v2' (SHA:fd55f4c5af5b953cc57a2be44cb082c8f6635e8e)
+2025-09-08T16:55:00.2143925Z Getting action download info
+2025-09-08T16:55:00.3208213Z Download action repository 'actions/cache@v4' (SHA:0400d5f644dc74513175e3cd8d07132dd4860809)
+2025-09-08T16:55:00.5245859Z Complete job name: flutter

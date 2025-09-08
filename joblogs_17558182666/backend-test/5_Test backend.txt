@@ -1,0 +1,14 @@
+﻿2025-09-08T16:56:35.3692108Z ##[group]Run cd backend
+2025-09-08T16:56:35.3692400Z [36;1mcd backend[0m
+2025-09-08T16:56:35.3692686Z [36;1mpython -m pytest tests/ -v || echo "No tests found"[0m
+2025-09-08T16:56:35.3725992Z shell: /usr/bin/bash -e {0}
+2025-09-08T16:56:35.3726225Z env:
+2025-09-08T16:56:35.3726472Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:56:35.3726880Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-09-08T16:56:35.3727260Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:56:35.3727593Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:56:35.3727948Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-09-08T16:56:35.3728295Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-09-08T16:56:35.3728579Z ##[endgroup]
+2025-09-08T16:56:35.3921675Z /opt/hostedtoolcache/Python/3.11.13/x64/bin/python: No module named pytest
+2025-09-08T16:56:35.3950365Z No tests found

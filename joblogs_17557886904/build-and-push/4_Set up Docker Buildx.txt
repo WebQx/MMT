@@ -1,0 +1,203 @@
+﻿2025-09-08T16:42:56.7299577Z ##[group]Run docker/setup-buildx-action@v2
+2025-09-08T16:42:56.7299863Z with:
+2025-09-08T16:42:56.7300035Z   driver: docker-container
+2025-09-08T16:42:56.7300496Z   buildkitd-flags: --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host
+2025-09-08T16:42:56.7300960Z   install: false
+2025-09-08T16:42:56.7301485Z   use: true
+2025-09-08T16:42:56.7301724Z   cleanup: true
+2025-09-08T16:42:56.7301899Z ##[endgroup]
+2025-09-08T16:42:56.8736321Z ##[group]Docker info
+2025-09-08T16:42:56.8762667Z [command]/usr/bin/docker version
+2025-09-08T16:42:56.8954681Z Client: Docker Engine - Community
+2025-09-08T16:42:56.8958342Z  Version:           28.0.4
+2025-09-08T16:42:56.8958702Z  API version:       1.48
+2025-09-08T16:42:56.8959049Z  Go version:        go1.23.7
+2025-09-08T16:42:56.8959399Z  Git commit:        b8034c0
+2025-09-08T16:42:56.8959768Z  Built:             Tue Mar 25 15:07:16 2025
+2025-09-08T16:42:56.8960187Z  OS/Arch:           linux/amd64
+2025-09-08T16:42:56.8960572Z  Context:           default
+2025-09-08T16:42:56.8960856Z 
+2025-09-08T16:42:56.8961200Z Server: Docker Engine - Community
+2025-09-08T16:42:56.8961582Z  Engine:
+2025-09-08T16:42:56.8961847Z   Version:          28.0.4
+2025-09-08T16:42:56.8962188Z   API version:      1.48 (minimum version 1.24)
+2025-09-08T16:42:56.8962477Z   Go version:       go1.23.7
+2025-09-08T16:42:56.8962702Z   Git commit:       6430e49
+2025-09-08T16:42:56.8962929Z   Built:            Tue Mar 25 15:07:16 2025
+2025-09-08T16:42:56.8963175Z   OS/Arch:          linux/amd64
+2025-09-08T16:42:56.8963424Z   Experimental:     false
+2025-09-08T16:42:56.8963622Z  containerd:
+2025-09-08T16:42:56.8963804Z   Version:          1.7.27
+2025-09-08T16:42:56.8964054Z   GitCommit:        05044ec0a9a75232cad458027ca83437aae3f4da
+2025-09-08T16:42:56.8964347Z  runc:
+2025-09-08T16:42:56.8964515Z   Version:          1.2.5
+2025-09-08T16:42:56.8964721Z   GitCommit:        v1.2.5-0-g59923ef
+2025-09-08T16:42:56.8964964Z  docker-init:
+2025-09-08T16:42:56.8965143Z   Version:          0.19.0
+2025-09-08T16:42:56.8965484Z   GitCommit:        de40ad0
+2025-09-08T16:42:56.9018611Z [command]/usr/bin/docker info
+2025-09-08T16:42:56.9555585Z Client: Docker Engine - Community
+2025-09-08T16:42:56.9556103Z  Version:    28.0.4
+2025-09-08T16:42:56.9556422Z  Context:    default
+2025-09-08T16:42:56.9556736Z  Debug Mode: false
+2025-09-08T16:42:56.9557025Z  Plugins:
+2025-09-08T16:42:56.9557326Z   buildx: Docker Buildx (Docker Inc.)
+2025-09-08T16:42:56.9557721Z     Version:  v0.27.0
+2025-09-08T16:42:56.9558171Z     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+2025-09-08T16:42:56.9558689Z   compose: Docker Compose (Docker Inc.)
+2025-09-08T16:42:56.9559085Z     Version:  v2.38.2
+2025-09-08T16:42:56.9559478Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+2025-09-08T16:42:56.9559839Z 
+2025-09-08T16:42:56.9559943Z Server:
+2025-09-08T16:42:56.9560197Z  Containers: 0
+2025-09-08T16:42:56.9560477Z   Running: 0
+2025-09-08T16:42:56.9560745Z   Paused: 0
+2025-09-08T16:42:56.9562877Z   Stopped: 0
+2025-09-08T16:42:56.9563178Z  Images: 1
+2025-09-08T16:42:56.9563456Z  Server Version: 28.0.4
+2025-09-08T16:42:56.9563787Z  Storage Driver: overlay2
+2025-09-08T16:42:56.9564135Z   Backing Filesystem: extfs
+2025-09-08T16:42:56.9564490Z   Supports d_type: true
+2025-09-08T16:42:56.9564809Z   Using metacopy: false
+2025-09-08T16:42:56.9565139Z   Native Overlay Diff: false
+2025-09-08T16:42:56.9565485Z   userxattr: false
+2025-09-08T16:42:56.9565796Z  Logging Driver: json-file
+2025-09-08T16:42:56.9566132Z  Cgroup Driver: systemd
+2025-09-08T16:42:56.9566449Z  Cgroup Version: 2
+2025-09-08T16:42:56.9566741Z  Plugins:
+2025-09-08T16:42:56.9566994Z   Volume: local
+2025-09-08T16:42:56.9567349Z   Network: bridge host ipvlan macvlan null overlay
+2025-09-08T16:42:56.9567976Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+2025-09-08T16:42:56.9568550Z  Swarm: inactive
+2025-09-08T16:42:56.9568869Z  Runtimes: io.containerd.runc.v2 runc
+2025-09-08T16:42:56.9569265Z  Default Runtime: runc
+2025-09-08T16:42:56.9569822Z  Init Binary: docker-init
+2025-09-08T16:42:56.9570277Z  containerd version: 05044ec0a9a75232cad458027ca83437aae3f4da
+2025-09-08T16:42:56.9570774Z  runc version: v1.2.5-0-g59923ef
+2025-09-08T16:42:56.9571361Z  init version: de40ad0
+2025-09-08T16:42:56.9571669Z  Security Options:
+2025-09-08T16:42:56.9571951Z   apparmor
+2025-09-08T16:42:56.9572203Z   seccomp
+2025-09-08T16:42:56.9572455Z    Profile: builtin
+2025-09-08T16:42:56.9572737Z   cgroupns
+2025-09-08T16:42:56.9573012Z  Kernel Version: 6.11.0-1018-azure
+2025-09-08T16:42:56.9573415Z  Operating System: Ubuntu 24.04.3 LTS
+2025-09-08T16:42:56.9573801Z  OSType: linux
+2025-09-08T16:42:56.9574090Z  Architecture: x86_64
+2025-09-08T16:42:56.9574389Z  CPUs: 4
+2025-09-08T16:42:56.9574653Z  Total Memory: 15.62GiB
+2025-09-08T16:42:56.9574977Z  Name: pkrvm7jw40e0xgp
+2025-09-08T16:42:56.9575313Z  ID: 33a18c03-7dc8-4ab9-bfe1-99342b7c1aaf
+2025-09-08T16:42:56.9575731Z  Docker Root Dir: /var/lib/docker
+2025-09-08T16:42:56.9576095Z  Debug Mode: false
+2025-09-08T16:42:56.9576397Z  Username: githubactions
+2025-09-08T16:42:56.9577214Z  Experimental: false
+2025-09-08T16:42:56.9577444Z  Insecure Registries:
+2025-09-08T16:42:56.9577735Z   ::1/128
+2025-09-08T16:42:56.9577933Z   127.0.0.0/8
+2025-09-08T16:42:56.9578106Z  Live Restore Enabled: false
+2025-09-08T16:42:56.9578257Z 
+2025-09-08T16:42:56.9585444Z ##[endgroup]
+2025-09-08T16:42:57.0906301Z ##[group]Buildx version
+2025-09-08T16:42:57.0929961Z [command]/usr/bin/docker buildx version
+2025-09-08T16:42:57.1439531Z github.com/docker/buildx v0.27.0 bac71def78b077ee6a2607119f88e291861b18ac
+2025-09-08T16:42:57.1480878Z ##[endgroup]
+2025-09-08T16:42:57.1488534Z ##[group]Creating a new builder instance
+2025-09-08T16:42:57.2289403Z [command]/usr/bin/docker buildx create --name builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc --driver docker-container --buildkitd-flags --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host --use
+2025-09-08T16:42:57.3076891Z builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc
+2025-09-08T16:42:57.3111799Z ##[endgroup]
+2025-09-08T16:42:57.3112303Z ##[group]Booting builder
+2025-09-08T16:42:57.3146267Z [command]/usr/bin/docker buildx inspect --bootstrap --builder builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc
+2025-09-08T16:42:57.3766812Z #1 [internal] booting buildkit
+2025-09-08T16:42:57.5269305Z #1 pulling image moby/buildkit:buildx-stable-1
+2025-09-08T16:43:00.9456008Z #1 pulling image moby/buildkit:buildx-stable-1 3.6s done
+2025-09-08T16:43:01.0964391Z #1 creating container buildx_buildkit_builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc0
+2025-09-08T16:43:01.2698610Z #1 creating container buildx_buildkit_builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc0 0.3s done
+2025-09-08T16:43:01.2784023Z #1 DONE 3.9s
+2025-09-08T16:43:01.3079503Z Name:          builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc
+2025-09-08T16:43:01.3080159Z Driver:        docker-container
+2025-09-08T16:43:01.3081482Z Last Activity: 2025-09-08 16:42:57 +0000 UTC
+2025-09-08T16:43:01.3081805Z 
+2025-09-08T16:43:01.3084576Z Nodes:
+2025-09-08T16:43:01.3085572Z Name:                  builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc0
+2025-09-08T16:43:01.3086171Z Endpoint:              unix:///var/run/docker.sock
+2025-09-08T16:43:01.3086641Z Status:                running
+2025-09-08T16:43:01.3087466Z BuildKit daemon flags: --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host
+2025-09-08T16:43:01.3088360Z BuildKit version:      v0.23.2
+2025-09-08T16:43:01.3089606Z Platforms:             linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/mips64le, linux/mips64, linux/loong64, linux/arm/v7, linux/arm/v6
+2025-09-08T16:43:01.3090871Z Labels:
+2025-09-08T16:43:01.3091448Z  org.mobyproject.buildkit.worker.executor:         oci
+2025-09-08T16:43:01.3092102Z  org.mobyproject.buildkit.worker.hostname:         4fd6c8705226
+2025-09-08T16:43:01.3092788Z  org.mobyproject.buildkit.worker.network:          host
+2025-09-08T16:43:01.3093449Z  org.mobyproject.buildkit.worker.oci.process-mode: sandbox
+2025-09-08T16:43:01.3094491Z  org.mobyproject.buildkit.worker.selinux.enabled:  false
+2025-09-08T16:43:01.3095140Z  org.mobyproject.buildkit.worker.snapshotter:      overlayfs
+2025-09-08T16:43:01.3095686Z GC Policy rule#0:
+2025-09-08T16:43:01.3095984Z  All:            false
+2025-09-08T16:43:01.3096490Z  Filters:        type==source.local,type==exec.cachemount,type==source.git.checkout
+2025-09-08T16:43:01.3097130Z  Keep Duration:  48h0m0s
+2025-09-08T16:43:01.3097452Z  Max Used Space: 488.3MiB
+2025-09-08T16:43:01.3097786Z GC Policy rule#1:
+2025-09-08T16:43:01.3098069Z  All:            false
+2025-09-08T16:43:01.3098414Z  Keep Duration:  1440h0m0s
+2025-09-08T16:43:01.3098754Z  Reserved Space: 7.451GiB
+2025-09-08T16:43:01.3099088Z  Max Used Space: 54.02GiB
+2025-09-08T16:43:01.3099410Z  Min Free Space: 13.97GiB
+2025-09-08T16:43:01.3099735Z GC Policy rule#2:
+2025-09-08T16:43:01.3100022Z  All:            false
+2025-09-08T16:43:01.3100329Z  Reserved Space: 7.451GiB
+2025-09-08T16:43:01.3100684Z  Max Used Space: 54.02GiB
+2025-09-08T16:43:01.3101164Z  Min Free Space: 13.97GiB
+2025-09-08T16:43:01.3101508Z GC Policy rule#3:
+2025-09-08T16:43:01.3101794Z  All:            true
+2025-09-08T16:43:01.3102098Z  Reserved Space: 7.451GiB
+2025-09-08T16:43:01.3102418Z  Max Used Space: 54.02GiB
+2025-09-08T16:43:01.3102738Z  Min Free Space: 13.97GiB
+2025-09-08T16:43:01.3139171Z ##[endgroup]
+2025-09-08T16:43:01.4145780Z ##[group]Inspect builder
+2025-09-08T16:43:01.4148081Z {
+2025-09-08T16:43:01.4148605Z   "nodes": [
+2025-09-08T16:43:01.4148929Z     {
+2025-09-08T16:43:01.4149332Z       "name": "builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc0",
+2025-09-08T16:43:01.4149926Z       "endpoint": "unix:///var/run/docker.sock",
+2025-09-08T16:43:01.4150417Z       "status": "running",
+2025-09-08T16:43:01.4151903Z       "platforms": "linux/amd64,linux/amd64/v2,linux/amd64/v3,linux/arm64,linux/riscv64,linux/ppc64le,linux/s390x,linux/386,linux/mips64le,linux/mips64,linux/loong64,linux/arm/v7,linux/arm/v6",
+2025-09-08T16:43:01.4153269Z       "labels": {
+2025-09-08T16:43:01.4153717Z         "org.mobyproject.buildkit.worker.executor": "oci",
+2025-09-08T16:43:01.4154411Z         "org.mobyproject.buildkit.worker.hostname": "4fd6c8705226",
+2025-09-08T16:43:01.4155100Z         "org.mobyproject.buildkit.worker.network": "host",
+2025-09-08T16:43:01.4155811Z         "org.mobyproject.buildkit.worker.oci.process-mode": "sandbox",
+2025-09-08T16:43:01.4156577Z         "org.mobyproject.buildkit.worker.selinux.enabled": "false",
+2025-09-08T16:43:01.4157289Z         "org.mobyproject.buildkit.worker.snapshotter": "overlayfs"
+2025-09-08T16:43:01.4157853Z       },
+2025-09-08T16:43:01.4158144Z       "gcPolicy": [
+2025-09-08T16:43:01.4158454Z         {
+2025-09-08T16:43:01.4158722Z           "all": false,
+2025-09-08T16:43:01.4159054Z           "filter": [
+2025-09-08T16:43:01.4159405Z             "type==source.local",
+2025-09-08T16:43:01.4159833Z             "type==exec.cachemount",
+2025-09-08T16:43:01.4160231Z             "type==source.git.checkout"
+2025-09-08T16:43:01.4161216Z           ],
+2025-09-08T16:43:01.4161532Z           "keepDuration": "48h0m0s"
+2025-09-08T16:43:01.4161921Z         },
+2025-09-08T16:43:01.4162210Z         {
+2025-09-08T16:43:01.4162509Z           "all": false,
+2025-09-08T16:43:01.4162882Z           "keepDuration": "1440h0m0s"
+2025-09-08T16:43:01.4163289Z         },
+2025-09-08T16:43:01.4163577Z         {
+2025-09-08T16:43:01.4163855Z           "all": false
+2025-09-08T16:43:01.4164187Z         },
+2025-09-08T16:43:01.4164463Z         {
+2025-09-08T16:43:01.4164751Z           "all": true
+2025-09-08T16:43:01.4165072Z         }
+2025-09-08T16:43:01.4165358Z       ]
+2025-09-08T16:43:01.4165641Z     }
+2025-09-08T16:43:01.4165906Z   ],
+2025-09-08T16:43:01.4166302Z   "name": "builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc",
+2025-09-08T16:43:01.4166836Z   "driver": "docker-container",
+2025-09-08T16:43:01.4167270Z   "lastActivity": "2025-09-08T16:42:57.000Z"
+2025-09-08T16:43:01.4167707Z }
+2025-09-08T16:43:01.4168291Z ##[endgroup]
+2025-09-08T16:43:01.4169195Z ##[group]BuildKit version
+2025-09-08T16:43:01.6579590Z builder-02a23cf0-4147-4bd6-a610-9066ab77b4fc0: moby/buildkit:buildx-stable-1 => buildkitd github.com/moby/buildkit v0.23.2 40b2ede0ac0a37030f9959b4a28e9c6c8ea036e7
+2025-09-08T16:43:01.6581315Z ##[endgroup]

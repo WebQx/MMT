@@ -1,0 +1,33 @@
+﻿2025-09-08T16:55:00.4314306Z Current runner version: '2.328.0'
+2025-09-08T16:55:00.4346208Z ##[group]Runner Image Provisioner
+2025-09-08T16:55:00.4347942Z Hosted Compute Agent
+2025-09-08T16:55:00.4348617Z Version: 20250829.383
+2025-09-08T16:55:00.4349205Z Commit: 27cb235aab5b0e52e153a26cd86b4742e89dac5d
+2025-09-08T16:55:00.4349897Z Build Date: 2025-08-29T13:48:48Z
+2025-09-08T16:55:00.4350542Z ##[endgroup]
+2025-09-08T16:55:00.4351119Z ##[group]Operating System
+2025-09-08T16:55:00.4351657Z Ubuntu
+2025-09-08T16:55:00.4352198Z 24.04.3
+2025-09-08T16:55:00.4352630Z LTS
+2025-09-08T16:55:00.4353089Z ##[endgroup]
+2025-09-08T16:55:00.4353634Z ##[group]Runner Image
+2025-09-08T16:55:00.4354185Z Image: ubuntu-24.04
+2025-09-08T16:55:00.4354697Z Version: 20250831.1.0
+2025-09-08T16:55:00.4355716Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250831.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-09-08T16:55:00.4357308Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250831.1
+2025-09-08T16:55:00.4358548Z ##[endgroup]
+2025-09-08T16:55:00.4359625Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T16:55:00.4361467Z Contents: read
+2025-09-08T16:55:00.4362029Z Metadata: read
+2025-09-08T16:55:00.4362547Z Packages: read
+2025-09-08T16:55:00.4362999Z ##[endgroup]
+2025-09-08T16:55:00.4365408Z Secret source: Actions
+2025-09-08T16:55:00.4366100Z Prepare workflow directory
+2025-09-08T16:55:00.4764198Z Prepare all required actions
+2025-09-08T16:55:00.4802393Z Getting action download info
+2025-09-08T16:55:00.9661694Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T16:55:01.1539728Z Download action repository 'subosito/flutter-action@v2' (SHA:fd55f4c5af5b953cc57a2be44cb082c8f6635e8e)
+2025-09-08T16:55:01.5859081Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2025-09-08T16:55:01.7769273Z Getting action download info
+2025-09-08T16:55:01.9392324Z Download action repository 'actions/cache@v4' (SHA:0400d5f644dc74513175e3cd8d07132dd4860809)
+2025-09-08T16:55:02.0992674Z Complete job name: flutter-build

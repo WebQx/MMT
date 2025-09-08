@@ -1,0 +1,57 @@
+﻿2025-09-08T16:55:44.4225367Z ##[group]Run flutter pub get
+2025-09-08T16:55:44.4225664Z [36;1mflutter pub get[0m
+2025-09-08T16:55:44.4257973Z shell: /usr/bin/bash -e {0}
+2025-09-08T16:55:44.4258244Z env:
+2025-09-08T16:55:44.4258502Z   FLUTTER_ROOT: /opt/hostedtoolcache/flutter/stable-3.16.0-x64
+2025-09-08T16:55:44.4258843Z   PUB_CACHE: /home/runner/.pub-cache
+2025-09-08T16:55:44.4259092Z ##[endgroup]
+2025-09-08T16:55:44.6394342Z 
+2025-09-08T16:55:44.6406772Z   ╔════════════════════════════════════════════════════════════════════════════╗
+2025-09-08T16:55:44.6407727Z   ║                 Welcome to Flutter! - https://flutter.dev                  ║
+2025-09-08T16:55:44.6408493Z   ║                                                                            ║
+2025-09-08T16:55:44.6409300Z   ║ The Flutter tool uses Google Analytics to anonymously report feature usage ║
+2025-09-08T16:55:44.6409983Z   ║ statistics and basic crash reports. This data is used to help improve      ║
+2025-09-08T16:55:44.6410484Z   ║ Flutter tools over time.                                                   ║
+2025-09-08T16:55:44.6411030Z   ║                                                                            ║
+2025-09-08T16:55:44.6411505Z   ║ Flutter tool analytics are not sent on the very first run. To disable      ║
+2025-09-08T16:55:44.6412343Z   ║ reporting, type 'flutter config --no-analytics'. To display the current    ║
+2025-09-08T16:55:44.6412900Z   ║ setting, type 'flutter config'. If you opt out of analytics, an opt-out    ║
+2025-09-08T16:55:44.6413403Z   ║ event will be sent, and then no further information will be sent by the    ║
+2025-09-08T16:55:44.6413839Z   ║ Flutter tool.                                                              ║
+2025-09-08T16:55:44.6414198Z   ║                                                                            ║
+2025-09-08T16:55:44.6414619Z   ║ By downloading the Flutter SDK, you agree to the Google Terms of Service.  ║
+2025-09-08T16:55:44.6415142Z   ║ The Google Privacy Policy describes how data is handled in this service.   ║
+2025-09-08T16:55:44.6415609Z   ║                                                                            ║
+2025-09-08T16:55:44.6416280Z   ║ Moreover, Flutter includes the Dart SDK, which may send usage metrics and  ║
+2025-09-08T16:55:44.6416784Z   ║ crash reports to Google.                                                   ║
+2025-09-08T16:55:44.6417160Z   ║                                                                            ║
+2025-09-08T16:55:44.6417560Z   ║ Read about data we send with crash reports:                                ║
+2025-09-08T16:55:44.6418081Z   ║ https://flutter.dev/docs/reference/crash-reporting                         ║
+2025-09-08T16:55:44.6418527Z   ║                                                                            ║
+2025-09-08T16:55:44.6418964Z   ║ See Google's privacy policy:                                               ║
+2025-09-08T16:55:44.6419496Z   ║ https://policies.google.com/privacy                                        ║
+2025-09-08T16:55:44.6419939Z   ║                                                                            ║
+2025-09-08T16:55:44.6420369Z   ║ To disable animations in this tool, use 'flutter config --no-animations'.  ║
+2025-09-08T16:55:44.6420894Z   ╚════════════════════════════════════════════════════════════════════════════╝
+2025-09-08T16:55:44.6421108Z 
+2025-09-08T16:55:49.3705874Z Error detected in pubspec.yaml:
+2025-09-08T16:55:49.3846138Z Error on line 27, column 3: Duplicate mapping key.
+2025-09-08T16:55:49.3846828Z    ╷
+2025-09-08T16:55:49.3847164Z 27 │   shared_preferences: ^2.0.15
+2025-09-08T16:55:49.3847515Z    │   ^^^^^^^^^^^^^^^^^^
+2025-09-08T16:55:49.3847797Z    ╵
+2025-09-08T16:55:49.3957942Z Please correct the pubspec.yaml file at /home/runner/work/MMT/MMT/app/pubspec.yaml
+2025-09-08T16:55:49.4021054Z The Flutter CLI developer tool uses Google Analytics to report usage and diagnostic data
+2025-09-08T16:55:49.4022305Z along with package dependencies, and crash reporting to send basic crash reports.
+2025-09-08T16:55:49.4023653Z This data is used to help improve the Dart platform, Flutter framework, and related tools.
+2025-09-08T16:55:49.4024285Z 
+2025-09-08T16:55:49.4024513Z Telemetry is not sent on the very first run.
+2025-09-08T16:55:49.4025142Z To disable reporting of telemetry, run this terminal command:
+2025-09-08T16:55:49.4025610Z 
+2025-09-08T16:55:49.4025798Z flutter --disable-analytics.
+2025-09-08T16:55:49.4026326Z If you opt out of telemetry, an opt-out event will be sent,
+2025-09-08T16:55:49.4026950Z and then no further information will be sent.
+2025-09-08T16:55:49.4027506Z This data is collected in accordance with the
+2025-09-08T16:55:49.4028184Z Google Privacy Policy (https://policies.google.com/privacy).
+2025-09-08T16:55:49.4028671Z 
+2025-09-08T16:55:49.4084084Z ##[error]Process completed with exit code 1.

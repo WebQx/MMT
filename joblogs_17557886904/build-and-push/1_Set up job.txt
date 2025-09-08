@@ -1,0 +1,32 @@
+﻿2025-09-08T16:42:47.8217225Z Current runner version: '2.328.0'
+2025-09-08T16:42:47.8248363Z ##[group]Runner Image Provisioner
+2025-09-08T16:42:47.8249321Z Hosted Compute Agent
+2025-09-08T16:42:47.8249993Z Version: 20250829.383
+2025-09-08T16:42:47.8250612Z Commit: 27cb235aab5b0e52e153a26cd86b4742e89dac5d
+2025-09-08T16:42:47.8251825Z Build Date: 2025-08-29T13:48:48Z
+2025-09-08T16:42:47.8252565Z ##[endgroup]
+2025-09-08T16:42:47.8253176Z ##[group]Operating System
+2025-09-08T16:42:47.8253791Z Ubuntu
+2025-09-08T16:42:47.8254336Z 24.04.3
+2025-09-08T16:42:47.8254863Z LTS
+2025-09-08T16:42:47.8255330Z ##[endgroup]
+2025-09-08T16:42:47.8255926Z ##[group]Runner Image
+2025-09-08T16:42:47.8256589Z Image: ubuntu-24.04
+2025-09-08T16:42:47.8257134Z Version: 20250831.1.0
+2025-09-08T16:42:47.8258234Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250831.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-09-08T16:42:47.8259619Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250831.1
+2025-09-08T16:42:47.8260867Z ##[endgroup]
+2025-09-08T16:42:47.8262241Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T16:42:47.8264594Z Metadata: read
+2025-09-08T16:42:47.8265316Z Packages: write
+2025-09-08T16:42:47.8265834Z ##[endgroup]
+2025-09-08T16:42:47.8267946Z Secret source: Actions
+2025-09-08T16:42:47.8268998Z Prepare workflow directory
+2025-09-08T16:42:47.8593966Z Prepare all required actions
+2025-09-08T16:42:47.8632293Z Getting action download info
+2025-09-08T16:42:48.2639849Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T16:42:48.4733472Z Download action repository 'docker/setup-qemu-action@v2' (SHA:2b82ce82d56a2a04d2637cd93a637ae1b359c0a7)
+2025-09-08T16:42:48.9330906Z Download action repository 'docker/setup-buildx-action@v2' (SHA:885d1462b80bc1c1c7f0b00334ad271f09369c55)
+2025-09-08T16:42:49.3707304Z Download action repository 'docker/login-action@v2' (SHA:465a07811f14bebb1938fbed4728c6a1ff8901fc)
+2025-09-08T16:42:49.8586092Z Download action repository 'docker/build-push-action@v4' (SHA:0a97817b6ade9f46837855d676c4cca3a2471fc9)
+2025-09-08T16:42:50.4476325Z Complete job name: build-and-push
