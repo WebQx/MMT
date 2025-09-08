@@ -31,12 +31,12 @@ class HomePage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('WebQx Multilingual Medical Transcription — Ambient clinical transcription, reimagined',
-                                style: theme.textTheme.headline4?.copyWith(fontWeight: FontWeight.bold)),
+                Text('WebQx Multilingual Medical Transcription — Ambient clinical transcription, reimagined',
+                  style: theme.textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold)),
                             const SizedBox(height: 12),
                             Text(
                               'Capture patient conversations, summarize notes, and integrate with EHRs — fast and securely.',
-                              style: theme.textTheme.subtitle1,
+                              style: theme.textTheme.bodyMedium,
                             ),
                             const SizedBox(height: 24),
                             Row(children: [
@@ -91,7 +91,7 @@ class HomePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('Why MMT', style: theme.textTheme.headline6),
+              Text('Why MMT', style: theme.textTheme.titleLarge),
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 16,
@@ -122,9 +122,9 @@ class HomePage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ready to try MMT?', style: theme.textTheme.headline6),
-                            const SizedBox(height: 6),
-                            Text('Sign in or continue as a guest to explore the demo.', style: theme.textTheme.bodyText2),
+                Text('Ready to try MMT?', style: theme.textTheme.titleLarge),
+                const SizedBox(height: 6),
+                Text('Sign in or continue as a guest to explore the demo.', style: theme.textTheme.bodyMedium),
                           ],
                         ),
                       ),
@@ -158,9 +158,9 @@ class _FeatureCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: Theme.of(context).textTheme.subtitle1?.copyWith(fontWeight: FontWeight.bold)),
+        Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
-            Text(body, style: Theme.of(context).textTheme.bodyText2),
+        Text(body, style: Theme.of(context).textTheme.bodyMedium),
           ]),
         ),
       ),
