@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.0.15
-  record: ^4.4.0
   http: ^1.2.0
   audioplayers: ^5.2.0
   path_provider: ^2.1.0
@@ -24,6 +23,7 @@ dependencies:
   permission_handler: ^11.0.1
   flutter_appauth: ^6.0.4
   flutter_secure_storage: ^9.0.0
+  record: ^4.4.0
 
 dev_dependencies:
   flutter_test:
