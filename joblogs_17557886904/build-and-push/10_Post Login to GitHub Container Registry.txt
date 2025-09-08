@@ -1,3 +1,0 @@
-﻿2025-09-08T16:43:03.1668400Z Post job cleanup.
-2025-09-08T16:43:03.2658053Z [command]/usr/bin/docker logout ghcr.io
-2025-09-08T16:43:03.2778208Z Removing login credentials for ghcr.io
