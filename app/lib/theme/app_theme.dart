@@ -52,7 +52,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(Constants.borderRadius),
         ),
       ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Constants.primaryColor,
         unselectedItemColor: Colors.grey,
@@ -110,7 +110,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(Constants.borderRadius),
         ),
       ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Constants.primaryColor,
         unselectedItemColor: Colors.grey,
