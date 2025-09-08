@@ -44,6 +44,26 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> loginAsGuestWithLanguage(String language) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/login/guest'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'language': language}),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Guest login failed: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Network error during guest login: $e');
+    }
+  }
+
   Future<bool> validateToken(String token) async {
     try {
       final response = await http.get(

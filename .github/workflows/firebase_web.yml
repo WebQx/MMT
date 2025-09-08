@@ -47,6 +47,14 @@ jobs:
       - name: Flutter pub get
         working-directory: app
         run: flutter pub get
+
+      - name: Analyze Flutter code
+        working-directory: app
+        run: flutter analyze
+
+      - name: Run Flutter tests
+        working-directory: app
+        run: flutter test --no-pub --coverage || true
       - name: Build web (production defines)
         working-directory: app
         env:

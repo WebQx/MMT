@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state_provider.dart';
+import '../utils/i18n.dart';
 
 /// A composable login card used by the main app. It mirrors a modern, centered
 /// sign-in page with email/password fields, OAuth sign-in button, guest CTA,
 /// and helpful links (Sign up / Forgot password).
 class LoginCard extends StatefulWidget {
   final VoidCallback onKeycloak;
+  final VoidCallback onGoogle;
+  final VoidCallback onMicrosoft;
+  final VoidCallback onApple;
   final VoidCallback onGuest;
   final void Function(String email, String password) onLocalLogin;
   final VoidCallback? onBack;
+  final VoidCallback onSignUp;
+  final void Function(String language) onLanguageChanged;
   final String resultText;
   final bool isLoading;
 
   const LoginCard({
     super.key,
-    required this.onKeycloak,
+  required this.onKeycloak,
+  required this.onGoogle,
+  required this.onMicrosoft,
+  required this.onApple,
     required this.onGuest,
     required this.onLocalLogin,
-    this.onBack,
+  this.onBack,
+  required this.onSignUp,
+  required this.onLanguageChanged,
     this.resultText = '',
     this.isLoading = false,
   });
@@ -29,6 +42,7 @@ class _LoginCardState extends State<LoginCard> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscure = true;
+  String _selectedLanguage = 'en';
 
   @override
   void dispose() {
@@ -70,16 +84,45 @@ class _LoginCardState extends State<LoginCard> {
                     children: [
                       const Icon(Icons.health_and_safety, size: 56, color: Colors.blueAccent),
                       const SizedBox(height: 8),
-                      Text('MMT Health', style: theme.textTheme.headline6?.copyWith(fontWeight: FontWeight.bold)),
+                      Text('WebQx Multilingual Medical Transcription (MMT)', style: theme.textTheme.headline6?.copyWith(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 20),
 
                   // Email field
-                  TextField(
+                  // Language selector
+                  Row(
+                    children: [
+                      Text(I18n.t('language', _selectedLanguage)),
+                      const SizedBox(width: 8),
+                      DropdownButton<String>(
+                        value: _selectedLanguage,
+                        items: const [
+                          DropdownMenuItem(value: 'en', child: Text('English')),
+                          DropdownMenuItem(value: 'zh', child: Text('中文 (Mandarin)')),
+                          DropdownMenuItem(value: 'es', child: Text('Español')),
+                          DropdownMenuItem(value: 'hi', child: Text('हिन्दी')),
+                          DropdownMenuItem(value: 'ar', child: Text('العربية')),
+                        ],
+                        onChanged: (v) {
+                          if (v == null) return;
+                          setState(() {
+                            _selectedLanguage = v;
+                          });
+                          // Persist selection to app state provider so it survives restarts
+                          try {
+                            Provider.of<AppStateProvider>(context, listen: false).setLanguage(v);
+                          } catch (_) {}
+                          widget.onLanguageChanged(v);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+          TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+            labelText: I18n.t('email', _selectedLanguage),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       prefixIcon: const Icon(Icons.email_outlined),
                     ),
@@ -88,11 +131,11 @@ class _LoginCardState extends State<LoginCard> {
                   const SizedBox(height: 12),
 
                   // Password field
-                  TextField(
+          TextField(
                     controller: _passwordController,
                     obscureText: _obscure,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+            labelText: I18n.t('password', _selectedLanguage),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
@@ -108,7 +151,7 @@ class _LoginCardState extends State<LoginCard> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      child: const Text('Sign in with email'),
+                      child: Text(I18n.t('sign_in', _selectedLanguage)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -122,7 +165,7 @@ class _LoginCardState extends State<LoginCard> {
 
                   const SizedBox(height: 10),
 
-                  Center(child: Text('or', style: theme.textTheme.bodySmall)),
+                  Center(child: Text(I18n.t('or', _selectedLanguage), style: theme.textTheme.bodySmall)),
 
                   const SizedBox(height: 10),
 
@@ -130,7 +173,7 @@ class _LoginCardState extends State<LoginCard> {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.login),
-                      label: const Text('Sign in with SSO'),
+                      label: Text(I18n.t('sso', _selectedLanguage)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -138,6 +181,33 @@ class _LoginCardState extends State<LoginCard> {
                       ),
                       onPressed: widget.isLoading ? null : widget.onKeycloak,
                     ),
+                  ),
+
+                  const SizedBox(height: 8),
+                  // Individual provider buttons
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.email),
+                        label: const Text('Google'),
+                        onPressed: widget.isLoading ? null : widget.onGoogle,
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.account_box),
+                        label: const Text('Microsoft'),
+                        onPressed: widget.isLoading ? null : widget.onMicrosoft,
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.apple),
+                        label: const Text('Sign in with Apple'),
+                        onPressed: widget.isLoading ? null : widget.onApple,
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 10),
@@ -150,7 +220,7 @@ class _LoginCardState extends State<LoginCard> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
-                      child: const Text('Continue as Guest'),
+                      child: Text(I18n.t('guest', _selectedLanguage)),
                     ),
                   ),
 
@@ -158,8 +228,8 @@ class _LoginCardState extends State<LoginCard> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextButton(onPressed: () {}, child: const Text('Sign Up')),
-                      TextButton(onPressed: () {}, child: const Text('Forgot Password?')),
+                      TextButton(onPressed: widget.onSignUp, child: Text(I18n.t('sign_up', _selectedLanguage))),
+                      TextButton(onPressed: () {}, child: Text(I18n.t('forgot', _selectedLanguage))),
                     ],
                   ),
 

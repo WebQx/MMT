@@ -55,6 +55,19 @@ class Settings(BaseSettings):
     openemr_fhir_redirect_uri: str | None = Field(default=None, env="OPENEMR_FHIR_REDIRECT_URI")
     openemr_fhir_use_pkce: bool = Field(default=True, env="OPENEMR_FHIR_USE_PKCE")
 
+    # Generic OAuth provider settings (for web SSO flows)
+    oauth_frontend_redirect_url: str | None = Field(default=None, env="OAUTH_FRONTEND_REDIRECT_URL")
+    oauth_backend_base_url: str | None = Field(default=None, env="OAUTH_BACKEND_BASE_URL")
+    # Google
+    oauth_google_client_id: str | None = Field(default=None, env="OAUTH_GOOGLE_CLIENT_ID")
+    oauth_google_client_secret: str | None = Field(default=None, env="OAUTH_GOOGLE_CLIENT_SECRET")
+    # Microsoft (Azure AD v2)
+    oauth_microsoft_client_id: str | None = Field(default=None, env="OAUTH_MICROSOFT_CLIENT_ID")
+    oauth_microsoft_client_secret: str | None = Field(default=None, env="OAUTH_MICROSOFT_CLIENT_SECRET")
+    # Apple (requires client secret generation or precomputed secret)
+    oauth_apple_client_id: str | None = Field(default=None, env="OAUTH_APPLE_CLIENT_ID")
+    oauth_apple_client_secret: str | None = Field(default=None, env="OAUTH_APPLE_CLIENT_SECRET")
+
     rate_limit_per_minute: int = Field(default=120, env="RATE_LIMIT_PER_MINUTE")
     consumer_max_attempts: int = Field(default=3, env="CONSUMER_MAX_ATTEMPTS")
     # Redis (optional) for rate limiting / caching
