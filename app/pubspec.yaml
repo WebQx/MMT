@@ -3,7 +3,8 @@ version: 0.3.0
 description: Multilingual Medical Transcription Flutter App
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.29.0"
 
 dependencies:
   flutter:
