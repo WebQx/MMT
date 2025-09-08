@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: openemr
+      MYSQL_PASSWORD: openemr
+      MYSQL_DATABASE: openemr
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  openemr:
+    image: openemr/openemr:latest
+    restart: unless-stopped
+    environment:
+      OE_USER: admin
+      OE_PASS: pass
+      OE_SITE: default
+      MYSQL_HOST: mysql
+      MYSQL_ROOT_PASS: root
+      OE_INSTALL: '1'
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ || exit 1"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        INCLUDE_ML: 0
+    image: mmt-backend:local
+    restart: unless-stopped
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      REDIS_URL: redis://redis:6379/0
+      RATE_LIMIT_PER_MINUTE: 120
+      STORE_PHI: "true"
+      ENABLE_LOCAL_TRANSCRIPTION: 0
+    depends_on:
+      - rabbitmq
+      - redis
+    ports:
+      - "8000:9000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/live || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.web
+    image: mmt-frontend:local
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    environment:
+      API_BASE_URL: http://localhost:8000
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  mysql_data:
+    driver: local

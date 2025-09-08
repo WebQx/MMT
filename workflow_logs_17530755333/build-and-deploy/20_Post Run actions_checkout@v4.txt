@@ -1,0 +1,10 @@
+﻿2025-09-07T16:00:40.1341002Z Post job cleanup.
+2025-09-07T16:00:40.2324487Z [command]/usr/bin/git version
+2025-09-07T16:00:40.2362084Z git version 2.51.0
+2025-09-07T16:00:40.2409762Z Temporarily overriding HOME='/home/runner/work/_temp/a045e78c-cf60-4482-838b-5d4f29832348' before making global git config changes
+2025-09-07T16:00:40.2412276Z Adding repository directory to the temporary git global config as a safe directory
+2025-09-07T16:00:40.2423101Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MMT/MMT
+2025-09-07T16:00:40.2459953Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-09-07T16:00:40.2495560Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-09-07T16:00:40.2716959Z fatal: No url found for submodule path 'app/flutter' in .gitmodules
+2025-09-07T16:00:40.2757381Z ##[warning]The process '/usr/bin/git' failed with exit code 128

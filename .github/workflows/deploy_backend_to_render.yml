@@ -1,0 +1,25 @@
+name: Deploy backend to Render (trigger)
+on:
+  workflow_run:
+    workflows: [ Build and Push Backend Docker image ]
+    types: [ completed ]
+
+jobs:
+  trigger-render-deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "RENDER_API_KEY or RENDER_SERVICE_ID not set. Skipping deploy."; exit 0
+          fi
+          echo "Triggering deploy for Render service $RENDER_SERVICE_ID"
+          curl -s -X POST "https://api.render.com/deploys" \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{ \"serviceId\": \"$RENDER_SERVICE_ID\" }" | jq .

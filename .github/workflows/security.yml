@@ -1,0 +1,70 @@
+name: security-scan
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+jobs:
+  deps-and-image-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install safety
+        run: pip install safety
+      - name: Safety scan
+        run: |
+          pip install -r backend/requirements.txt
+          safety check -r backend/requirements.txt || true
+      - name: Build image
+        run: docker build -t mmt-backend:ci ./backend
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: 'mmt-backend:ci'
+          format: 'table'
+          exit-code: '0'
+          vuln-type: 'os,library'
+          ignore-unfixed: truename: security
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  deps-and-code-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt bandit safety
+      - name: Bandit scan
+        run: bandit -r backend -q || true
+      - name: Safety dependency scan
+        run: safety check -r backend/requirements.txt || true
+  image-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: |
+          docker build -t mmt-backend:ci -f backend/Dockerfile . || docker build -t mmt-backend:ci .
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: 'mmt-backend:ci'
+          format: 'table'
+          exit-code: '0'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
