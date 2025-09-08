@@ -21,6 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
       - name: Fail fast if required secrets missing
         if: ${{ github.event_name != 'pull_request' }}
         run: |
@@ -44,6 +47,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.16.0'
           channel: stable
       - name: Flutter pub get
         working-directory: app

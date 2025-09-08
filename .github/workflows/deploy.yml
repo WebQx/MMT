@@ -22,7 +22,9 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/backend
+  # Use a raw repo name and compute lowercase IMAGE_NAME at runtime (shell) to
+  # satisfy Docker's lowercase requirement for image names.
+  IMAGE_NAME_RAW: ${{ github.repository }}/backend
 
 jobs:
   build-and-push:
@@ -35,6 +37,12 @@ jobs:
       image_tag: ${{ steps.meta.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
+      - name: Normalize image name to lowercase
+        run: |
+          echo "IMAGE_NAME=$(echo \"${IMAGE_NAME_RAW}\" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Buildx
@@ -52,15 +60,15 @@ jobs:
           if [ -n "${{ github.event.inputs.image_tag }}" ]; then TAG="${{ github.event.inputs.image_tag }}"; fi
           echo "version=$TAG" >> "$GITHUB_OUTPUT"
       - name: Build and push image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: backend/Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
+        run: |
+          TAG="${{ steps.meta.outputs.version }}"
+          echo "Building and pushing $REGISTRY/$IMAGE_NAME:$TAG"
+          docker buildx build --platform linux/amd64 --push -f backend/Dockerfile -t "$REGISTRY/$IMAGE_NAME:$TAG" backend
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          # IMAGE_NAME is set earlier via GITHUB_ENV by the Normalize step
+          IMAGE_NAME: ${{ env.IMAGE_NAME_RAW }}
+        shell: bash
   helm-upgrade:
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -75,7 +83,7 @@ jobs:
       - name: Create image override file
         run: |
           mkdir -p /tmp/overrides
-          printf 'image:\n  repository: ghcr.io/%s\n  tag: %s\nservice:\n  port: 80\n  targetPort: 9000\n' "${{ env.IMAGE_NAME }}" "${{ needs.build-and-push.outputs.image_tag }}" > /tmp/overrides/values-override.yaml
+          printf 'image:\n  repository: ghcr.io/%s\n  tag: %s\nservice:\n  port: 80\n  targetPort: 9000\n' "$IMAGE_NAME" "${{ needs.build-and-push.outputs.image_tag }}" > /tmp/overrides/values-override.yaml
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
