@@ -6,7 +6,7 @@ import 'package:path/path.dart' as path;
 import '../utils/constants.dart';
 
 class AudioService {
-  final AudioRecorder _recorder = AudioRecorder();
+  final Record _recorder = Record();
   final AudioPlayer _player = AudioPlayer();
   
   bool _isRecording = false;
@@ -36,12 +36,10 @@ class AudioService {
       outputPath ??= await _generateRecordingPath();
       
       await _recorder.start(
-        const RecordConfig(
-          encoder: AudioEncoder.wav,
-          bitRate: 128000,
-          sampleRate: 44100,
-        ),
         path: outputPath,
+        encoder: AudioEncoder.wav,
+        bitRate: 128000,
+        samplingRate: 44100,
       );
       
       _isRecording = true;
@@ -67,7 +65,9 @@ class AudioService {
     if (!_isRecording) return;
 
     try {
-      await _recorder.pause();
+      if (await _recorder.isRecording()) {
+        await _recorder.pause();
+      }
     } catch (e) {
       throw Exception('Failed to pause recording: $e');
     }
@@ -75,7 +75,7 @@ class AudioService {
 
   Future<void> resumeRecording() async {
     try {
-      await _recorder.resume();
+  await _recorder.resume();
     } catch (e) {
       throw Exception('Failed to resume recording: $e');
     }
@@ -153,7 +153,7 @@ class AudioService {
     
     // For mobile, use app documents directory
     // For web, this will be handled differently
-    if (Platform.isAndroid || Platform.isIOS) {
+  if (Platform.isAndroid || Platform.isIOS) {
       final directory = Directory('/storage/emulated/0/Download'); // Android
       if (!await directory.exists()) {
         await directory.create(recursive: true);

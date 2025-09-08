@@ -84,7 +84,7 @@ class _LoginCardState extends State<LoginCard> {
                     children: [
                       const Icon(Icons.health_and_safety, size: 56, color: Colors.blueAccent),
                       const SizedBox(height: 8),
-                      Text('WebQx Multilingual Medical Transcription (MMT)', style: theme.textTheme.headline6?.copyWith(fontWeight: FontWeight.bold)),
+                      Text('WebQx Multilingual Medical Transcription (MMT)', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 20),

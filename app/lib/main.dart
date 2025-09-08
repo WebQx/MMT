@@ -514,72 +514,76 @@ class _MyAppState extends State<MyApp> {
       title: 'WebQx Multilingual Medical Transcription (MMT)',
       home: Scaffold(
         backgroundColor: const Color(0xFFF5F6FA),
-        body: _showHome
-            ? HomePage(
-                onGetStarted: () => setState(() => _showHome = false),
-                onLearnMore: null,
-              )
-            : (!_isLoggedIn
-        ? LoginCard(
-                    onKeycloak: _loginWithKeycloak,
-                    onGoogle: () => _openProviderAuthorize('google'),
-                    onMicrosoft: () => _openProviderAuthorize('microsoft'),
-                    onApple: () => _openProviderAuthorize('apple'),
-                    onGuest: _loginAsGuest,
-                    onLocalLogin: _loginWithLocal,
-          onBack: () => setState(() => _showHome = true),
-          onSignUp: _showSignUpDialog,
-          onLanguageChanged: (lang) => setState(() => _selectedLanguage = lang),
-                    resultText: _result,
-                    isLoading: _isUploading,
-                  )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // ...existing code for main UI (transcription type, mode, etc.)...
-                  Text('API Endpoint: $BASE_URL'),
-                  const SizedBox(height: 20),
-                  // Mode selection UI
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Mode: '),
-                      DropdownButton<String>(
-                        value: _selectedMode,
-                        items: const [
-                          DropdownMenuItem(
-                              value: 'cellular', child: Text('Cellular Data')),
-                          DropdownMenuItem(value: 'wifi', child: Text('WiFi')),
-                          DropdownMenuItem(value: 'cloud', child: Text('Cloud-Based')),
-                        ],
-                        onChanged: _isUploading
-                            ? null
-                            : (value) {
-                                setState(() {
-                                  _selectedMode = value!;
-                                });
-                              },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Checkbox(
-                        value: _phiConsent,
-                        onChanged: (v) {
-                          setState(() => _phiConsent = v ?? false);
-                        },
-                      ),
-                      const SizedBox(width: 4),
-                      const Expanded(
-                          child: Text(
-                              'I understand transcripts may contain sensitive (PHI) data.')),
-                    ],
-                  ),
-                  // The rest of the main UI remains unchanged (upload/transcribe, ambient mode, etc.)
-                ],
-              ),
+        body: Builder(builder: (context) {
+          Widget bodyWidget;
+          if (_showHome) {
+            bodyWidget = HomePage(
+              onGetStarted: () => setState(() => _showHome = false),
+              onLearnMore: null,
+            );
+          } else if (!_isLoggedIn) {
+            bodyWidget = LoginCard(
+              onKeycloak: _loginWithKeycloak,
+              onGoogle: () => _openProviderAuthorize('google'),
+              onMicrosoft: () => _openProviderAuthorize('microsoft'),
+              onApple: () => _openProviderAuthorize('apple'),
+              onGuest: _loginAsGuest,
+              onLocalLogin: _loginWithLocal,
+              onBack: () => setState(() => _showHome = true),
+              onSignUp: _showSignUpDialog,
+              onLanguageChanged: (lang) => setState(() => _selectedLanguage = lang),
+              resultText: _result,
+              isLoading: _isUploading,
+            );
+          } else {
+            bodyWidget = Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // ...existing code for main UI (transcription type, mode, etc.)...
+                Text('API Endpoint: $BASE_URL'),
+                const SizedBox(height: 20),
+                // Mode selection UI
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Mode: '),
+                    DropdownButton<String>(
+                      value: _selectedMode,
+                      items: const [
+                        DropdownMenuItem(value: 'cellular', child: Text('Cellular Data')),
+                        DropdownMenuItem(value: 'wifi', child: Text('WiFi')),
+                        DropdownMenuItem(value: 'cloud', child: Text('Cloud-Based')),
+                      ],
+                      onChanged: _isUploading
+                          ? null
+                          : (value) {
+                              setState(() {
+                                _selectedMode = value!;
+                              });
+                            },
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: _phiConsent,
+                      onChanged: (v) {
+                        setState(() => _phiConsent = v ?? false);
+                      },
+                    ),
+                    const SizedBox(width: 4),
+                    const Expanded(child: Text('I understand transcripts may contain sensitive (PHI) data.')),
+                  ],
+                ),
+                // The rest of the main UI remains unchanged (upload/transcribe, ambient mode, etc.)
+              ],
+            );
+          }
+
+          return bodyWidget;
+        }),
       ),
     );
   }
