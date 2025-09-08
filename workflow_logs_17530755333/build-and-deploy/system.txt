@@ -1,5 +1,0 @@
-2025-09-07T16:00:30.8930000Z Requested labels: ubuntu-latest
-2025-09-07T16:00:30.8930000Z Job defined at: WebQx/MMT/.github/workflows/firebase_web.yml@refs/pull/16/merge
-2025-09-07T16:00:30.8930000Z Waiting for a runner to pick up this job...
-2025-09-07T16:00:31.3940000Z Job is waiting for a hosted runner to come online.
-2025-09-07T16:00:31.3940000Z Job is about to start running on the hosted runner: GitHub Actions 1000001187

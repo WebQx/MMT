@@ -1,2 +1,0 @@
-Alembic migrations for MMT backend.
-Use ALEMBIC_DB_URL env var or TRANSCRIPTS_DB_* variables for connection.
