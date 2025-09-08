@@ -10,6 +10,7 @@ import os
 import mimetypes
 import subprocess
 from typing import Optional
+from urllib.parse import urlencode, urljoin
 
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request, Depends, WebSocket, WebSocketDisconnect, Response
 from fastapi.responses import JSONResponse
@@ -71,6 +72,7 @@ import time
 from postprocess import normalize_text
 import threading
 import requests as _requests
+from requests import RequestException
 from threading import RLock
 from chart_templates import list_templates, parse_transcript, build_prompt
 
@@ -99,6 +101,10 @@ def _refresh_jwks(initial: bool = False):
     except (_requests.RequestException, ValueError, KeyError) as e:
         jwks_refresh_total.labels(status="fail").inc()
         structlog.get_logger(__name__).warning("jwks_refresh_failed", error=str(e))
+
+
+# In-memory dev/local users map (email -> password). Only used when allow_local_login is True.
+_dev_local_users: dict[str, str] = {}
 
 
 def _jwks_background_loop():  # pragma: no cover
@@ -603,11 +609,19 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_
     raise HTTPException(status_code=401, detail="Invalid or expired token.")
 
 @app.post("/login/guest")
-async def login_guest():
+async def login_guest(body: dict | None = None):
     if not settings.allow_guest_auth:
         raise HTTPException(status_code=403, detail="Guest auth disabled")
-    audit(AuditEvent.GUEST_LOGIN)
-    return {"access_token": settings.guest_secret, "token_type": "bearer"}
+    # Accept optional language metadata for analytics/dev UX
+    lang = None
+    try:
+        if isinstance(body, dict):
+            lang = body.get('language')
+    except Exception:
+        lang = None
+    audit(AuditEvent.GUEST_LOGIN, filename=None, session_id=None)
+    # Non-sensitive: return guest token as before
+    return {"access_token": settings.guest_secret, "token_type": "bearer", "language": lang}
 
 
 @app.post("/login/local")
@@ -625,22 +639,49 @@ def login_local(creds: dict):
     password = creds.get('password') if isinstance(creds, dict) else None
     if not email or not password:
         raise HTTPException(status_code=400, detail="Missing email or password")
-    users_raw = settings.local_login_users or ''
-    pairs = [p.strip() for p in users_raw.split(',') if p.strip()]
-    match = False
-    for p in pairs:
-        if ':' not in p:
-            continue
-        u, pw = p.split(':', 1)
-        if secrets.compare_digest(u.strip(), email.strip()) and secrets.compare_digest(pw, password):
-            match = True
-            break
-    if not match:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    # First check runtime-registered dev users
+    if email in _dev_local_users and secrets.compare_digest(_dev_local_users[email], password):
+        match = True
+    else:
+        users_raw = settings.local_login_users or ''
+        pairs = [p.strip() for p in users_raw.split(',') if p.strip()]
+        match = False
+        for p in pairs:
+            if ':' not in p:
+                continue
+            u, pw = p.split(':', 1)
+            if secrets.compare_digest(u.strip(), email.strip()) and secrets.compare_digest(pw, password):
+                match = True
+                break
+        if not match:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
     # For local users grant writer scope for convenience
     session_id = secrets.token_urlsafe(16)
     token = issue_internal_jwt(session_id, 'user/DocumentReference.write user/DocumentReference.read')
     audit(AuditEvent.GUEST_LOGIN)
+    return {"access_token": token, "token_type": "bearer"}
+
+
+@app.post('/register')
+def register_user(body: dict):
+    """Dev-only registration: accepts {"email":"...","password":"..."} and registers a local user.
+
+    Only enabled when settings.allow_local_login is True.
+    Returns an internal JWT on success.
+    """
+    if not settings.allow_local_login:
+        raise HTTPException(status_code=403, detail='Local registration disabled')
+    email = body.get('email')
+    password = body.get('password')
+    if not email or not password:
+        raise HTTPException(status_code=400, detail='Missing email or password')
+    # basic validation
+    if '@' not in email or len(password) < 4:
+        raise HTTPException(status_code=400, detail='Invalid email or weak password')
+    _dev_local_users[email] = password
+    session_id = secrets.token_urlsafe(16)
+    token = issue_internal_jwt(session_id, 'user/DocumentReference.write user/DocumentReference.read')
+    audit(AuditEvent.GUEST_LOGIN, session_id=session_id)
     return {"access_token": token, "token_type": "bearer"}
 
 
@@ -659,6 +700,148 @@ def smart_callback(code: str, state: str):
     internal_token = issue_internal_jwt(token_payload['session_id'], token_payload.get('scope', ''))
     audit(AuditEvent.SMART_CALLBACK, session_id=token_payload['session_id'])
     return {"access_token": internal_token, "token_type": "bearer", "expires_in": token_payload.get("expires_in")}
+
+
+# ---------------------- OAuth web SSO (Google, Microsoft, Apple) ---------------------- #
+def _build_redirect_response(token: str):
+    # If frontend redirect configured, redirect with token in fragment for SPA; otherwise return JSON
+    if settings.oauth_frontend_redirect_url:
+        # append as fragment to avoid token in server logs
+        redirect_to = settings.oauth_frontend_redirect_url.rstrip('/') + '#access_token=' + token
+        return JSONResponse(status_code=302, content={"location": redirect_to}, headers={"Location": redirect_to})
+    return {"access_token": token, "token_type": "bearer"}
+
+
+@app.get('/auth/oauth/{provider}/authorize')
+def oauth_authorize(provider: str):
+    """Return an authorization URL for the named provider.
+
+    Providers supported: google, microsoft, apple
+    """
+    prov = provider.lower()
+    if prov == 'google':
+        client_id = settings.oauth_google_client_id
+        if not client_id:
+            raise HTTPException(status_code=400, detail='Google OAuth not configured')
+        redirect_base = settings.oauth_backend_base_url or settings.oauth_frontend_redirect_url or ''
+        params = {
+            'client_id': client_id,
+            'response_type': 'code',
+            'scope': 'openid email profile',
+            'access_type': 'offline',
+            'prompt': 'select_account',
+            'redirect_uri': urljoin(redirect_base, '/auth/oauth/google/callback'),
+        }
+        url = 'https://accounts.google.com/o/oauth2/v2/auth?' + urlencode(params)
+        return {'authorize_url': url}
+    if prov == 'microsoft':
+        client_id = settings.oauth_microsoft_client_id
+        if not client_id:
+            raise HTTPException(status_code=400, detail='Microsoft OAuth not configured')
+        redirect_base = settings.oauth_backend_base_url or settings.oauth_frontend_redirect_url or ''
+        params = {
+            'client_id': client_id,
+            'response_type': 'code',
+            'scope': 'openid email profile offline_access',
+            'redirect_uri': urljoin(redirect_base, '/auth/oauth/microsoft/callback'),
+        }
+        # Use common endpoint for multi-tenant
+        url = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' + urlencode(params)
+        return {'authorize_url': url}
+    if prov == 'apple':
+        client_id = settings.oauth_apple_client_id
+        if not client_id:
+            raise HTTPException(status_code=400, detail='Apple OAuth not configured')
+        redirect_base = settings.oauth_backend_base_url or settings.oauth_frontend_redirect_url or ''
+        params = {
+            'response_type': 'code id_token',
+            'response_mode': 'form_post',
+            'client_id': client_id,
+            'scope': 'name email',
+            'redirect_uri': urljoin(redirect_base, '/auth/oauth/apple/callback'),
+        }
+        url = 'https://appleid.apple.com/auth/authorize?' + urlencode(params)
+        return {'authorize_url': url}
+    raise HTTPException(status_code=404, detail='Provider not supported')
+
+
+@app.get('/auth/oauth/{provider}/callback')
+def oauth_callback(provider: str, code: str | None = None, state: str | None = None):
+    prov = provider.lower()
+    if prov == 'google':
+        token_url = 'https://oauth2.googleapis.com/token'
+        client_id = settings.oauth_google_client_id
+        client_secret = settings.oauth_google_client_secret
+        redirect_uri = urljoin(settings.oauth_backend_base_url or settings.oauth_frontend_redirect_url or '', '/auth/oauth/google/callback')
+        if not client_id or not client_secret:
+            raise HTTPException(status_code=400, detail='Google OAuth not fully configured')
+        try:
+            resp = _requests.post(token_url, data={
+                'code': code,
+                'client_id': client_id,
+                'client_secret': client_secret,
+                'redirect_uri': redirect_uri,
+                'grant_type': 'authorization_code',
+            }, timeout=10)
+            resp.raise_for_status()
+            pdata = resp.json()
+            id_token = pdata.get('id_token') or pdata.get('access_token')
+        except RequestException as e:
+            raise HTTPException(status_code=400, detail=f'Google token exchange failed: {e}')
+        # issue internal JWT
+        session_id = secrets.token_urlsafe(16)
+        token = issue_internal_jwt(session_id, 'user/DocumentReference.write user/DocumentReference.read')
+        audit(AuditEvent.SMART_CALLBACK, session_id=session_id)
+        return _build_redirect_response(token)
+    if prov == 'microsoft':
+        token_url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
+        client_id = settings.oauth_microsoft_client_id
+        client_secret = settings.oauth_microsoft_client_secret
+        redirect_uri = urljoin(settings.oauth_backend_base_url or settings.oauth_frontend_redirect_url or '', '/auth/oauth/microsoft/callback')
+        if not client_id or not client_secret:
+            raise HTTPException(status_code=400, detail='Microsoft OAuth not fully configured')
+        try:
+            resp = _requests.post(token_url, data={
+                'code': code,
+                'client_id': client_id,
+                'client_secret': client_secret,
+                'redirect_uri': redirect_uri,
+                'grant_type': 'authorization_code',
+            }, timeout=10)
+            resp.raise_for_status()
+            pdata = resp.json()
+            id_token = pdata.get('id_token') or pdata.get('access_token')
+        except RequestException as e:
+            raise HTTPException(status_code=400, detail=f'Microsoft token exchange failed: {e}')
+        session_id = secrets.token_urlsafe(16)
+        token = issue_internal_jwt(session_id, 'user/DocumentReference.write user/DocumentReference.read')
+        audit(AuditEvent.SMART_CALLBACK, session_id=session_id)
+        return _build_redirect_response(token)
+    if prov == 'apple':
+        token_url = 'https://appleid.apple.com/auth/token'
+        client_id = settings.oauth_apple_client_id
+        client_secret = settings.oauth_apple_client_secret
+        redirect_uri = urljoin(settings.oauth_backend_base_url or settings.oauth_frontend_redirect_url or '', '/auth/oauth/apple/callback')
+        if not client_id or not client_secret:
+            raise HTTPException(status_code=400, detail='Apple OAuth not fully configured')
+        try:
+            resp = _requests.post(token_url, data={
+                'code': code,
+                'client_id': client_id,
+                'client_secret': client_secret,
+                'redirect_uri': redirect_uri,
+                'grant_type': 'authorization_code',
+            }, timeout=10)
+            resp.raise_for_status()
+            pdata = resp.json()
+            id_token = pdata.get('id_token') or pdata.get('access_token')
+        except RequestException as e:
+            raise HTTPException(status_code=400, detail=f'Apple token exchange failed: {e}')
+        session_id = secrets.token_urlsafe(16)
+        token = issue_internal_jwt(session_id, 'user/DocumentReference.write user/DocumentReference.read')
+        audit(AuditEvent.SMART_CALLBACK, session_id=session_id)
+        return _build_redirect_response(token)
+    raise HTTPException(status_code=404, detail='Provider not supported')
 
 
 @app.get("/auth/me")

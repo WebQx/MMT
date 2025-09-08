@@ -14,6 +14,10 @@ import 'dart:convert';
 import 'package:printing/printing.dart';
 import 'passkey_intro_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+// Web-only import for reading window location fragment
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() {
@@ -42,6 +46,7 @@ class _MyAppState extends State<MyApp> {
   String? _accessToken;
   String? _refreshToken;
   bool _isLoggedIn = false;
+  String _selectedLanguage = 'en';
 
   // Keycloak config (replace with your values)
   final String _clientId = 'mmt-app';
@@ -79,6 +84,52 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<void> _openProviderAuthorize(String provider) async {
+    final uri = Uri.parse('$BASE_URL/auth/oauth/$provider/authorize');
+    try {
+      final resp = await http.get(uri).timeout(const Duration(seconds: 8));
+      if (resp.statusCode == 200) {
+        final data = json.decode(resp.body) as Map<String, dynamic>;
+        final auth = data['authorize_url'] as String?;
+        if (auth != null) {
+          await launchUrl(Uri.parse(auth), mode: LaunchMode.externalApplication);
+          // On web the provider flow should redirect back to frontend; parse fragment
+          if (kIsWeb) {
+            // small delay for redirect
+            await Future.delayed(const Duration(seconds: 1));
+            _maybeCaptureFragmentToken();
+          }
+          return;
+        }
+      }
+      setState(() => _result = 'Failed to get authorize URL for $provider');
+    } catch (e) {
+      setState(() => _result = 'Network error opening provider authorize: $e');
+    }
+  }
+
+  void _maybeCaptureFragmentToken() async {
+    if (!kIsWeb) return;
+    try {
+      final frag = html.window.location.hash; // e.g. #access_token=...
+      if (frag != null && frag.isNotEmpty) {
+        final cleaned = frag.startsWith('#') ? frag.substring(1) : frag;
+        final parts = Uri.splitQueryString(cleaned);
+        final token = parts['access_token'];
+        if (token != null) {
+          setState(() {
+            _accessToken = token;
+            _isLoggedIn = true;
+            _result = 'SSO login succeeded';
+          });
+          await _secureStorage.write(key: 'access_token', value: _accessToken);
+          // Clear fragment for cleanliness
+          html.window.history.replaceState(null, '', html.window.location.pathname);
+        }
+      }
+    } catch (_) {}
+  }
+
   Future<void> _loginAsGuest() async {
     final uri = Uri.parse('$BASE_URL/login/guest');
     setState(() {
@@ -86,7 +137,7 @@ class _MyAppState extends State<MyApp> {
     });
     http.Response response;
     try {
-      response = await http.post(uri).timeout(const Duration(seconds: 15));
+      response = await http.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode({'language': _selectedLanguage})).timeout(const Duration(seconds: 15));
     } catch (e) {
       setState(() {
         _result =
@@ -128,8 +179,8 @@ class _MyAppState extends State<MyApp> {
     });
     http.Response response;
     try {
-      response = await http
-          .post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode({'email': email, 'password': password}))
+    response = await http
+      .post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode({'email': email, 'password': password, 'language': _selectedLanguage}))
           .timeout(const Duration(seconds: 15));
     } catch (e) {
       setState(() {
@@ -194,6 +245,63 @@ class _MyAppState extends State<MyApp> {
         }
       }
     } catch (_) {}
+  }
+
+  Future<void> _showSignUpDialog() async {
+    String email = '';
+    String password = '';
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Create account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(onChanged: (v) => email = v, decoration: const InputDecoration(labelText: 'Email')),
+              TextField(onChanged: (v) => password = v, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Create')),
+          ],
+        );
+      },
+    );
+    if (email.isEmpty || password.isEmpty) return;
+    setState(() {
+      _isUploading = true;
+      _result = 'Creating account...';
+    });
+    try {
+      final uri = Uri.parse('$BASE_URL/register');
+      final resp = await http.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode({'email': email, 'password': password, 'language': _selectedLanguage})).timeout(const Duration(seconds: 10));
+      if (resp.statusCode == 200) {
+        final data = json.decode(resp.body) as Map<String, dynamic>;
+        final token = data['access_token'] as String?;
+        if (token != null) {
+          await _secureStorage.write(key: 'access_token', value: token);
+          setState(() {
+            _accessToken = token;
+            _isLoggedIn = true;
+            _result = 'Account created & logged in';
+          });
+        } else {
+          setState(() => _result = 'Registration succeeded but no token returned');
+        }
+      } else {
+        setState(() => _result = 'Registration failed: ${resp.statusCode} ${resp.body}');
+      }
+    } catch (e) {
+      setState(() => _result = 'Registration network error: $e');
+    } finally {
+      setState(() => _isUploading = false);
+    }
   }
 
   Future<http.Response> _retryingPost(Uri uri,
@@ -403,7 +511,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MMT',
+      title: 'WebQx Multilingual Medical Transcription (MMT)',
       home: Scaffold(
         backgroundColor: const Color(0xFFF5F6FA),
         body: _showHome
@@ -412,11 +520,16 @@ class _MyAppState extends State<MyApp> {
                 onLearnMore: null,
               )
             : (!_isLoggedIn
-                ? LoginCard(
+        ? LoginCard(
                     onKeycloak: _loginWithKeycloak,
+                    onGoogle: () => _openProviderAuthorize('google'),
+                    onMicrosoft: () => _openProviderAuthorize('microsoft'),
+                    onApple: () => _openProviderAuthorize('apple'),
                     onGuest: _loginAsGuest,
                     onLocalLogin: _loginWithLocal,
-                    onBack: () => setState(() => _showHome = true),
+          onBack: () => setState(() => _showHome = true),
+          onSignUp: _showSignUpDialog,
+          onLanguageChanged: (lang) => setState(() => _selectedLanguage = lang),
                     resultText: _result,
                     isLoading: _isUploading,
                   )

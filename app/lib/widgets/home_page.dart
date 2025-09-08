@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ambient clinical transcription, reimagined',
+                            Text('WebQx Multilingual Medical Transcription — Ambient clinical transcription, reimagined',
                                 style: theme.textTheme.headline4?.copyWith(fontWeight: FontWeight.bold)),
                             const SizedBox(height: 12),
                             Text(
