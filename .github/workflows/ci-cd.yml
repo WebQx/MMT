@@ -74,7 +74,13 @@ jobs:
       run: |
         cd app
         flutter pub get
-        flutter build web --base-href /MMT/
+        if [ -n "${{ secrets.PUBLIC_BACKEND_URL }}" ]; then
+          echo "Building with PUBLIC_BACKEND_URL=${{ secrets.PUBLIC_BACKEND_URL }}"
+          flutter build web --base-href /MMT/ --dart-define=BASE_URL=${{ secrets.PUBLIC_BACKEND_URL }}
+        else
+          echo "Building with default BASE_URL (localhost)"
+          flutter build web --base-href /MMT/
+        fi
     
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3

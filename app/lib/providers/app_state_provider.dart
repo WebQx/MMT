@@ -94,8 +94,10 @@ class AppStateProvider extends ChangeNotifier {
   }
   
   void setLanguage(String language) {
-    _selectedLanguage = language;
-    notifyListeners();
+  _selectedLanguage = language;
+  // persist the selection
+  _prefs.setString('selected_language', language);
+  notifyListeners();
   }
   
   // Private methods
@@ -118,5 +120,7 @@ class AppStateProvider extends ChangeNotifier {
     
     // Load onboarding state
     _onboardingCompleted = _prefs.getBool(Constants.onboardingCompletedKey) ?? false;
+  // Load selected language
+  _selectedLanguage = _prefs.getString('selected_language') ?? _selectedLanguage;
   }
 }

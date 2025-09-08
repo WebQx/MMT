@@ -168,9 +168,8 @@ class _LoginScreenState extends State<LoginScreen> {
     
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final appState = Provider.of<AppStateProvider>(context, listen: false);
-      
-      final response = await authService.loginAsGuest();
+  final appState = Provider.of<AppStateProvider>(context, listen: false);
+  final response = await authService.loginAsGuestWithLanguage(appState.selectedLanguage);
       final token = response['access_token'] as String;
       
       appState.setAuthenticated(token, 'guest');

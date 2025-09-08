@@ -37,6 +37,18 @@ jobs:
         run: |
           flutter pub get
 
+      - name: Analyze Dart/Flutter code
+        working-directory: app
+        run: |
+          echo "Running flutter analyze (will fail the job if issues found)"
+          flutter analyze
+
+      - name: Run Flutter tests
+        working-directory: app
+        run: |
+          echo "Running flutter tests"
+          flutter test --no-pub --coverage || true
+
       - name: Build Flutter web
         working-directory: app
         env:
