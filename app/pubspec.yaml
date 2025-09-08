@@ -8,6 +8,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  shared_preferences: ^2.0.15
+  record: ^4.3.0
   http: ^1.2.0
   audioplayers: ^5.2.0
   path_provider: ^2.1.0
