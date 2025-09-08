@@ -40,6 +40,17 @@ class AuthService {
         throw Exception('Guest login failed: ${response.body}');
       }
     } catch (e) {
+      // If backend is unreachable and offline auth is allowed (dev only),
+      // return a simple mock token so the UI can proceed for demo purposes.
+      if (Constants.allowOfflineAuth) {
+        return {
+          'access_token': '${Constants.offlineGuestTokenPrefix}-${DateTime.now().millisecondsSinceEpoch}',
+          'token_type': 'Bearer',
+          'expires_in': 3600,
+          'offline': true,
+        };
+      }
+
       throw Exception('Network error during guest login: $e');
     }
   }
@@ -60,6 +71,16 @@ class AuthService {
         throw Exception('Guest login failed: ${response.body}');
       }
     } catch (e) {
+      if (Constants.allowOfflineAuth) {
+        return {
+          'access_token': '${Constants.offlineGuestTokenPrefix}-${DateTime.now().millisecondsSinceEpoch}',
+          'token_type': 'Bearer',
+          'expires_in': 3600,
+          'language': language,
+          'offline': true,
+        };
+      }
+
       throw Exception('Network error during guest login: $e');
     }
   }
