@@ -58,6 +58,13 @@ class Constants {
   static const String themeKey = 'theme_mode';
   static const String localeKey = 'locale';
   static const String onboardingCompletedKey = 'onboarding_completed';
+
+  // Development helpers
+  // When true the app will allow a local/offline guest login flow when the
+  // backend is unreachable. This should remain true for local development and
+  // false in production deployments.
+  static const bool allowOfflineAuth = true;
+  static const String offlineGuestTokenPrefix = 'dev-guest-token';
   
   // Error Messages
   static const String networkErrorMessage = 'Network error. Please check your connection.';
