@@ -3,26 +3,27 @@ version: 0.3.0
 description: Multilingual Medical Transcription Flutter App
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.29.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  audioplayers: ^5.2.0
-  file_picker: ^10.3.2
-  flutter_appauth: ^6.0.4
-  flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.0.15
+  record: ^4.4.0
   http: ^1.2.0
-  pdf: ^3.10.1
-  permission_handler: ^11.0.1
+  audioplayers: ^5.2.0
   path_provider: ^2.1.0
   provider: ^6.0.0
+  file_picker: ^10.3.2
   printing: ^5.12.0
-  record: ^4.4.0
-  sentry_flutter: ^8.3.0
-  shared_preferences: ^2.0.15
-  speech_to_text: ^6.6.0
+  pdf: ^3.10.1
   url_launcher: ^6.2.6
+  sentry_flutter: ^8.3.0
+  speech_to_text: ^6.6.0
+  permission_handler: ^11.0.1
+  flutter_appauth: ^6.0.4
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:
