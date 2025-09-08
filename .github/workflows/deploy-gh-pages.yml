@@ -20,7 +20,14 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          # pin to a stable SDK matching CI (helps dependency resolution)
+          flutter-version: '3.16.0'
           channel: stable
+
+      - name: Show Flutter & Dart versions
+        run: |
+          flutter --version || true
+          dart --version || true
 
       - name: Cache Pub packages
         uses: actions/cache@v4
@@ -32,10 +39,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-flutter-pub-
 
-      - name: Install dependencies
+      - name: Install dependencies (verbose)
         working-directory: app
         run: |
-          flutter pub get
+          echo 'Resolving Flutter/Dart dependencies (verbose)'
+          flutter pub get --verbose || (echo 'flutter pub get failed'; cat pubspec.yaml; exit 1)
+          echo 'pubspec.lock contents:'
+          cat pubspec.lock || true
 
       - name: Analyze Dart/Flutter code
         working-directory: app
