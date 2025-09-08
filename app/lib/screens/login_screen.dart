@@ -171,8 +171,20 @@ class _LoginScreenState extends State<LoginScreen> {
   final appState = Provider.of<AppStateProvider>(context, listen: false);
   final response = await authService.loginAsGuestWithLanguage(appState.selectedLanguage);
       final token = response['access_token'] as String;
-      
+      final offline = response['offline'] as bool? ?? false;
+
       appState.setAuthenticated(token, 'guest');
+
+      if (offline) {
+        // Inform the user they are in offline/demo mode on GitHub Pages.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Demo mode: running without backend; some features are disabled.'),
+            backgroundColor: Constants.warningColor,
+            duration: Duration(seconds: 6),
+          ),
+        );
+      }
       
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/home');
