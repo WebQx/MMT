@@ -20,8 +20,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          # pin to a stable SDK matching CI (helps dependency resolution)
-          flutter-version: '3.16.0'
+          # Use the latest stable Flutter so the bundled Dart SDK satisfies newer package SDK constraints
+          flutter-version: 'stable'
           channel: stable
 
       - name: Show Flutter & Dart versions
