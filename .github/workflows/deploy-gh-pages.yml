@@ -20,8 +20,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          # Request latest Flutter release so the bundled Dart SDK satisfies newer package SDK constraints
-          flutter-version: 'latest'
+          # Pin to a concrete 3.16.x release which includes Dart 3.4+ and matches package SDK constraints
+          flutter-version: '3.16.6'
           channel: stable
 
       - name: Show Flutter & Dart versions
