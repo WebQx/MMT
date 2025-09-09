@@ -1,2 +1,2 @@
-openai-whisper==20231117
+openai-whisper==20250625
 presidio-analyzer==2.2.354
