@@ -20,6 +20,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'utils/constants.dart';
 
 void main() {
   final sentryDsn =
