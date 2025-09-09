@@ -22,7 +22,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/backend
+  # Ensure image name is lowercase to satisfy Docker/GHCR requirements
+  IMAGE_NAME: ${{ github.repository_owner }}/mmt-backend
 
 jobs:
   build-and-push:
@@ -75,17 +76,45 @@ jobs:
       - name: Create image override file
         run: |
           mkdir -p /tmp/overrides
-          printf 'image:\n  repository: ghcr.io/%s\n  tag: %s\nservice:\n  port: 80\n  targetPort: 9000\n' "${{ env.IMAGE_NAME }}" "${{ needs.build-and-push.outputs.image_tag }}" > /tmp/overrides/values-override.yaml
+          repo="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          # repo should already be lowercase because IMAGE_NAME uses github.repository_owner
+          printf 'image:\n  repository: %s\n  tag: %s\nservice:\n  port: 80\n  targetPort: 9000\n' "$repo" "${{ needs.build-and-push.outputs.image_tag }}" > /tmp/overrides/values-override.yaml
+      - name: Create OpenAI k8s secret (if provided)
+        if: "${{ env.ENVIRONMENT != 'dev' }} && (secrets.OPENAI_API_KEY != '')"
+        run: |
+          echo "Creating namespace and openai secret"
+          kubectl create namespace mmt || true
+          kubectl delete secret mmt-openai-secret -n mmt || true
+          echo "${{ secrets.OPENAI_API_KEY }}" | base64 --decode > /tmp/openai_key || true
+          kubectl create secret generic mmt-openai-secret -n mmt --from-file=OPENAI_API_KEY=/tmp/openai_key
+          echo "openai.secretName=mmt-openai-secret" >> /tmp/overrides/values-override.yaml
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
           version: v3.15.2
-      - name: Kubernetes auth (OIDC)
+      - name: Authenticate to GKE (Google Kubernetes Engine)
         if: "${{ env.ENVIRONMENT != 'dev' }}"
-        run: echo "(Placeholder) Configure cluster auth here" && exit 0
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          # These values must be provided as repository secrets (see .github/DEPLOY_NOTES.md)
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_LOCATION }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+          credentials: ${{ secrets.GKE_SA_KEY }}
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: '1'
       - name: Kube config (self-hosted dev)
         if: "${{ env.ENVIRONMENT == 'dev' }}"
-        run: echo "Skipping cluster auth; using existing kube context"
+        run: |
+          echo "Checking for available kubeconfig/context"
+          if ! kubectl version --client >/dev/null 2>&1; then
+            echo "kubectl is not available in runner" >&2
+            exit 1
+          fi
+          if ! kubectl config current-context >/dev/null 2>&1; then
+            echo "No kube context found. Skipping deploy to cluster." >&2
+            exit 1
+          fi
       - name: Helm upgrade
         run: |
           RELEASE=mmt

@@ -12,17 +12,14 @@ on:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-    env:
-      # Optionally override API base URL for the web build (set this in repository secrets if you have a production API)
-      PROD_BASE_URL: ${{ secrets.PROD_BASE_URL || '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.3'
+          flutter-version: '3.16.6'
           channel: stable
 
       - name: Install deps
@@ -33,15 +30,7 @@ jobs:
         working-directory: app
         run: |
           mkdir -p /tmp/build-logs
-          BUILD_CMD="flutter build web --base-href /MMT/"
-          if [ -n "${PROD_BASE_URL}" ]; then
-            BUILD_CMD="$BUILD_CMD --dart-define=BASE_URL=${PROD_BASE_URL}"
-            echo "Using PROD_BASE_URL for build"
-          else
-            echo "No PROD_BASE_URL set; build will use default BASE_URL (http://localhost:8000)"
-          fi
-          echo "Running: $BUILD_CMD"
-          /bin/sh -c "$BUILD_CMD" 2>&1 | tee /tmp/build-logs/flutter_build.log
+          flutter build web --base-href /MMT/ 2>&1 | tee /tmp/build-logs/flutter_build.log
 
       - name: List build output
         run: |

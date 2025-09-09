@@ -127,3 +127,6 @@ secrets:
     secretName: "redis-conn"         # key: url
   vault:
     secretName: "vault-approle"      # keys: roleId, secretId
+
+  openai:
+    secretName: ""  # Kubernetes Secret name containing OPENAI_API_KEY (key: OPENAI_API_KEY)

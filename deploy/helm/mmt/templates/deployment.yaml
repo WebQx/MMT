@@ -90,6 +90,13 @@ spec:
                   name: {{ .Values.secrets.vault.secretName }}
                   key: secretId
           {{- end }}
+          {{- if .Values.openai.secretName }}
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.openai.secretName }}
+                  key: OPENAI_API_KEY
+          {{- end }}
           {{- end }}
 {{- range $k, $v := .Values.env }}
             - name: {{ $k }}
