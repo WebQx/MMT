@@ -76,3 +76,4 @@ uploads/
 # Docker
 .dockerignore
 
+mmt-offline-*.tar.gz
