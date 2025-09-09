@@ -439,43 +439,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _isListening = false;
     });
-            // If running in offline/demo mode show a persistent banner that encourages full SSO login
-            if (_isOfflineDemo) {
-              return Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Container(
-                    color: Colors.orange.shade700,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.info_outline, color: Colors.white),
-                        const SizedBox(width: 8),
-                        const Expanded(child: Text('Demo mode: some features are disabled. Sign in with Google for full access.', style: TextStyle(color: Colors.white))),
-                        TextButton(
-                          onPressed: () async {
-                            await _openProviderAuthorize('google');
-                          },
-                          child: const Text('Sign in (Google)', style: TextStyle(color: Colors.white)),
-                        ),
-                        IconButton(
-                          onPressed: () async {
-                            // Dismiss the demo banner for this session (does not revoke token)
-                            setState(() {
-                              _isOfflineDemo = false;
-                            });
-                          },
-                          icon: const Icon(Icons.close, color: Colors.white),
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(child: bodyWidget),
-                ],
-              );
-            }
-
-            return bodyWidget;
+  }
 
   String? _savedAudioPath; // For record now, transcribe later
   // Add login step state
