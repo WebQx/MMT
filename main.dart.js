@@ -81365,7 +81365,7 @@ return A.R($async$oI,r)},
 kz(a){return this.a9L(a)},
 a9L(a){var s=0,r=A.S(t.H),q,p=2,o=[],n=this,m,l,k,j,i,h,g,f
 var $async$kz=A.O(function(b,c){if(b===1){o.push(c)
-s=p}while(true)switch(s){case 0:g=A.e5("http://localhost:8000/auth/oauth/"+a+"/authorize",0,null)
+s=p}while(true)switch(s){case 0:g=A.e5("https://api.webqx.ai/auth/oauth/"+a+"/authorize",0,null)
 p=4
 s=7
 return A.M(A.aPS(g).uH(0,B.E3),$async$kz)
@@ -81561,7 +81561,7 @@ return A.M(A.aBw(new A.alo(d),g,t.z),$async$oZ)
 case 3:if(d.b.length===0||d.a.length===0){s=1
 break}m.a2(new A.alp(m))
 p=5
-l=A.e5("http://localhost:8000/register",0,null)
+l=A.e5("https://api.webqx.ai/register",0,null)
 g=t.N
 f=A.ah(["Content-Type","application/json"],g,g)
 s=8
@@ -81687,7 +81687,7 @@ return A.M(A.kr(B.cu,null,t.z),$async$n3)
 case 5:p.a2(new A.alg(p,a))
 s=1
 break
-case 4:o=A.e5("http://localhost:8000/transcribe/",0,null)
+case 4:o=A.e5("https://api.webqx.ai/transcribe/",0,null)
 s=6
 return A.M(p.vY(),$async$n3)
 case 6:n=c
@@ -81854,7 +81854,7 @@ $1(a){var s,r,q,p,o,n=null,m=this.a
 if(m.db)s=new A.J5(new A.alE(m),n,n)
 else if(!m.w)s=new A.yn(m.ga8n(),new A.alF(m),new A.alG(m),new A.alI(m),m.ga8m(),m.ga8o(),new A.alJ(m),m.gacb(),new A.alK(m),m.fx,m.fy,n)
 else{r=t.E
-q=A.c([A.db("API Endpoint: http://localhost:8000",n,n,n,n,n,n),B.yn],r)
+q=A.c([A.db("API Endpoint: https://api.webqx.ai",n,n,n,n,n,n),B.yn],r)
 if(m.x)q.push(A.hL(A.c([B.TV,B.kA,A.u4(B.U5,new A.alL(m),n)],r),B.a9,B.df,B.an,0))
 else{p=m.go
 o=m.fy?n:new A.alM(m)
