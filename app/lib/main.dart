@@ -361,12 +361,12 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    // For cloud/real-time ambient mode, ensure the user is not running the demo/offline token.
+    // For cloud/real-time ambient mode, if running a demo/offline token offer a simulated ambient demo
     if (_isOfflineDemo) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ambient real-time mode requires cloud access. Sign in with your account for full access.'), backgroundColor: Colors.orange),
+        const SnackBar(content: Text('Running in demo mode — ambient input will be simulated locally.'), backgroundColor: Colors.orange),
       );
-      return;
+      // allow simulated ambient flow (no microphone streaming to backend)
     }
 
     var status = await Permission.microphone.request();
@@ -410,6 +410,15 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _isUploading = true;
     });
+    // Demo/offline users: simulate ambient ingestion locally
+    if (_isOfflineDemo) {
+      await Future.delayed(const Duration(milliseconds: 600));
+      setState(() {
+        _result = 'Demo ambient transcription: ${_sanitizeForShare(text)}';
+        _isUploading = false;
+      });
+      return;
+    }
     final uri = Uri.parse('$BASE_URL/transcribe/');
     final token = await _getToken();
     final response = await _retryingPost(
@@ -490,12 +499,13 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    // For cloud modes, block demo/offline tokens and ask user to sign in.
+    // For cloud modes, if running demo/offline token simulate a transcription locally
     if (_isOfflineDemo) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('This operation requires cloud transcription. Sign in with your account for full access.'), backgroundColor: Colors.orange),
-      );
+      // Simulate a short processing delay and produce a canned/demo transcription
+      await Future.delayed(const Duration(seconds: 1));
+      final fname = file.path.split('/').last;
       setState(() {
+        _result = 'Demo transcription (offline): Sample transcription for $fname\n\nPatient reports mild headache and dizziness. No acute distress.';
         _isUploading = false;
       });
       return;
@@ -668,6 +678,32 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
                 // The rest of the main UI remains unchanged (upload/transcribe, ambient mode, etc.)
+                const SizedBox(height: 16),
+                Center(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.science),
+                    label: const Text('Run Whisper Demo'),
+                    onPressed: _isUploading
+                        ? null
+                        : () async {
+                            setState(() {
+                              _isUploading = true;
+                              _result = 'Running demo whisper...';
+                            });
+                            // Simulate ambient snippet then a file transcription
+                            await Future.delayed(const Duration(milliseconds: 700));
+                            // ambient simulated
+                            final ambient = 'Simulated ambient: patient denies shortness of breath.';
+                            await _sendAmbientTranscript(ambient);
+                            // small pause then simulated file transcription
+                            await Future.delayed(const Duration(milliseconds: 600));
+                            setState(() {
+                              _result = '${_result}\n\nDemo file transcription:\nPhysical exam normal. Vital signs stable.';
+                              _isUploading = false;
+                            });
+                          },
+                  ),
+                ),
               ],
             );
           }
