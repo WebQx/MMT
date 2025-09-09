@@ -11,6 +11,7 @@ import 'widgets/login_card.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'services/auth_service.dart';
 import 'package:printing/printing.dart';
 import 'passkey_intro_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -46,6 +47,7 @@ class _MyAppState extends State<MyApp> {
   String? _accessToken;
   String? _refreshToken;
   bool _isLoggedIn = false;
+  bool _isOfflineDemo = false;
   String _selectedLanguage = 'en';
 
   // Keycloak config (replace with your values)
@@ -69,6 +71,7 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           _accessToken = result.accessToken;
           _isLoggedIn = true;
+          _isOfflineDemo = false;
         });
         await _secureStorage.write(key: 'access_token', value: _accessToken);
         if (result.refreshToken != null) {
@@ -120,6 +123,7 @@ class _MyAppState extends State<MyApp> {
           setState(() {
             _accessToken = token;
             _isLoggedIn = true;
+            _isOfflineDemo = false;
             _result = 'SSO login succeeded';
           });
           await _secureStorage.write(key: 'access_token', value: _accessToken);
@@ -131,30 +135,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _loginAsGuest() async {
-    final uri = Uri.parse('$BASE_URL/login/guest');
-    setState(() {
-      _result = 'Attempting guest login @ ${uri.toString()}';
-    });
-    http.Response response;
+    setState(() => _result = 'Attempting guest login');
+    final auth = AuthService();
     try {
-      response = await http.post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode({'language': _selectedLanguage})).timeout(const Duration(seconds: 15));
-    } catch (e) {
-      setState(() {
-        _result =
-            'Guest login network error: $e\nCheck backend running & BASE_URL=$BASE_URL';
-      });
-      return;
-    }
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = {};
-      try {
-        data = json.decode(response.body) as Map<String, dynamic>;
-      } catch (_) {}
-      final token = data['access_token'] as String?;
+      final resp = await auth.loginAsGuestWithLanguage(_selectedLanguage);
+      final token = resp['access_token'] as String?;
       if (token == null) {
-        setState(() {
-          _result = 'Guest login response missing access_token';
-        });
+        setState(() => _result = 'Guest login response missing access_token');
         return;
       }
       setState(() {
@@ -163,45 +150,29 @@ class _MyAppState extends State<MyApp> {
         _result = 'Guest login succeeded';
       });
       await _secureStorage.write(key: 'access_token', value: _accessToken);
-    } else {
-      setState(() {
-        _result =
-            'Guest login failed: HTTP ${response.statusCode} ${response.reasonPhrase}\nBody: ${response.body}\n(BASE_URL=$BASE_URL)';
-      });
+
+      final offline = resp['offline'] as bool? ?? false;
+      if (offline) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Demo mode: running without backend; some features are disabled.'), backgroundColor: Colors.orange),
+        );
+      }
+    } catch (e) {
+      setState(() => _result = 'Guest login error: $e');
     }
   }
 
   Future<void> _loginWithLocal(String email, String password) async {
-    final uri = Uri.parse('$BASE_URL/login/local');
     setState(() {
       _result = 'Attempting local login as $email';
       _isUploading = true;
     });
-    http.Response response;
+    final auth = AuthService();
     try {
-    response = await http
-      .post(uri, headers: {'Content-Type': 'application/json'}, body: json.encode({'email': email, 'password': password, 'language': _selectedLanguage}))
-          .timeout(const Duration(seconds: 15));
-    } catch (e) {
-      setState(() {
-        _result = 'Local login network error: $e\nCheck backend & BASE_URL=$BASE_URL';
-        _isUploading = false;
-      });
-      return;
-    }
-    setState(() {
-      _isUploading = false;
-    });
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = {};
-      try {
-        data = json.decode(response.body) as Map<String, dynamic>;
-      } catch (_) {}
-      final token = data['access_token'] as String?;
+      final resp = await auth.loginLocal(email, password, _selectedLanguage);
+      final token = resp['access_token'] as String?;
       if (token == null) {
-        setState(() {
-          _result = 'Local login response missing access_token';
-        });
+        setState(() => _result = 'Local login response missing access_token');
         return;
       }
       setState(() {
@@ -210,9 +181,18 @@ class _MyAppState extends State<MyApp> {
         _result = 'Local login succeeded';
       });
       await _secureStorage.write(key: 'access_token', value: _accessToken);
-    } else {
+
+      final offline = resp['offline'] as bool? ?? false;
+      if (offline) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Demo mode: running without backend; some features are disabled.'), backgroundColor: Colors.orange),
+        );
+      }
+    } catch (e) {
+      setState(() => _result = 'Local login error: $e');
+    } finally {
       setState(() {
-        _result = 'Local login failed: HTTP ${response.statusCode} ${response.reasonPhrase}\nBody: ${response.body}';
+        _isUploading = false;
       });
     }
   }
@@ -344,11 +324,50 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _speech = stt.SpeechToText();
+    _loadStoredToken();
+  }
+
+  // URL where users can download the standalone/local Whisper app
+  final String _downloadUrl = 'https://github.com/WebQx/MMT/releases/latest';
+
+  Future<void> _loadStoredToken() async {
+    try {
+      final token = await _secureStorage.read(key: 'access_token');
+      final storedMode = await _secureStorage.read(key: 'selected_mode');
+      if (token != null) {
+        setState(() {
+          _accessToken = token;
+          _isLoggedIn = true;
+          _isOfflineDemo = token.startsWith(Constants.offlineGuestTokenPrefix);
+        });
+      }
+      if (storedMode != null && storedMode.isNotEmpty) {
+        setState(() {
+          _selectedMode = storedMode;
+        });
+      }
+    } catch (_) {}
   }
 
   bool _showHome = true;
 
   Future<void> _startAmbientMode() async {
+    // If user selected Local Whisper (cellular) mode, direct them to download the standalone app.
+    if (_selectedMode == 'cellular') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Local Whisper mode is offline-only. Download the standalone app at $_downloadUrl to transcribe later.'), backgroundColor: Colors.blue),
+      );
+      return;
+    }
+
+    // For cloud/real-time ambient mode, ensure the user is not running the demo/offline token.
+    if (_isOfflineDemo) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ambient real-time mode requires cloud access. Sign in with your account for full access.'), backgroundColor: Colors.orange),
+      );
+      return;
+    }
+
     var status = await Permission.microphone.request();
     if (status.isGranted) {
       bool available = await _speech!.initialize(
@@ -420,7 +439,43 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _isListening = false;
     });
-  }
+            // If running in offline/demo mode show a persistent banner that encourages full SSO login
+            if (_isOfflineDemo) {
+              return Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Container(
+                    color: Colors.orange.shade700,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, color: Colors.white),
+                        const SizedBox(width: 8),
+                        const Expanded(child: Text('Demo mode: some features are disabled. Sign in with Google for full access.', style: TextStyle(color: Colors.white))),
+                        TextButton(
+                          onPressed: () async {
+                            await _openProviderAuthorize('google');
+                          },
+                          child: const Text('Sign in (Google)', style: TextStyle(color: Colors.white)),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            // Dismiss the demo banner for this session (does not revoke token)
+                            setState(() {
+                              _isOfflineDemo = false;
+                            });
+                          },
+                          icon: const Icon(Icons.close, color: Colors.white),
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(child: bodyWidget),
+                ],
+              );
+            }
+
+            return bodyWidget;
 
   String? _savedAudioPath; // For record now, transcribe later
   // Add login step state
@@ -459,6 +514,28 @@ class _MyAppState extends State<MyApp> {
       _isUploading = true;
       _result = 'Uploading...';
     });
+    // Handle Local Whisper (download) mode first: instruct the user to download the offline app.
+    if (_selectedMode == 'cellular') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('To transcribe locally please download the standalone app from $_downloadUrl'), backgroundColor: Colors.blue),
+      );
+      setState(() {
+        _isUploading = false;
+      });
+      return;
+    }
+
+    // For cloud modes, block demo/offline tokens and ask user to sign in.
+    if (_isOfflineDemo) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('This operation requires cloud transcription. Sign in with your account for full access.'), backgroundColor: Colors.orange),
+      );
+      setState(() {
+        _isUploading = false;
+      });
+      return;
+    }
+
     String endpoint = '/transcribe/';
     Map<String, String> fields = {};
     if (_selectedMode == 'cellular') {
@@ -543,27 +620,75 @@ class _MyAppState extends State<MyApp> {
                 Text('API Endpoint: $BASE_URL'),
                 const SizedBox(height: 20),
                 // Mode selection UI
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Mode: '),
-                    DropdownButton<String>(
-                      value: _selectedMode,
-                      items: const [
-                        DropdownMenuItem(value: 'cellular', child: Text('Cellular Data')),
-                        DropdownMenuItem(value: 'wifi', child: Text('WiFi')),
-                        DropdownMenuItem(value: 'cloud', child: Text('Cloud-Based')),
+                if (_isOfflineDemo)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Mode: Demo (limited access)'),
+                      const SizedBox(width: 12),
+                      TextButton(
+                        onPressed: () async {
+                          await _openProviderAuthorize('google');
+                        },
+                        child: const Text('Sign in for full access'),
+                      )
+                    ],
+                  )
+                else
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Mode: '),
+                      DropdownButton<String>(
+                        value: _selectedMode,
+                        items: const [
+                          DropdownMenuItem(value: 'cellular', child: Text('Local Whisper (download - transcribe later)')),
+                          DropdownMenuItem(value: 'wifi', child: Text('OpenAI Whisper API (real-time/ambient)')),
+                          DropdownMenuItem(value: 'cloud', child: Text('Cloud-Based (external)')),
+                        ],
+                        onChanged: _isUploading
+                            ? null
+                            : (value) async {
+                                setState(() {
+                                  _selectedMode = value!;
+                                });
+                                try {
+                                  await _secureStorage.write(key: 'selected_mode', value: _selectedMode);
+                                } catch (_) {}
+                              },
+                      ),
+                        IconButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) {
+                                return AlertDialog(
+                                  title: const Text('Modes explained'),
+                                  content: const Text('Demo: limited guest access (no cloud).\n\nLocal Whisper: download the standalone app to record and transcribe later locally.\n\nCloud (OpenAI Whisper API): real-time and ambient transcription using cloud services; requires sign-in and backend access.'),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.info_outline),
+                        ),
+                      if (_selectedMode == 'cellular') ...[
+                        const SizedBox(width: 12),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final url = Uri.parse(_downloadUrl);
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url, mode: LaunchMode.externalApplication);
+                            }
+                          },
+                          icon: const Icon(Icons.download),
+                          label: const Text('Download App'),
+                        )
                       ],
-                      onChanged: _isUploading
-                          ? null
-                          : (value) {
-                              setState(() {
-                                _selectedMode = value!;
-                              });
-                            },
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

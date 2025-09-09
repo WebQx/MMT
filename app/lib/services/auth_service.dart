@@ -85,6 +85,36 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> loginLocal(String email, String password, String language) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/login/local'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'email': email, 'password': password, 'language': language}),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Local login failed: ${response.body}');
+      }
+    } catch (e) {
+      if (Constants.allowOfflineAuth) {
+        return {
+          'access_token': '${Constants.offlineGuestTokenPrefix}-${DateTime.now().millisecondsSinceEpoch}',
+          'token_type': 'Bearer',
+          'expires_in': 3600,
+          'language': language,
+          'offline': true,
+        };
+      }
+
+      throw Exception('Network error during local login: $e');
+    }
+  }
+
   Future<bool> validateToken(String token) async {
     try {
       final response = await http.get(
