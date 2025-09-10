@@ -15,6 +15,8 @@ jobs:
     env:
       # Optionally override API base URL for the web build (set this in repository secrets if you have a production API)
       PROD_BASE_URL: ${{ secrets.PROD_BASE_URL || '' }}
+      # OpenAI API key for Whisper integration
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,6 +41,12 @@ jobs:
             echo "Using PROD_BASE_URL for build"
           else
             echo "No PROD_BASE_URL set; build will use default BASE_URL (http://localhost:8000)"
+          fi
+          if [ -n "${OPENAI_API_KEY}" ]; then
+            BUILD_CMD="$BUILD_CMD --dart-define=OPENAI_API_KEY=${OPENAI_API_KEY}"
+            echo "Using OPENAI_API_KEY for build"
+          else
+            echo "No OPENAI_API_KEY set; OpenAI Whisper features may be limited"
           fi
           echo "Running: $BUILD_CMD"
           /bin/sh -c "$BUILD_CMD" 2>&1 | tee /tmp/build-logs/flutter_build.log
