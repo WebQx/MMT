@@ -1477,6 +1477,117 @@ def fhir_patient_read(patient_id: str, current_user: dict = Depends(get_current_
     resp.raise_for_status()
     return resp.json()
 
+
+@app.get("/fhir/Patient")
+def fhir_patient_search(name: str = None, _count: int = 20, current_user: dict = Depends(get_current_user)):
+    _require_scope(current_user, 'user/Patient.read')
+    token = current_user.get('fhir_access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing FHIR token")
+    settings = get_settings()
+    import requests
+    
+    url = f"{settings.openemr_fhir_base_url}/apis/{settings.openemr_site}/fhir/Patient"
+    params = {"_count": _count}
+    if name:
+        params["name"] = name
+    
+    resp = requests.get(url, headers={"Authorization": f"Bearer {token}"}, params=params, timeout=30)
+    if resp.status_code == 401:
+        raise HTTPException(status_code=401, detail="Unauthorized to search patients")
+    resp.raise_for_status()
+    return resp.json()
+
+
+@app.get("/fhir/Encounter")
+def fhir_encounter_search(patient: str = None, _count: int = 50, _sort: str = None, current_user: dict = Depends(get_current_user)):
+    _require_scope(current_user, 'user/Encounter.read')
+    token = current_user.get('fhir_access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing FHIR token")
+    settings = get_settings()
+    import requests
+    
+    url = f"{settings.openemr_fhir_base_url}/apis/{settings.openemr_site}/fhir/Encounter"
+    params = {"_count": _count}
+    if patient:
+        params["patient"] = patient
+    if _sort:
+        params["_sort"] = _sort
+    
+    resp = requests.get(url, headers={"Authorization": f"Bearer {token}"}, params=params, timeout=30)
+    if resp.status_code == 401:
+        raise HTTPException(status_code=401, detail="Unauthorized to search encounters")
+    resp.raise_for_status()
+    return resp.json()
+
+
+@app.post("/fhir/Encounter")
+def fhir_encounter_create(encounter_data: dict, current_user: dict = Depends(get_current_user)):
+    _require_scope(current_user, 'user/Encounter.write')
+    token = current_user.get('fhir_access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing FHIR token")
+    settings = get_settings()
+    import requests
+    
+    url = f"{settings.openemr_fhir_base_url}/apis/{settings.openemr_site}/fhir/Encounter"
+    resp = requests.post(url, headers={
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/fhir+json"
+    }, json=encounter_data, timeout=30)
+    
+    if resp.status_code == 401:
+        raise HTTPException(status_code=401, detail="Unauthorized to create encounter")
+    if resp.status_code != 201:
+        raise HTTPException(status_code=resp.status_code, detail=f"Failed to create encounter: {resp.text}")
+    return resp.json()
+
+
+@app.post("/fhir/DocumentReference")
+def fhir_document_reference_create(document_data: dict, current_user: dict = Depends(get_current_user)):
+    _require_scope(current_user, 'user/DocumentReference.write')
+    token = current_user.get('fhir_access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing FHIR token")
+    settings = get_settings()
+    import requests
+    
+    url = f"{settings.openemr_fhir_base_url}/apis/{settings.openemr_site}/fhir/DocumentReference"
+    resp = requests.post(url, headers={
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/fhir+json"
+    }, json=document_data, timeout=30)
+    
+    if resp.status_code == 401:
+        raise HTTPException(status_code=401, detail="Unauthorized to create document")
+    if resp.status_code != 201:
+        raise HTTPException(status_code=resp.status_code, detail=f"Failed to create document: {resp.text}")
+    return resp.json()
+
+
+@app.get("/fhir/DocumentReference")
+def fhir_document_reference_search(patient: str = None, _count: int = 50, _sort: str = None, current_user: dict = Depends(get_current_user)):
+    _require_scope(current_user, 'user/DocumentReference.read')
+    token = current_user.get('fhir_access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing FHIR token")
+    settings = get_settings()
+    import requests
+    
+    url = f"{settings.openemr_fhir_base_url}/apis/{settings.openemr_site}/fhir/DocumentReference"
+    params = {"_count": _count}
+    if patient:
+        params["patient"] = patient
+    if _sort:
+        params["_sort"] = _sort
+    
+    resp = requests.get(url, headers={"Authorization": f"Bearer {token}"}, params=params, timeout=30)
+    if resp.status_code == 401:
+        raise HTTPException(status_code=401, detail="Unauthorized to search documents")
+    resp.raise_for_status()
+    return resp.json()
+
 # startup handled by lifespan context
 
 def _current_alembic_revision() -> str | None:
