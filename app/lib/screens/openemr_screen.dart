@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/app_state_provider.dart';
 import '../services/openemr_service.dart';
 import '../models/patient.dart';
 import '../models/encounter.dart';
@@ -166,12 +164,22 @@ class _OpenEMRScreenState extends State<OpenEMRScreen> {
       return;
     }
 
-    // Set patient/encounter context in app state
-    final appState = Provider.of<AppStateProvider>(context, listen: false);
-    appState.setPatientContext(_selectedPatient!, _selectedEncounter!);
+    // Show success message with patient context
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Transcription ready for:\n'
+          'Patient: ${_selectedPatient!.fullName}\n'
+          'Encounter: ${_selectedEncounter!.type} - ${_selectedEncounter!.date}\n\n'
+          'This will integrate with the main transcription interface.',
+        ),
+        backgroundColor: Constants.successColor,
+        duration: const Duration(seconds: 4),
+      ),
+    );
     
-    // Navigate to transcription screen
-    Navigator.of(context).pushNamed('/transcription');
+    // For now, just go back to main screen where user can use transcription
+    Navigator.of(context).pop();
   }
 
   @override
