@@ -129,4 +129,19 @@ class AuthService {
       return false;
     }
   }
+
+  Future<String?> getAccessToken() async {
+    // For now, return a mock token for development
+    // In production, this should retrieve the token from secure storage
+    if (Constants.allowOfflineAuth) {
+      return '${Constants.offlineGuestTokenPrefix}-mock';
+    }
+    
+    // TODO: Implement proper token retrieval from secure storage
+    // This would typically involve:
+    // 1. Retrieving from FlutterSecureStorage
+    // 2. Checking if token is expired
+    // 3. Refreshing if needed
+    return null;
+  }
 }

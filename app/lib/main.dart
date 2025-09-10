@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'config/api_config.dart';
 import 'widgets/home_page.dart';
 import 'widgets/login_card.dart';
+import 'screens/openemr_screen.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -679,30 +680,50 @@ class _MyAppState extends State<MyApp> {
                 ),
                 // The rest of the main UI remains unchanged (upload/transcribe, ambient mode, etc.)
                 const SizedBox(height: 16),
-                Center(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.science),
-                    label: const Text('Run Whisper Demo'),
-                    onPressed: _isUploading
-                        ? null
-                        : () async {
-                            setState(() {
-                              _isUploading = true;
-                              _result = 'Running demo whisper...';
-                            });
-                            // Simulate ambient snippet then a file transcription
-                            await Future.delayed(const Duration(milliseconds: 700));
-                            // ambient simulated
-                            final ambient = 'Simulated ambient: patient denies shortness of breath.';
-                            await _sendAmbientTranscript(ambient);
-                            // small pause then simulated file transcription
-                            await Future.delayed(const Duration(milliseconds: 600));
-                            setState(() {
-                              _result = '${_result}\n\nDemo file transcription:\nPhysical exam normal. Vital signs stable.';
-                              _isUploading = false;
-                            });
-                          },
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.science),
+                      label: const Text('Run Whisper Demo'),
+                      onPressed: _isUploading
+                          ? null
+                          : () async {
+                              setState(() {
+                                _isUploading = true;
+                                _result = 'Running demo whisper...';
+                              });
+                              // Simulate ambient snippet then a file transcription
+                              await Future.delayed(const Duration(milliseconds: 700));
+                              // ambient simulated
+                              final ambient = 'Simulated ambient: patient denies shortness of breath.';
+                              await _sendAmbientTranscript(ambient);
+                              // small pause then simulated file transcription
+                              await Future.delayed(const Duration(milliseconds: 600));
+                              setState(() {
+                                _result = '${_result}\n\nDemo file transcription:\nPhysical exam normal. Vital signs stable.';
+                                _isUploading = false;
+                              });
+                            },
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.local_hospital),
+                      label: const Text('OpenEMR Integration'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const OpenEMRScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             );

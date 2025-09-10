@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';
+import '../models/patient.dart';
+import '../models/encounter.dart';
 
 class AppStateProvider extends ChangeNotifier {
   final SharedPreferences _prefs;
@@ -25,6 +27,10 @@ class AppStateProvider extends ChangeNotifier {
   bool _ambientModeEnabled = false;
   String _selectedLanguage = 'auto';
   
+  // OpenEMR/Patient context
+  Patient? _selectedPatient;
+  Encounter? _selectedEncounter;
+  
   // Getters
   bool get isAuthenticated => _isAuthenticated;
   String? get authToken => _authToken;
@@ -36,6 +42,8 @@ class AppStateProvider extends ChangeNotifier {
   String get selectedNetworkMode => _selectedNetworkMode;
   bool get ambientModeEnabled => _ambientModeEnabled;
   String get selectedLanguage => _selectedLanguage;
+  Patient? get selectedPatient => _selectedPatient;
+  Encounter? get selectedEncounter => _selectedEncounter;
   
   // Authentication methods
   void setAuthenticated(String token, String type) {
@@ -94,10 +102,29 @@ class AppStateProvider extends ChangeNotifier {
   }
   
   void setLanguage(String language) {
-  _selectedLanguage = language;
-  // persist the selection
-  _prefs.setString('selected_language', language);
-  notifyListeners();
+    _selectedLanguage = language;
+    // persist the selection
+    _prefs.setString('selected_language', language);
+    notifyListeners();
+  }
+  
+  // Patient/Encounter context methods
+  void setPatientContext(Patient patient, Encounter encounter) {
+    _selectedPatient = patient;
+    _selectedEncounter = encounter;
+    
+    // Persist patient/encounter context
+    _prefs.setString('selected_patient', patient.toJson().toString());
+    _prefs.setString('selected_encounter', encounter.toJson().toString());
+    notifyListeners();
+  }
+  
+  void clearPatientContext() {
+    _selectedPatient = null;
+    _selectedEncounter = null;
+    _prefs.remove('selected_patient');
+    _prefs.remove('selected_encounter');
+    notifyListeners();
   }
   
   // Private methods

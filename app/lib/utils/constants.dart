@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 class Constants {
   // API Configuration
-  static const String baseUrl = 'http://localhost:8000';
+  static const String baseUrl = String.fromEnvironment('BASE_URL', defaultValue: 'http://localhost:8000');
   static const String apiVersion = '/api/v1';
+  
+  // OpenAI Configuration
+  static const String openaiApiKey = String.fromEnvironment('OPENAI_API_KEY', defaultValue: '');
   
   // Keycloak Configuration
   static const String keycloakUrl = 'https://your-keycloak-domain/auth';
