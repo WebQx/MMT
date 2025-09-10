@@ -1,2 +1,2 @@
 openai-whisper==20231117
-presidio-analyzer==2.2.354
+presidio-analyzer==2.2.360
