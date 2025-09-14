@@ -1,8 +1,23 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Constants {
-  // API Configuration
-  static const String baseUrl = String.fromEnvironment('BASE_URL', defaultValue: 'http://localhost:8000');
+  // API Configuration - Dynamic URL detection
+  static String get baseUrl {
+    const envUrl = String.fromEnvironment('BASE_URL');
+    if (envUrl.isNotEmpty) {
+      return envUrl;
+    }
+    
+    // Auto-detect based on environment
+    if (kDebugMode) {
+      return 'http://localhost:8001'; // Updated to match Django port
+    } else {
+      // Production - should be set via environment variable
+      return 'https://api.yourserver.com'; // Replace with actual production URL
+    }
+  }
+  
   static const String apiVersion = '/api/v1';
   
   // OpenAI Configuration
