@@ -464,12 +464,6 @@ class MMTLanding {
                 const buttonText = button.textContent.trim();
                 console.log(`Button clicked: ${buttonText}`);
                 
-                // Handle service access for localhost links
-                if (button.href && button.href.includes('localhost')) {
-                    e.preventDefault();
-                    this.handleServiceAccess(button.href, buttonText);
-                }
-                
                 // Log interaction for analytics
                 this.logInteraction('button_click', {
                     text: buttonText,
@@ -478,70 +472,6 @@ class MMTLanding {
                 });
             });
         });
-    }
-
-    handleServiceAccess(url, serviceName) {
-        // Extract service type from URL
-        let serviceType = 'unknown';
-        if (url.includes(':8080')) serviceType = 'openemr';
-        else if (url.includes(':3000')) serviceType = 'flutter';
-        else if (url.includes(':8001')) serviceType = 'django';
-
-        this.accessService(serviceType, serviceName);
-    }
-
-    accessService(serviceType, serviceName = '') {
-        const service = this.connectionStatus.get(serviceType);
-        const url = this.backendUrls[serviceType];
-
-        if (!url) {
-            this.showNotification(`Service ${serviceType} not configured`, 'error');
-            return;
-        }
-
-        if (service && service.status === 'online') {
-            // Service is confirmed online, open it
-            window.open(url, '_blank');
-            this.logInteraction('service_access', {
-                serviceType,
-                serviceName,
-                url,
-                status: 'success'
-            });
-        } else if (service && service.status === 'cors_error') {
-            // Service is running but has CORS issues
-            const proceed = confirm(`${serviceName || serviceType} is running but may have CORS configuration issues.\n\nWould you like to try opening it anyway?`);
-            if (proceed) {
-                window.open(url, '_blank');
-                this.logInteraction('service_access', {
-                    serviceType,
-                    serviceName,
-                    url,
-                    status: 'cors_warning_ignored'
-                });
-            }
-        } else {
-            // Service appears offline
-            const isDev = window.location.hostname === 'localhost';
-            const message = isDev ? 
-                `${serviceName || serviceType} appears to be offline.\n\nMake sure you've started it with:\ndocker-compose up ${serviceType}\n\nWould you like to try opening it anyway?` :
-                `${serviceName || serviceType} is not available in demo mode.\n\nTo access this service:\n1. Clone the repository\n2. Run: docker-compose up\n3. Access services locally\n\nWould you like to view the setup guide?`;
-            
-            const proceed = confirm(message);
-            if (proceed) {
-                if (isDev) {
-                    window.open(url, '_blank');
-                } else {
-                    window.open('https://github.com/WebQx/MMT#setup', '_blank');
-                }
-                this.logInteraction('service_access', {
-                    serviceType,
-                    serviceName,
-                    url,
-                    status: 'offline_attempt'
-                });
-            }
-        }
     }
 
     logInteraction(type, data) {

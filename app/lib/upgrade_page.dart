@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'utils/constants.dart';
 
 class UpgradePage extends StatelessWidget {
   Future<String> assignTier({
@@ -8,7 +9,7 @@ class UpgradePage extends StatelessWidget {
     required String ipAddress,
     required String keycloakId,
   }) async {
-    const String backendUrl = 'http://localhost:8000/assign-tier';
+    final String backendUrl = '${Constants.baseUrl}/assign-tier';
     final response = await http.post(
       Uri.parse(backendUrl),
       headers: {'Content-Type': 'application/json'},
