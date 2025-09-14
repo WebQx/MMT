@@ -167,9 +167,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     
     try {
-      final authService = Provider.of<AuthService>(context, listen: false);
-  final appState = Provider.of<AppStateProvider>(context, listen: false);
-  final response = await authService.loginAsGuestWithLanguage(appState.selectedLanguage);
+      final authService = AuthService();
+      final appState = Provider.of<AppStateProvider>(context, listen: false);
+      final response = await authService.loginAsGuestWithLanguage(appState.selectedLanguage);
       final token = response['access_token'] as String;
       final offline = response['offline'] as bool? ?? false;
 
