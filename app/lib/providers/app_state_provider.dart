@@ -6,10 +6,7 @@ import '../models/encounter.dart';
 
 class AppStateProvider extends ChangeNotifier {
   final SharedPreferences _prefs;
-  
-  AppStateProvider(this._prefs) {
-    _loadSettings();
-  }
+  bool _isInitialized = false;
   
   // Authentication state
   bool _isAuthenticated = false;
@@ -31,7 +28,12 @@ class AppStateProvider extends ChangeNotifier {
   Patient? _selectedPatient;
   Encounter? _selectedEncounter;
   
+  AppStateProvider(this._prefs) {
+    _loadSettings();
+  }
+  
   // Getters
+  bool get isInitialized => _isInitialized;
   bool get isAuthenticated => _isAuthenticated;
   String? get authToken => _authToken;
   String? get userType => _userType;
@@ -128,26 +130,35 @@ class AppStateProvider extends ChangeNotifier {
   }
   
   // Private methods
-  void _loadSettings() {
-    // Load authentication state
-    _authToken = _prefs.getString(Constants.authTokenKey);
-    _userType = _prefs.getString(Constants.userTypeKey);
-    _isAuthenticated = _authToken != null;
-    
-    // Load theme
-    final themeIndex = _prefs.getInt(Constants.themeKey) ?? ThemeMode.system.index;
-    _themeMode = ThemeMode.values[themeIndex];
-    
-    // Load locale
-    final localeString = _prefs.getString(Constants.localeKey) ?? 'en_US';
-    final parts = localeString.split('_');
-    if (parts.length == 2) {
-      _currentLocale = Locale(parts[0], parts[1]);
+  void _loadSettings() async {
+    try {
+      // Load authentication state
+      _authToken = _prefs.getString(Constants.authTokenKey);
+      _userType = _prefs.getString(Constants.userTypeKey);
+      _isAuthenticated = _authToken != null;
+      
+      // Load theme
+      final themeIndex = _prefs.getInt(Constants.themeKey) ?? ThemeMode.system.index;
+      _themeMode = ThemeMode.values[themeIndex];
+      
+      // Load locale
+      final localeString = _prefs.getString(Constants.localeKey) ?? 'en_US';
+      final parts = localeString.split('_');
+      if (parts.length == 2) {
+        _currentLocale = Locale(parts[0], parts[1]);
+      }
+      
+      // Load onboarding state
+      _onboardingCompleted = _prefs.getBool(Constants.onboardingCompletedKey) ?? false;
+      
+      // Load selected language
+      _selectedLanguage = _prefs.getString('selected_language') ?? _selectedLanguage;
+      
+      _isInitialized = true;
+    } catch (e) {
+      print('Error loading settings: $e');
+      _isInitialized = true;
     }
-    
-    // Load onboarding state
-    _onboardingCompleted = _prefs.getBool(Constants.onboardingCompletedKey) ?? false;
-  // Load selected language
-  _selectedLanguage = _prefs.getString('selected_language') ?? _selectedLanguage;
+    notifyListeners();
   }
 }
