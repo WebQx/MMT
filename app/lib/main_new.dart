@@ -9,6 +9,7 @@ import 'screens/transcription_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/openemr_screen.dart';
 import 'theme/app_theme.dart';
+import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,21 +38,6 @@ class MyApp extends StatelessWidget {
       create: (context) => AppStateProvider(prefs),
       child: Consumer<AppStateProvider>(
         builder: (context, appState, _) {
-          // Show loading screen while provider is initializing
-          if (!appState.isInitialized) {
-            return MaterialApp(
-              title: 'WebQx MMT - Medical Transcription',
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: ThemeMode.system,
-              home: const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            );
-          }
-          
           return MaterialApp(
             title: 'WebQx MMT - Medical Transcription',
             theme: AppTheme.lightTheme,
@@ -64,23 +50,6 @@ class MyApp extends StatelessWidget {
               '/transcription': (context) => const TranscriptionScreen(),
               '/settings': (context) => const SettingsScreen(),
               '/openemr': (context) => const OpenEMRScreen(),
-            },
-            onGenerateRoute: (settings) {
-              // Ensure all routes have access to the Provider
-              switch (settings.name) {
-                case '/login':
-                  return MaterialPageRoute(builder: (context) => const LoginScreen());
-                case '/home':
-                  return MaterialPageRoute(builder: (context) => const HomeScreen());
-                case '/transcription':
-                  return MaterialPageRoute(builder: (context) => const TranscriptionScreen());
-                case '/settings':
-                  return MaterialPageRoute(builder: (context) => const SettingsScreen());
-                case '/openemr':
-                  return MaterialPageRoute(builder: (context) => const OpenEMRScreen());
-                default:
-                  return null;
-              }
             },
           );
         },
