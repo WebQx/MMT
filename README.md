@@ -450,3 +450,76 @@ For issues, open a GitHub issue or contact the maintainers.
 ---
 
 © 2025 WebQx – Released under MIT License.
+
+---
+
+## Django Whisper Service (Experimental)
+
+An auxiliary `django-whisper` service (Django + Gunicorn + Faster-Whisper) provides an authenticated transcription endpoint separate from the primary FastAPI backend. This is useful for testing lighter CPU-only inference or integrating with Django auth flows.
+
+### Key Files
+- `medtranscribe_backend/` – Django project root
+- `medtranscribe_backend/api/views.py` – Transcription API (lazy model load)
+- `medtranscribe_backend/Dockerfile` – Slim image (Python 3.10, ffmpeg, faster-whisper, gunicorn)
+
+### Endpoint
+`POST /api/transcribe/` (Basic or session auth)
+
+Form field:
+- `audio` – audio file (wav/mp3/m4a/etc.)
+
+Response JSON:
+```json
+{
+	"language": "en",
+	"language_probability": 0.98,
+	"text": "Full concatenated transcript...",
+	"segments": [
+		{"id":0, "start":0.0, "end":2.1, "text":"Hello"}
+	]
+}
+```
+
+### Environment Variables
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DB_HOST` | mysql | MariaDB/MySQL host |
+| `DB_NAME` | openemr | Database name |
+| `DB_USER` | openemr | Username |
+| `DB_PASSWORD` | openemr | Password |
+| `DB_PORT` | 3306 | Port |
+| `WHISPER_MODEL` | tiny | Faster-Whisper model size (e.g. `tiny`, `base`) |
+| `DJANGO_SUPERUSER_USERNAME` | admin | Auto-admin username (for scripted create) |
+| `DJANGO_SUPERUSER_PASSWORD` | adminpass | Auto-admin password |
+| `DJANGO_SUPERUSER_EMAIL` | admin@example.com | Admin email |
+
+### Minimal Local Stack
+Use the lightweight compose file to iterate on Django + DB only:
+```bash
+docker compose -f docker-compose.min.yml up -d mysql
+docker compose -f docker-compose.min.yml build django-whisper
+docker compose -f docker-compose.min.yml run --rm django-whisper python manage.py migrate
+docker compose -f docker-compose.min.yml run --rm django-whisper python manage.py createsuperuser --noinput \
+	--username "$DJANGO_SUPERUSER_USERNAME" --email "$DJANGO_SUPERUSER_EMAIL"
+docker compose -f docker-compose.min.yml up -d django-whisper
+```
+
+### Smoke Test
+Generate a 1‑second tone and send it:
+```bash
+python - <<'PY'
+import numpy as np, wave, sys
+sr=16000; t=np.linspace(0,1,sr,False); tone=(0.1*np.sin(2*np.pi*440*t)).astype(np.float32)
+with wave.open('test.wav','w') as w:
+		w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
+		w.writeframes((tone*32767).astype('<i2').tobytes())
+PY
+
+curl -u admin:adminpass -F audio=@test.wav http://localhost:8001/api/transcribe/
+```
+
+### Notes
+- Model loads lazily on first request; adjust `WHISPER_MODEL` to trade accuracy vs speed.
+- For production, consider moving secret credentials to a secrets manager and enabling HTTPS (reverse proxy / ingress).
+- This service is intentionally slim (no migrations beyond Django auth tables, no custom models yet).
+

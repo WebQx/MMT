@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  mysql:
+    image: mariadb:10.5
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: openemr
+      MYSQL_PASSWORD: openemr
+      MYSQL_DATABASE: openemr
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  django-whisper:
+    build:
+      context: ./medtranscribe_backend
+      dockerfile: Dockerfile
+    image: django-whisper:local
+    restart: unless-stopped
+    volumes:
+      - ./medtranscribe_backend:/app
+    environment:
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: adminpass
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+      DB_NAME: openemr
+      DB_USER: openemr
+      DB_PASSWORD: openemr
+      DB_HOST: mysql
+      DB_PORT: 3306
+    depends_on:
+      - mysql
+    ports:
+      - "8001:8000"
+volumes:
+  mysql_data:

@@ -9,7 +9,6 @@ import 'screens/transcription_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/openemr_screen.dart';
 import 'theme/app_theme.dart';
-import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
