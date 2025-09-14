@@ -52,6 +52,25 @@ services:
       timeout: 5s
       retries: 3
 
+  frontend-landing:
+    build:
+      context: ./frontend-landing
+      dockerfile: Dockerfile
+    image: mmt-frontend-landing:local
+    restart: unless-stopped
+    depends_on:
+      django-backend:
+        condition: service_healthy
+      openemr:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   django-backend:
     build:
       context: ./medtranscribe_backend
