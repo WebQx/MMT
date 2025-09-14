@@ -48,6 +48,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "api.auth_backends.SessionAuthMiddleware",  # Custom OpenEMR session middleware
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -128,3 +129,35 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'api.auth_backends.OpenEMRAuthBackend',  # Custom OpenEMR authentication
+    'django.contrib.auth.backends.ModelBackend',  # Default Django authentication
+]
+
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
+
+# OpenEMR Integration Settings
+OPENEMR_BASE_URL = os.environ.get('OPENEMR_BASE_URL', 'http://openemr')
+OPENEMR_API_TOKEN = os.environ.get('OPENEMR_API_TOKEN', '')
+
+# Security settings
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Update SECRET_KEY from environment
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', "django-insecure--gz6b(fb9a-#sbh*wb-(f54v0oep2o3ri5o%sy=ct(+3f09img")
+
+# Update DEBUG from environment
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
