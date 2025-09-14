@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Copy frontend files
+        run: |
+          mkdir -p _site
+          cp -r frontend-landing/* _site/
+          # Update base URL for GitHub Pages
+          sed -i 's|href="/|href="/MMT/|g' _site/index.html
+          sed -i 's|src="/|src="/MMT/|g' _site/index.html
+          sed -i 's|url("/|url("/MMT/|g' _site/style.css || true
+          # Update API endpoints to use relative paths or full URLs
+          sed -i 's|http://localhost:8001|https://webqx.github.io/MMT|g' _site/script.js || true
+          sed -i 's|http://localhost:8080|#|g' _site/script.js || true
+          sed -i 's|http://localhost:3000|#|g' _site/script.js || true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
