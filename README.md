@@ -1,7 +1,25 @@
 # Multilingual Medical Transcription (MMT) - End-to-End Blueprint
-![Deploy Flutter web to GitHub Pages](https://github.com/WebQx/MMT/actions/workflows/deploy-gh-pages.yml/badge.svg)
 
-Current Version: **v0.3.0**
+![Frontend Demo](https://github.com/WebQx/MMT/actions/workflows/deploy-github-pages.yml/badge.svg)
+![Backend Production](https://github.com/WebQx/MMT/actions/workflows/railway-backend.yml/badge.svg)
+![CI/CD](https://github.com/WebQx/MMT/actions/workflows/ci-cd.yml/badge.svg)
+
+**Current Version:** v0.3.0  
+**Live Demo:** [https://webqx.github.io/MMT/](https://webqx.github.io/MMT/)  
+**Backend Status:** [https://mmt-backend-production.up.railway.app/health/live](https://mmt-backend-production.up.railway.app/health/live)
+
+## 🚀 Quick Start
+
+### Try the Live Demo
+Visit [**webqx.github.io/MMT**](https://webqx.github.io/MMT/) to test the platform with a live production backend.
+
+### Deploy Your Own
+1. **Fork this repository**
+2. **Configure Railway**: Add `RAILWAY_TOKEN` to GitHub secrets
+3. **Set environment variables** in Railway dashboard (see [DEPLOYMENT_CONFIG.md](DEPLOYMENT_CONFIG.md))
+4. **Push to main** - automatic deployment to Railway (backend) and GitHub Pages (frontend)
+
+---
 ## UI & Navigation Flow (Flutter)
 \n+## Automated Documentation for Medical Transcriptions\n+\n+🔹 **Automated Documentation Features:**\n+\n+• Capture patient-provider conversations and generate complete clinical notes\n+• Document history, examination, assessment, and plan\n+• Create comprehensive notes by the end of each visit\n+• Support both in-clinic and telehealth visits\n*** End Patch
 
@@ -384,30 +402,47 @@ Then hit: `http://localhost:9000/demo/status`
 Once you’re ready for full integration, unset `DEMO_MODE` and start RabbitMQ + OpenEMR services.
 
 ---
-## Split Deployment (Railway Backend + Static Frontend)
+## Production Deployment (Railway Backend + GitHub Pages Frontend)
 
-The repository now supports deploying the FastAPI backend to Railway while serving the Flutter web + landing page statically (GitHub Pages / Firebase / S3). See `DEPLOYMENT.md` for full details.
+The repository is configured for split deployment with:
+- **Backend**: Railway (production mode, full ML stack)
+- **Frontend**: GitHub Pages (demo mode with live backend connection)
 
-### Runtime API Override
-The landing page auto-detects environment, but you can explicitly point it to a production backend:
+### 🔄 Automatic Deployment Flow
+1. **Push to main** triggers CI/CD pipeline
+2. **Backend deploys** to Railway in production mode after successful tests
+3. **Frontend deploys** to GitHub Pages in demo mode
+4. **Health checks** verify deployment success
 
-1. Query parameter: `?api=https://mmt-prod.up.railway.app`
-2. Inline global JS before `script.js`:
+### 🎛️ Runtime API Configuration
+The frontend auto-detects environment and connects to the Railway backend, but you can override:
+
+1. **Query parameter**: `?api=https://your-railway-app.up.railway.app`
+2. **Inline global JS** before `script.js`:
 	```html
-	<script>window.__MMT_CONFIG={API_BASE_URL:'https://mmt-prod.up.railway.app'};</script>
+	<script>window.__MMT_CONFIG={API_BASE_URL:'https://your-railway-app.up.railway.app'};</script>
 	<script src="/script.js" defer></script>
 	```
-3. Banner "Change API" button (persists via query string reload).
+3. **Banner "Change API" button** (persists via localStorage)
 
-The banner color indicates:
-* Green – Production backend responding (`DEMO_MODE=false`)
-* Blue – Demo backend (`DEMO_MODE=true`)
-* Red – Unreachable endpoint (static-only state)
+### 🚦 Status Indicators
+The banner color indicates backend status:
+* **Green** – Production backend responding (`DEMO_MODE=false`)
+* **Blue** – Demo backend (`DEMO_MODE=true`)
+* **Red** – Unreachable endpoint (static-only state)
 
-### Railway CI/CD
-GitHub Action: `.github/workflows/railway-backend.yml` deploys on pushes touching `backend/**` or manual dispatch. Provide `RAILWAY_TOKEN` in repository secrets.
+### 🔧 Manual Deployment Triggers
+Both deployments support manual triggering:
+- **Backend**: Use GitHub Actions "Deploy Backend Production to Railway" workflow
+- **Frontend**: Use GitHub Actions "Deploy Frontend Demo to GitHub Pages" workflow
 
-Environment configuration guidance, security checklist, and troubleshooting live in `DEPLOYMENT.md`.
+### 📊 Health Monitoring
+Automated health checks monitor the production deployment:
+- **Endpoint**: `/demo/status` and `/health/live`
+- **Frequency**: Every 30 minutes via GitHub Actions
+- **Alerts**: Workflow fails if backend is unreachable or in demo mode
+
+Environment configuration guidance, security checklist, and troubleshooting live in [`DEPLOYMENT_CONFIG.md`](DEPLOYMENT_CONFIG.md).
 Use `backend/.env.production.example` as a starting point for production environment variables (copy & adapt; never commit real secrets).
 
 ### Remote API Health Probe
@@ -443,7 +478,7 @@ Generate strong secrets & optional RSA / encryption keys:
 ```
 python scripts/generate_secrets.py --all > generated-secrets.env
 ```
-Copy values (not the file) into Railway or your secret manager. See `DEPLOYMENT.md` sections 12–13 for rotation & upgrade details.
+Copy values (not the file) into Railway or your secret manager. See [`DEPLOYMENT_CONFIG.md`](DEPLOYMENT_CONFIG.md) sections for rotation & upgrade details.
 
 ---
 # Multilingual Medical Transcription (MMT) - End-to-End Blueprint
@@ -514,7 +549,50 @@ MMT is a secure, multilingual, healthcare-grade transcription platform supportin
 
 ## Deployment
 
-### Web (Flutter) via Firebase Hosting
+MMT supports multiple deployment strategies. The recommended production setup uses:
+- **Frontend Demo**: GitHub Pages with demo mode
+- **Backend Production**: Railway with full ML stack and production configuration
+
+### 🚀 Quick Start Deployment
+
+#### Frontend Demo (GitHub Pages)
+**Automatically deploys on push to main branch**
+
+- **URL**: https://webqx.github.io/MMT/
+- **Configuration**: Demo mode with live backend connection
+- **Workflow**: `.github/workflows/deploy-github-pages.yml`
+
+The demo frontend automatically connects to the Railway production backend and provides a safe demo environment.
+
+#### Backend Production (Railway) 
+**Automatically deploys after successful CI/CD**
+
+- **Configuration**: Full production mode with ML stack
+- **Workflow**: `.github/workflows/railway-backend.yml`
+- **Requirements**: `RAILWAY_TOKEN` secret configured
+
+### 📋 Deployment Configuration
+
+For detailed deployment setup, environment variables, and troubleshooting, see [`DEPLOYMENT_CONFIG.md`](DEPLOYMENT_CONFIG.md).
+
+#### Required Railway Environment Variables
+```env
+# Core Production Settings
+ENV=prod
+DEMO_MODE=false
+INTERNAL_JWT_SECRET=<32+-character-secret>
+
+# API Keys
+OPENAI_API_KEY=<your-openai-api-key>
+
+# Database & Queue
+TRANSCRIPTS_DB_URL=<mysql-connection-string>
+RABBITMQ_URL=<rabbitmq-connection-string>
+```
+
+### Alternative Deployment Options
+
+#### Web (Flutter) via Firebase Hosting
 1. Create a Firebase project (or use existing) and enable Hosting.
 2. Add secrets in GitHub repo settings:
 	- `FIREBASE_SERVICE_ACCOUNT`: JSON service account (Base64 or raw) with `Firebase Hosting Admin`.
@@ -525,12 +603,11 @@ MMT is a secure, multilingual, healthcare-grade transcription platform supportin
 
 The workflow builds the Flutter web app from `app/` and deploys the contents of `app/build/web` to the live channel.
 
-
-### Backend (FastAPI)
+#### Backend (FastAPI) - Local/Custom
 1. Set up `.env` with all secrets (OpenAI, Keycloak, OpenEMR, RabbitMQ)
 2. Run: `uvicorn main:app --reload`
 3. Ensure CORS is enabled for your frontend domain
- 4. (Optional) Supply `REDIS_URL` to enable distributed idempotency + rate limiting.
+4. (Optional) Supply `REDIS_URL` to enable distributed idempotency + rate limiting.
 
 ### Idempotency & Duplicate Suppression
 To avoid double-processing (client retries, network races), the consumer applies best-effort idempotency:
@@ -572,12 +649,25 @@ Prometheus Alerts (Helm): P95 latency, duplicate spike, consumer failure ratio.
 
 ## File Structure (Key Parts)
 
+### Backend
 - `/backend/main.py` - FastAPI backend, all endpoints
-- `/backend/.env` - Secrets and API keys
+- `/backend/.env` - Secrets and API keys (local development)
+- `/backend/start.sh` - Railway startup script
+- `/backend/railway.toml` - Railway deployment configuration
+- `/backend/Procfile` - Alternative process definition
 - `/backend/openemr_consumer.py` - RabbitMQ to OpenEMR integration
+
+### Frontend
 - `/app/lib/main.dart` - Flutter app main logic
 - `/app/pubspec.yaml` - Flutter dependencies
 - `/app/web/index.html` - Web entry point
+- `/frontend-landing/` - Landing page for demos
+
+### Deployment & Configuration
+- `/.github/workflows/deploy-github-pages.yml` - Frontend demo deployment
+- `/.github/workflows/railway-backend.yml` - Backend production deployment
+- `/DEPLOYMENT_CONFIG.md` - Comprehensive deployment guide
+- `/backend/.env.production.example` - Production environment template
 
 ---
 
