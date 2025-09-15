@@ -7,7 +7,11 @@ on:
       - 'backend/**'
       - '.github/workflows/railway-backend.yml'
       - 'requirements*.txt'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Optional tag to create after successful deploy (e.g. v0.3.1)'
+        required: false
 
 jobs:
   deploy:
@@ -55,3 +59,28 @@ jobs:
       - name: Post-deploy info
         if: always()
         run: echo "Deployment attempt finished (see Railway dashboard for status)."
+
+      - name: Smoke wait & probe health
+        if: success()
+        env:
+          REMOTE_API_BASE_URL: ${{ secrets.REMOTE_API_BASE_URL }}
+        run: |
+          if [ -z "$REMOTE_API_BASE_URL" ]; then
+            echo "REMOTE_API_BASE_URL secret not set; skipping smoke tests"; exit 0; fi
+          echo "Waiting 15s for service warm-up..."; sleep 15
+          set -e
+          curl -fsS -o /dev/null "$REMOTE_API_BASE_URL/health/live" || { echo 'Health endpoint failed'; exit 1; }
+          STATUS_JSON=$(curl -fsS "$REMOTE_API_BASE_URL/demo/status" || echo '{}')
+          echo "demo/status => $STATUS_JSON"
+          DEMO_MODE=$(echo "$STATUS_JSON" | grep -o 'demo_mode": *[^,}]*' | awk -F: '{print $2}' | tr -d ' "')
+          if [ "$DEMO_MODE" = "true" ] || [ "$DEMO_MODE" = "True" ]; then
+            echo 'ERROR: Backend still in demo_mode=true for production deploy'; exit 1; fi
+          echo 'Smoke checks passed.'
+
+      - name: Create release tag
+        if: success() && github.event.inputs.release_tag != ''
+        run: |
+          git config user.name 'github-actions'
+          git config user.email 'actions@users.noreply.github.com'
+          git tag "${{ github.event.inputs.release_tag }}"
+          git push origin "${{ github.event.inputs.release_tag }}"

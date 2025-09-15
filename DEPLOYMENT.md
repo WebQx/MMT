@@ -237,5 +237,28 @@ Setup Example (static host `index.html`):
 
 This allows a frictionless evaluation path: explore demo → upgrade to full capabilities without changing hosting artifacts.
 
+---
+## 14. CI Post-Deploy Smoke & Tagging
+
+The Railway deploy workflow performs an optional post-deploy smoke test if `REMOTE_API_BASE_URL` is provided as a repository secret:
+
+Checks:
+1. `GET /health/live` returns 200
+2. `GET /demo/status` returns `demo_mode: false` (build fails if still true)
+
+Skipping: If the secret is absent, smoke tests are skipped (non-fatal).
+
+Manual Release Tag:
+Trigger the workflow with `workflow_dispatch` and supply `release_tag` (e.g. `v0.3.1`) to automatically tag the repository after a successful deployment.
+
+Tag Workflow Path: `.github/workflows/railway-backend.yml`
+
+Recommended Process:
+1. Run workflow with proposed tag (e.g. `v0.3.1-rc1`)
+2. Verify smoke test pass + remote health workflow green
+3. Re-run with final tag (e.g. `v0.3.1`)
+
+Rollback: Push a hotfix commit and redeploy or revert to previous tag; Railway keeps prior build images in its history.
+
 Generated: Keep this file updated when environment variables or deployment workflows change.
 
