@@ -38,8 +38,8 @@ jobs:
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-  flutter-version: '3.35.3'
-  channel: 'stable'
+        flutter-version: '3.35.3'
+        channel: 'stable'
     
     - name: Install dependencies
       run: |
@@ -67,8 +67,8 @@ jobs:
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-  flutter-version: '3.35.3'
-  channel: 'stable'
+        flutter-version: '3.35.3'
+        channel: 'stable'
     
     - name: Build Flutter Web
       run: |
