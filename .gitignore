@@ -4,6 +4,11 @@
 .env.*
 *.env
 backend/.env
+backend/.env.production
+backend/.env.local
+backend/secrets/
+secrets/
+generated-secrets-*.env
 
 # Python
 backend/.venv/

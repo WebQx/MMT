@@ -1,0 +1,57 @@
+name: Deploy Backend to Railway
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/railway-backend.yml'
+      - 'requirements*.txt'
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install backend dependencies (lock-in validation)
+        working-directory: backend
+        run: |
+          pip install -r requirements.txt
+          python -m py_compile $(git ls-files '*.py' | tr '\n' ' ')
+
+      - name: Install Railway CLI
+        run: curl -fsSL https://railway.app/install.sh | sh
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "RAILWAY_TOKEN secret not set" >&2
+            exit 1
+          fi
+          # Pin directory to backend to avoid scanning entire monorepo
+          pushd backend
+          ~/.railway/bin/railway up --service backend --detach || ~/.railway/bin/railway up --detach
+          popd
+
+      - name: Post-deploy info
+        if: always()
+        run: echo "Deployment attempt finished (see Railway dashboard for status)."

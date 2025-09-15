@@ -10,33 +10,37 @@ class MMTLanding {
     detectBackendUrls() {
         const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         const isGitHubPages = window.location.hostname === 'webqx.github.io';
+        // Allow explicit override via global config or query string (api, backend, api_base)
+        const params = new URLSearchParams(window.location.search);
+        const override = (window.__MMT_CONFIG && window.__MMT_CONFIG.API_BASE_URL) || params.get('api') || params.get('backend') || params.get('api_base');
         
         if (isDevelopment) {
             return {
-                django: 'http://localhost:8001',
+                django: override || 'http://localhost:8001',
                 openemr: 'http://localhost:8080',
                 flutter: 'http://localhost:3000',
-                websocket: 'ws://localhost:8001'
+                websocket: (override ? override.replace(/^http/, 'ws') : 'ws://localhost:8001')
             };
         } else if (isGitHubPages) {
             // For production deployment, these would be real URLs
             return {
-                django: 'https://api.yourserver.com',  // Replace with actual production URLs
+                django: override || 'https://api.yourserver.com',  // Replace with actual production URLs or set via query/global
                 openemr: 'https://openemr.yourserver.com',
                 flutter: 'https://app.yourserver.com',
-                websocket: 'wss://api.yourserver.com'
+                websocket: (override ? override.replace(/^http/,'wss') : 'wss://api.yourserver.com')
             };
         } else {
             // Custom domain detection
             const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
             const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const baseUrl = `${protocol}//${window.location.hostname}`;
+            const api = override || `${baseUrl}:8001`;
             
             return {
-                django: `${baseUrl}:8001`,
+                django: api,
                 openemr: `${baseUrl}:8080`,
                 flutter: `${baseUrl}:3000`,
-                websocket: `${wsProtocol}//${window.location.hostname}:8001`
+                websocket: api.replace(/^http/, wsProtocol)
             };
         }
     }
@@ -116,6 +120,8 @@ class MMTLanding {
     async initializeBackendConnections() {
         // Check all backend services
         await this.checkAllServices();
+        // Fetch demo/production status banner
+        this.fetchDemoStatus();
         
         // Set up periodic health checks
         setInterval(() => {
@@ -124,6 +130,69 @@ class MMTLanding {
 
         // Retry failed error logs
         this.retryFailedLogs();
+    }
+
+    async fetchDemoStatus() {
+        try {
+            const resp = await fetch(`${this.backendUrls.django}/demo/status`, { cache: 'no-store' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            this.renderEnvBanner(data);
+        } catch (e) {
+            // If unreachable, show a subtle warning only once
+            this.renderEnvBanner({ unreachable: true });
+        }
+    }
+
+    renderEnvBanner(info) {
+        let bar = document.getElementById('env-banner');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'env-banner';
+            bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;padding:4px 10px;font-size:12px;font-family:system-ui,Arial,sans-serif;display:flex;align-items:center;gap:12px;color:#fff;';
+            document.body.prepend(bar);
+            // push main content if any
+            document.documentElement.style.setProperty('--mmt-banner-height','24px');
+        }
+        let text = '';
+        let bg = '#1f2937';
+        if (info.unreachable) {
+            text = 'Backend unreachable – using static landing only. Add ?api=https://your-api.example to test.';
+            bg = '#b91c1c';
+        } else if (info.demo_mode) {
+            text = 'Demo Mode Active: transcripts stored locally only';
+            bg = '#2563eb';
+        } else {
+            text = 'Production Backend Connected';
+            bg = '#059669';
+        }
+        const apiDisp = this.backendUrls.django;
+        const prodApi = (window.__MMT_CONFIG && window.__MMT_CONFIG.PRODUCTION_API_BASE_URL) || null;
+        const showUpgrade = info.demo_mode && prodApi && prodApi !== apiDisp;
+        bar.innerHTML = `<span style="font-weight:600;">${text}</span><span style="opacity:.8;">API: ${apiDisp}</span>`+
+            `<button id="change-api-btn" style="margin-left:auto;background:#374151;color:#fff;border:0;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Change API</button>`+
+            (showUpgrade ? `<button id="upgrade-to-prod-btn" style="background:#059669;color:#fff;border:0;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;">Connect to Production</button>` : '');
+        bar.style.background = bg;
+        const btn = document.getElementById('change-api-btn');
+        if (btn) {
+            btn.onclick = () => {
+                const current = this.backendUrls.django;
+                const entered = prompt('Enter new API base URL (e.g. https://api.example.com)', current);
+                if (entered && /^https?:\/\//.test(entered)) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('api', entered);
+                    window.location.href = url.toString();
+                }
+            };
+        }
+        const upgradeBtn = document.getElementById('upgrade-to-prod-btn');
+        if (upgradeBtn && prodApi) {
+            upgradeBtn.onclick = () => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('api', prodApi);
+                window.location.href = url.toString();
+            };
+        }
     }
 
     async checkAllServices() {

@@ -1,0 +1,29 @@
+# Optional override to run a lightweight demo stack.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.override.demo.yml up -d backend frontend
+# This omits OpenEMR, Django backend, RabbitMQ, Redis unless explicitly started.
+
+services:
+  backend:
+    environment:
+      DEMO_MODE: "1"
+      ALLOW_GUEST_AUTH: "1"
+      ENABLE_CLOUD_TRANSCRIPTION: "1"
+      ENABLE_LOCAL_TRANSCRIPTION: "0"
+    # In demo we don't require rabbitmq; ensure no hard dependency.
+    depends_on: []
+
+  frontend:
+    environment:
+      API_BASE_URL: http://localhost:9000
+
+  # Disable services by default in demo (can still be started manually if needed)
+  openemr:
+    profiles: ["ehr"]
+  mariadb:
+    profiles: ["ehr"]
+  django-backend:
+    profiles: ["django"]
+  rabbitmq:
+    profiles: ["queue"]
+  redis:
+    profiles: ["cache"]

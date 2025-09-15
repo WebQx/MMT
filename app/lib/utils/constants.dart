@@ -8,14 +8,9 @@ class Constants {
     if (envUrl.isNotEmpty) {
       return envUrl;
     }
-    
-    // Auto-detect based on environment
-    if (kDebugMode) {
-      return 'http://localhost:8001'; // Updated to match Django port
-    } else {
-      // Production - should be set via environment variable
-      return 'https://api.yourserver.com'; // Replace with actual production URL
-    }
+    // Fallback heuristics (should be overridden in production via --dart-define)
+    if (kDebugMode) return 'http://localhost:8001';
+    return 'http://localhost:8001'; // Safe default if not provided
   }
   
   static const String apiVersion = '/api/v1';

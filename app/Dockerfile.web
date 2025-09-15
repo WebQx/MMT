@@ -1,8 +1,11 @@
 FROM ghcr.io/cirruslabs/flutter:stable AS build
 WORKDIR /app
 COPY . .
+# Build arg for API base (optional). Provide at build: --build-arg API_BASE_URL=https://prod.api
+ARG API_BASE_URL=http://localhost:8001
 # Enable faster build by pre-downloading dependencies
-RUN flutter pub get && flutter build web --release --base-href /
+RUN flutter pub get \
+ && flutter build web --release --base-href / --dart-define=BASE_URL=${API_BASE_URL}
 
 FROM nginx:alpine
 COPY --from=build /app/build/web /usr/share/nginx/html

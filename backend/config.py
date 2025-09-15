@@ -130,6 +130,8 @@ class Settings(BaseSettings):
     # Telemetry (Sentry)
     sentry_dsn: str | None = Field(default=None, env="SENTRY_DSN")
     sentry_traces_sample_rate: float = Field(default=0.0, env="SENTRY_TRACES_SAMPLE_RATE")
+    # Demo mode (disable external integrations & queue publishing)
+    demo_mode: bool = Field(default=False, env="DEMO_MODE")
 
 
 @lru_cache(maxsize=1)

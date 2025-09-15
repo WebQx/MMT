@@ -885,10 +885,32 @@ def jwks():
             })
     return {"keys": keys}
 
+@app.get("/demo/status")
+def demo_status():
+    """Expose runtime demo mode flags so clients can adapt UI.
+
+    Returns:
+        demo_mode: whether DEMO_MODE is enabled.
+        cloud_enabled / local_enabled: transcription capability flags.
+        guest_auth: whether guest/unauthenticated usage is allowed.
+    """
+    return {
+        "demo_mode": settings.demo_mode,
+        "cloud_enabled": settings.enable_cloud_transcription,
+        "local_enabled": settings.enable_local_transcription,
+        "guest_auth": settings.allow_guest_auth,
+    }
+
 # ---------------------- Utility ---------------------- #
 def _publish_transcription(filename: str, text: str, correlation_id: str | None = None):
     if _draining:
         raise HTTPException(status_code=503, detail="Service draining - no new publishes accepted")
+    # Demo mode: skip queue publishing and persist locally only
+    if settings.demo_mode:
+        from persistence import store_transcript
+        store_transcript(filename, text, None, None, source="api-demo")
+        transcripts_published_total.inc()
+        return
     payload = {"filename": filename, "text": text, "source": "api", "publish_time": time.time()}
     if correlation_id:
         payload["correlation_id"] = correlation_id

@@ -1,0 +1,34 @@
+name: Remote API Health
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # every 30 minutes
+  workflow_dispatch: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout (minimal)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tests/remote_demo_status.test.mjs
+            README.md
+            backend/
+      - name: Node setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Run probe
+        env:
+          REMOTE_API_BASE_URL: ${{ secrets.REMOTE_API_BASE_URL }}
+        run: |
+          if [ -z "$REMOTE_API_BASE_URL" ]; then
+            echo 'REMOTE_API_BASE_URL secret missing' >&2; exit 1; fi
+          node tests/remote_demo_status.test.mjs
+      - name: Outcome
+        if: ${{ success() }}
+        run: echo "Remote API probe succeeded"

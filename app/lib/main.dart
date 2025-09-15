@@ -9,6 +9,8 @@ import 'screens/transcription_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/openemr_screen.dart';
 import 'theme/app_theme.dart';
+import 'widgets/demo_mode_banner.dart';
+import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +59,7 @@ class MyApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: appState.themeMode,
-            home: _buildHomeScreen(appState),
+            home: _wrapWithDemoBanner(_buildHomeScreen(appState)),
             routes: {
               '/login': (context) => const LoginScreen(),
               '/home': (context) => const HomeScreen(),
@@ -85,6 +87,17 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _wrapWithDemoBanner(Widget child) {
+    // Heuristic: if BASE_URL still localhost or contains 'demo', show banner.
+    final url = Constants.baseUrl;
+    final isDemo = url.contains('localhost') || url.contains('demo');
+    if (!isDemo) return child;
+    return Scaffold(
+      appBar: const DemoModeBanner(demoMode: true),
+      body: child,
     );
   }
   
