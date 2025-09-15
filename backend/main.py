@@ -386,6 +386,24 @@ _cb_open_until = 0.0
 _CB_THRESHOLD = 5
 _CB_RESET_SECONDS = 60
 
+# --- Startup configuration sanity warnings (non-fatal) ---
+try:  # pragma: no cover
+    if settings.enable_local_transcription:
+        try:
+            import whisper  # type: ignore  # noqa: F401
+        except Exception:  # noqa: BLE001
+            structlog.get_logger(__name__).warning(
+                "startup/local-transcription-misconfig",
+                detail="ENABLE_LOCAL_TRANSCRIPTION=1 but whisper not installed",
+            )
+    if os.environ.get("ENV", settings.environment_name) == "prod" and settings.demo_mode:
+        structlog.get_logger(__name__).warning(
+            "startup/demo-mode-prod",
+            detail="DEMO_MODE is enabled in production – transcripts will not be published",
+        )
+except Exception:
+    pass
+
 @app.get("/healthz")
 def healthz():
     from persistence import _enc_material  # type: ignore
@@ -410,6 +428,36 @@ def healthz():
         "field_encryption_enabled": settings.enable_field_encryption,
         "model_loaded": model_loaded,
         "db_ok": db_ok,
+    }
+
+
+@app.get("/version")
+def version():
+    """Lightweight version & environment metadata."""
+    return {
+        "version": settings.app_version,
+        "environment": settings.environment_name,
+        "demo_mode": settings.demo_mode,
+    }
+
+
+@app.get("/config/public")
+def public_config():
+    """Public runtime configuration for frontend bootstrapping.
+
+    Excludes secrets; safe unauthenticated.
+    """
+    return {
+        "version": settings.app_version,
+        "environment": settings.environment_name,
+        "demo_mode": settings.demo_mode,
+        "features": {
+            "cloud_transcription": settings.enable_cloud_transcription,
+            "local_transcription": settings.enable_local_transcription,
+            "partial_streaming": settings.enable_partial_streaming,
+            "chart_templates": settings.enable_chart_templates,
+        },
+        "limits": {"max_upload_bytes": settings.max_upload_bytes},
     }
 
 # ---------------------- Auth Helpers ---------------------- #

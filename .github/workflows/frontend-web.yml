@@ -1,0 +1,61 @@
+name: Frontend Web Build
+
+on:
+  push:
+    paths:
+      - 'app/**'
+      - 'frontend-landing/**'
+      - '.github/workflows/frontend-web.yml'
+  workflow_dispatch:
+    inputs:
+      production_api_base_url:
+        description: 'Inject PRODUCTION_API_BASE_URL into landing script (optional)'
+        required: false
+        type: string
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Pub get
+        working-directory: app
+        run: flutter pub get
+
+      - name: Build web (release)
+        working-directory: app
+        env:
+          PRODUCTION_API_BASE_URL: ${{ inputs.production_api_base_url }}
+        run: |
+          # If provided, pass as --dart-define for potential usage.
+            if [ -n "${PRODUCTION_API_BASE_URL}" ]; then
+              flutter build web --release --dart-define=PRODUCTION_API_BASE_URL=${PRODUCTION_API_BASE_URL}
+            else
+              flutter build web --release
+            fi
+
+      - name: Archive build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-web-build
+          path: app/build/web
+
+      - name: Static landing lint
+        run: |
+          grep -q '/config/public' frontend-landing/script.js || (echo 'Expected /config/public reference missing' && exit 1)
+
+      - name: Summary
+        run: |
+          echo "Web build completed" >> $GITHUB_STEP_SUMMARY
+          echo "Production API Base (if any): ${PRODUCTION_API_BASE_URL}" >> $GITHUB_STEP_SUMMARY

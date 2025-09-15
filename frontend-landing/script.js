@@ -180,10 +180,14 @@ class MMTLanding {
             bg = '#059669';
         }
         const apiDisp = this.backendUrls.django;
+        const latency = (this._lastLatencyMs != null) ? `latency ${this._lastLatencyMs}ms` : 'latency …';
+        const envName = (info.environment || info.env || '').toString();
         const prodApi = (window.__MMT_CONFIG && window.__MMT_CONFIG.PRODUCTION_API_BASE_URL) || null;
         const showUpgrade = info.demo_mode && prodApi && prodApi !== apiDisp;
         const hasStored = !!localStorage.getItem('mmt_selected_api');
         bar.innerHTML = `<span style="font-weight:600;">${text}</span><span style="opacity:.8;">API: ${apiDisp}</span>`+
+            `<span style="opacity:.8;">${latency}</span>`+
+            (envName ? `<span style="opacity:.8;">env: ${envName}</span>` : '')+
             `<button id="change-api-btn" style="margin-left:auto;background:#374151;color:#fff;border:0;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Change API</button>`+
             (showUpgrade ? `<button id="upgrade-to-prod-btn" style="background:#059669;color:#fff;border:0;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;">Connect to Production</button>` : '')+
             (hasStored ? `<button id="reset-api-btn" title="Clear saved API override" style="background:#6b7280;color:#fff;border:0;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Reset</button>` : '');
@@ -246,6 +250,8 @@ class MMTLanding {
                 this.updateServiceStatusUI(service.key, { status: 'error', error: error.message });
             }
         }
+        // After service checks, attempt to fetch public config & version for richer banner
+        this.updatePublicConfig();
     }
 
     async checkServiceHealth(service) {
@@ -265,9 +271,13 @@ class MMTLanding {
             clearTimeout(timeoutId);
 
             if (response.ok) {
+                const now = performance.now();
+                if (service.key === 'django') {
+                    this._lastLatencyMs = Math.round(now - (this._djangoProbeStart || now));
+                }
                 return {
                     status: 'online',
-                    responseTime: performance.now(),
+                    responseTime: now,
                     lastCheck: new Date().toISOString()
                 };
             } else {
@@ -288,6 +298,24 @@ class MMTLanding {
             } else {
                 throw error;
             }
+        }
+    }
+
+    async updatePublicConfig() {
+        try {
+            const start = performance.now();
+            this._djangoProbeStart = start;
+            const vResp = await fetch(`${this.backendUrls.django}/version`, { cache: 'no-store' });
+            let versionData = {};
+            if (vResp.ok) versionData = await vResp.json();
+            const cResp = await fetch(`${this.backendUrls.django}/config/public`, { cache: 'no-store' });
+            let cfg = {};
+            if (cResp.ok) cfg = await cResp.json();
+            const merged = { ...(cfg || {}), ...(versionData || {}) };
+            merged.environment = merged.environment || merged.env;
+            this.renderEnvBanner(merged);
+        } catch (e) {
+            // swallow errors – banner already handles unreachable
         }
     }
 

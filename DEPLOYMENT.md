@@ -319,3 +319,53 @@ Pinning `torch==2.3.1` avoids prolonged pip backtracking across many CUDA build 
 
 ---
 
+## 16. Public Runtime Config & Frontend Build Workflow
+
+Two new lightweight backend endpoints expose non-sensitive runtime information for the web and mobile clients to adapt without requiring a redeploy:
+
+Endpoint | Purpose | Example
+---------|---------|--------
+`GET /version` | Minimal version + environment + demo flag | `{"version":"0.3.0","environment":"prod","demo_mode":false}`
+`GET /config/public` | Feature flags & limits for UI gating | `{"features":{"cloud_transcription":true,...}}`
+
+Security: These endpoints intentionally exclude secrets (API keys, internal JWT material, encryption keys). Safe for public exposure.
+
+Use Cases:
+ - Hide local transcription button if `features.local_transcription == false`
+ - Display max upload limit to user (progress bars / preflight validation)
+ - Show environment name in banner for multi-env QA
+
+### 16.1 Frontend Landing Enhancements
+
+`frontend-landing/script.js` now:
+ - Measures and displays API latency (HEAD /api/health/)
+ - Fetches `/version` + `/config/public` and merges into the top banner
+ - Persists selected API endpoint (`localStorage.mmt_selected_api`)
+ - Shows environment name and latency figure (e.g. `latency 87ms`)
+
+### 16.2 GitHub Action: Flutter Web Build
+
+Workflow path: `.github/workflows/frontend-web.yml`
+
+Triggers:
+ - `push` affecting `app/**` or `frontend-landing/**`
+ - Manual `workflow_dispatch` with optional `production_api_base_url`
+
+Behavior:
+ 1. Checks out repo and sets up stable Flutter
+ 2. Runs `flutter build web --release` (injecting `--dart-define=PRODUCTION_API_BASE_URL=...` if provided)
+ 3. Uploads compiled web assets as an artifact (`flutter-web-build`)
+ 4. Sanity check to ensure landing script references `/config/public`
+
+You can download the artifact and host it statically (e.g., GitHub Pages, Firebase Hosting, S3 + CloudFront).
+
+### 16.3 Mobile / Flutter Integration (Future)
+
+Mobile builds can optionally prefetch `/config/public` during splash to decide whether to enable certain buttons (e.g., offline/local transcription) without requiring a new app store release when backend flags change.
+
+### 16.4 Operational Notes
+
+If `ENABLE_LOCAL_TRANSCRIPTION=1` but the ML stack (whisper) isn't installed because `include_ml=false` was chosen in the deploy workflow, a startup warning is logged (`startup/local-transcription-misconfig`) and the feature is effectively disabled—clients can detect this via `/config/public`.
+
+---
+
