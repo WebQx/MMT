@@ -1,12 +1,11 @@
 name: Deploy Backend to Railway
 
 on:
-  push:
+  workflow_run:
+    workflows: ["MMT CI/CD", "security-scan", "Mobile CI"]
+    types:
+      - completed
     branches: [ main ]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/railway-backend.yml'
-      - 'requirements*.txt'
   workflow_dispatch:
     inputs:
       release_tag:
@@ -21,9 +20,23 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Only run if triggered by workflow_run and all workflows succeeded, or manually dispatched
+    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch' }}
     steps:
+      - name: Log trigger information
+        run: |
+          echo "Deployment triggered by: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "Triggering workflow: ${{ github.event.workflow_run.name }}"
+            echo "Workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+            echo "Workflow head SHA: ${{ github.event.workflow_run.head_sha }}"
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # When triggered by workflow_run, checkout the head SHA of the triggering workflow
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
