@@ -12,6 +12,10 @@ on:
       release_tag:
         description: 'Optional tag to create after successful deploy (e.g. v0.3.1)'
         required: false
+      include_ml:
+        description: 'Install heavy ML deps (whisper, torch, spacy)'
+        required: false
+        default: 'false'
 
 jobs:
   deploy:
@@ -36,8 +40,18 @@ jobs:
 
       - name: Install backend dependencies (lock-in validation)
         working-directory: backend
+        env:
+          INCLUDE_ML: ${{ github.event.inputs.include_ml }}
         run: |
-          pip install -r requirements.txt
+          set -e
+          echo "INCLUDE_ML=$INCLUDE_ML"
+          if [ "${INCLUDE_ML}" = "true" ]; then
+            echo "Installing full stack (base + ML)";
+            pip install -r requirements.txt;
+          else
+            echo "Installing light stack (no heavy ML)";
+            pip install -r requirements.light.txt;
+          fi
           python -m py_compile $(git ls-files '*.py' | tr '\n' ' ')
 
       - name: Install Railway CLI

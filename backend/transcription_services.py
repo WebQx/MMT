@@ -13,10 +13,15 @@ import requests
 
 from config import get_settings
 
-try:  # lazy import whisper only if enabled
-    import whisper  # type: ignore
-except Exception:  # pragma: no cover
-    whisper = None  # fallback if not installed
+# Defer whisper import unless local transcription explicitly enabled
+settings_for_import = get_settings()
+if settings_for_import.enable_local_transcription:
+    try:  # lazy import whisper only if enabled
+        import whisper  # type: ignore
+    except Exception:  # pragma: no cover
+        whisper = None  # fallback if not installed
+else:  # pragma: no cover
+    whisper = None
 
 
 _whisper_model = None

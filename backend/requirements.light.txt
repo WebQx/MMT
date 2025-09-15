@@ -1,0 +1,4 @@
+# Lightweight dependencies for deployments without local Whisper or PII NLP
+# Includes base requirements but excludes heavy ML stack (whisper, presidio, torch, spacy, etc.)
+# Use this when ENABLE_LOCAL_TRANSCRIPTION and advanced NLP features are disabled.
+-r requirements.base.txt

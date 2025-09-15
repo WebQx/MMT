@@ -262,3 +262,60 @@ Rollback: Push a hotfix commit and redeploy or revert to previous tag; Railway k
 
 Generated: Keep this file updated when environment variables or deployment workflows change.
 
+---
+## 15. Optimizing Deploy Time (Conditional ML Stack)
+
+Large ML dependencies (torch, whisper, spacy, presidio) can add several minutes and hundreds of MB to cold installs. If you do not need local Whisper inference or advanced PII NLP in a given environment (e.g. a lightweight production where only cloud transcription is enabled), you can skip them.
+
+### 15.1 Files
+
+- `backend/requirements.base.txt` – core API + observability
+- `backend/requirements.ml.txt` – heavy ML packages (now explicitly pins `torch==2.3.1` to avoid resolver backtracking)
+- `backend/requirements.light.txt` – convenience wrapper that only includes base requirements
+
+### 15.2 Workflow Flag
+
+The GitHub Actions workflow `railway-backend.yml` exposes an input:
+
+`include_ml` (default `false`)
+
+Behavior:
+- `include_ml = false` → installs `requirements.light.txt`
+- `include_ml = true`  → installs full `requirements.txt` (which references base + ml)
+
+### 15.3 Environment Alignment
+
+Ensure these settings match what you install:
+
+| Setting | When to set | Required ML packages |
+|---------|-------------|----------------------|
+| `ENABLE_LOCAL_TRANSCRIPTION=1` | Need on-box Whisper inference | Install ML stack (`include_ml=true`)
+| `ENABLE_LOCAL_TRANSCRIPTION=0` | Rely only on cloud transcription | `include_ml=false` (lighter)
+| `ENABLE_CLOUD_TRANSCRIPTION=1` | Uses OpenAI Whisper API | Only base deps (OpenAI client is already in base) |
+
+If you accidentally disable ML install but leave `ENABLE_LOCAL_TRANSCRIPTION=1`, the application will fallback gracefully and log a warning (whisper import will be `None`).
+
+### 15.4 Manual Local Use
+
+Local dev quick start (no ML):
+```
+pip install -r backend/requirements.light.txt
+```
+
+Enable local transcription later:
+```
+pip install -r backend/requirements.ml.txt
+```
+
+### 15.5 Rationale for Torch Pin
+
+Pinning `torch==2.3.1` avoids prolonged pip backtracking across many CUDA build variants that was previously observed, shaving significant time off dependency resolution. Update intentionally and test before changing this version.
+
+### 15.6 Future Improvements
+
+- Pre-build a slim base image and layer ML separately
+- Cache wheelhouse for torch + whisper between runs
+- Split presidio/spacy into a separate optional NLP feature flag
+
+---
+
