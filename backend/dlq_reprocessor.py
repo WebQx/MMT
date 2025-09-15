@@ -100,6 +100,7 @@ _stop_event = threading.Event()
 def run():
 	logger.info("starting_reprocessor", dlq=DLQ_QUEUE, main=MAIN_QUEUE, url=RABBITMQ_URL)
 	connection = None
+	channel = None
 	try:
 		connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
 		channel = connection.channel()
@@ -107,29 +108,32 @@ def run():
 		channel.basic_qos(prefetch_count=1)
 		channel.basic_consume(queue=DLQ_QUEUE, on_message_callback=_handle_message)
 
-	def _graceful(*_a):  # noqa: D401
-		logger.info("signal_received_shutdown")
-		_stop_event.set()
-		try:
-			channel.stop_consuming()
-		except Exception:  # noqa: BLE001
-			pass
+		def _graceful(*_a):  # noqa: D401
+			logger.info("signal_received_shutdown")
+			_stop_event.set()
+			try:
+				if channel:
+					channel.stop_consuming()
+			except Exception:  # noqa: BLE001
+				pass
 
-	for sig in (signal.SIGINT, signal.SIGTERM):  # pragma: no cover
-		try:
-			signal.signal(sig, _graceful)
-		except Exception:  # noqa: BLE001
-			pass
-		try:
-			while not _stop_event.is_set():
+		for sig in (signal.SIGINT, signal.SIGTERM):  # pragma: no cover
+			try:
+				signal.signal(sig, _graceful)
+			except Exception:  # noqa: BLE001
+				pass
+
+		while not _stop_event.is_set():
+			try:
 				channel.connection.process_data_events(time_limit=1)
-		finally:
-			if connection and not connection.is_closed:
-				connection.close()
-	except Exception as e:
-		logger.error("connection_error", error=str(e))
+			except Exception as loop_e:  # noqa: BLE001
+				logger.warning("loop_error", error=str(loop_e))
+	finally:
 		if connection and not connection.is_closed:
-			connection.close()
+			try:
+				connection.close()
+			except Exception:  # noqa: BLE001
+				pass
 
 
 if __name__ == "__main__":  # pragma: no cover
