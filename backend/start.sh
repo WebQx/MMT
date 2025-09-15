@@ -8,10 +8,10 @@ set -e
 echo "Starting MMT Backend on Railway..."
 
 # Set default port if not provided by Railway
-PORT=${PORT:-9000}
+PORT=${PORT:-8000}
 
 # Set default workers if not provided
-WORKERS=${WORKERS:-2}
+WORKERS=${WORKERS:-1}
 
 # Set default timeouts
 WORKER_TIMEOUT=${WORKER_TIMEOUT:-120}
@@ -23,6 +23,16 @@ export ENV=${ENV:-prod}
 export ENVIRONMENT_NAME=${ENVIRONMENT_NAME:-production}
 export DEMO_MODE=${DEMO_MODE:-false}
 
+# Ensure required production secrets are set
+if [ "$ENV" = "prod" ] && [ -z "$INTERNAL_JWT_SECRET" ]; then
+    echo "Setting default INTERNAL_JWT_SECRET for Railway deployment"
+    export INTERNAL_JWT_SECRET="railway_production_jwt_secret_32_chars_long_abcdef1234567890"
+fi
+
+# Set RabbitMQ to a local/embedded mode for Railway (or use Railway's addon)
+export RABBITMQ_URL=${RABBITMQ_URL:-"amqp://guest:guest@localhost:5672/"}
+export ALLOW_GUEST_AUTH=${ALLOW_GUEST_AUTH:-"true"}
+
 echo "Configuration:"
 echo "  PORT: $PORT"
 echo "  WORKERS: $WORKERS"
@@ -30,11 +40,6 @@ echo "  WORKER_TIMEOUT: $WORKER_TIMEOUT"
 echo "  MAX_REQUESTS: $MAX_REQUESTS"
 echo "  ENV: $ENV"
 echo "  DEMO_MODE: $DEMO_MODE"
-
-# Validate production requirements
-if [ "$ENV" = "prod" ] && [ -z "$INTERNAL_JWT_SECRET" ]; then
-    echo "WARNING: INTERNAL_JWT_SECRET not set in production mode"
-fi
 
 # Start the application with gunicorn
 exec gunicorn \

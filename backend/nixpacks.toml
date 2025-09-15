@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["python3", "python3Packages.pip"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[phases.build]
+cmds = ["chmod +x start.sh"]
+
+[start]
+cmd = "bash start.sh"

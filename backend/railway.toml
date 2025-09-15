@@ -2,7 +2,7 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "./start.sh"
+startCommand = "python run.py"
 healthcheckPath = "/health/live"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
@@ -15,6 +15,9 @@ DEMO_MODE = "false"
 INCLUDE_ML = "true"
 ENABLE_LOCAL_TRANSCRIPTION = "true"
 ENABLE_CLOUD_TRANSCRIPTION = "true"
+INTERNAL_JWT_SECRET = "railway_production_jwt_secret_32_chars_long_abcdef1234567890"
+ALLOW_GUEST_AUTH = "true"
+RABBITMQ_URL = "amqp://guest:guest@localhost:5672/"
 
 [[services]]
 name = "backend"
