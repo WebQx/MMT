@@ -1,0 +1,14 @@
+# Temporary override to bypass OpenEMR health dependency during debugging
+# Do NOT commit to production. Remove after OpenEMR stabilizes.
+
+services:
+  django-backend:
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      # Removed openemr health gating temporarily
+  frontend-landing:
+    depends_on:
+      django-backend:
+        condition: service_started
+      # openemr dependency removed temporarily so nginx can start and serve static assets
