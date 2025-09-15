@@ -1,6 +1,19 @@
 // MMT Landing Page JavaScript - Enhanced with Remote Backend Connectivity
 class MMTLanding {
     constructor() {
+        // Load any previously selected API override from localStorage BEFORE detection
+        try {
+            const stored = localStorage.getItem('mmt_selected_api');
+            if (stored && /^https?:\/\//.test(stored)) {
+                // Inject into a transient global so detectBackendUrls can pick it up like query/global override
+                window.__MMT_CONFIG = window.__MMT_CONFIG || {};
+                if (!window.__MMT_CONFIG.API_BASE_URL) {
+                    window.__MMT_CONFIG.API_BASE_URL = stored;
+                }
+            }
+        } catch (e) {
+            // ignore storage errors (Safari private mode etc.)
+        }
         this.backendUrls = this.detectBackendUrls();
         this.connectionStatus = new Map();
         this.errorLog = [];
@@ -169,9 +182,11 @@ class MMTLanding {
         const apiDisp = this.backendUrls.django;
         const prodApi = (window.__MMT_CONFIG && window.__MMT_CONFIG.PRODUCTION_API_BASE_URL) || null;
         const showUpgrade = info.demo_mode && prodApi && prodApi !== apiDisp;
+        const hasStored = !!localStorage.getItem('mmt_selected_api');
         bar.innerHTML = `<span style="font-weight:600;">${text}</span><span style="opacity:.8;">API: ${apiDisp}</span>`+
             `<button id="change-api-btn" style="margin-left:auto;background:#374151;color:#fff;border:0;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Change API</button>`+
-            (showUpgrade ? `<button id="upgrade-to-prod-btn" style="background:#059669;color:#fff;border:0;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;">Connect to Production</button>` : '');
+            (showUpgrade ? `<button id="upgrade-to-prod-btn" style="background:#059669;color:#fff;border:0;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;">Connect to Production</button>` : '')+
+            (hasStored ? `<button id="reset-api-btn" title="Clear saved API override" style="background:#6b7280;color:#fff;border:0;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Reset</button>` : '');
         bar.style.background = bg;
         const btn = document.getElementById('change-api-btn');
         if (btn) {
@@ -179,6 +194,7 @@ class MMTLanding {
                 const current = this.backendUrls.django;
                 const entered = prompt('Enter new API base URL (e.g. https://api.example.com)', current);
                 if (entered && /^https?:\/\//.test(entered)) {
+                    try { localStorage.setItem('mmt_selected_api', entered); } catch(_) {}
                     const url = new URL(window.location.href);
                     url.searchParams.set('api', entered);
                     window.location.href = url.toString();
@@ -188,8 +204,21 @@ class MMTLanding {
         const upgradeBtn = document.getElementById('upgrade-to-prod-btn');
         if (upgradeBtn && prodApi) {
             upgradeBtn.onclick = () => {
+                try { localStorage.setItem('mmt_selected_api', prodApi); } catch(_) {}
                 const url = new URL(window.location.href);
                 url.searchParams.set('api', prodApi);
+                window.location.href = url.toString();
+            };
+        }
+        const resetBtn = document.getElementById('reset-api-btn');
+        if (resetBtn) {
+            resetBtn.onclick = () => {
+                try { localStorage.removeItem('mmt_selected_api'); } catch(_) {}
+                const url = new URL(window.location.href);
+                url.searchParams.delete('api');
+                // Also drop any alias params
+                url.searchParams.delete('backend');
+                url.searchParams.delete('api_base');
                 window.location.href = url.toString();
             };
         }

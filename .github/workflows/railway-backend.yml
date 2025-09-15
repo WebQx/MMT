@@ -64,6 +64,7 @@ jobs:
         if: success()
         env:
           REMOTE_API_BASE_URL: ${{ secrets.REMOTE_API_BASE_URL }}
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
         run: |
           if [ -z "$REMOTE_API_BASE_URL" ]; then
             echo "REMOTE_API_BASE_URL secret not set; skipping smoke tests"; exit 0; fi
@@ -76,6 +77,23 @@ jobs:
           if [ "$DEMO_MODE" = "true" ] || [ "$DEMO_MODE" = "True" ]; then
             echo 'ERROR: Backend still in demo_mode=true for production deploy'; exit 1; fi
           echo 'Smoke checks passed.'
+
+      - name: Transcription ambient smoke
+        if: success()
+        env:
+          REMOTE_API_BASE_URL: ${{ secrets.REMOTE_API_BASE_URL }}
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+        run: |
+          if [ -z "$REMOTE_API_BASE_URL" ]; then echo "REMOTE_API_BASE_URL not set; skipping ambient transcription smoke"; exit 0; fi
+          if [ -z "$ADMIN_API_KEY" ]; then echo "ADMIN_API_KEY not set; skipping ambient transcription smoke"; exit 0; fi
+          echo 'Attempt ambient transcription JSON path'
+          RESP=$(curl -s -o /dev/stderr -w '%{http_code}' -X POST "$REMOTE_API_BASE_URL/transcribe/cloud/" \
+            -H "Authorization: Bearer $ADMIN_API_KEY" -H 'Content-Type: application/json' \
+            -d '{"text":"ping smoke"}')
+          CODE=$(echo "$RESP" | tail -n1 | tr -dc '0-9')
+          if [ "$CODE" = "403" ]; then echo 'Cloud transcription disabled (403) - treating as non-fatal'; exit 0; fi
+          if [ "$CODE" != "200" ]; then echo "Unexpected status $CODE from transcription endpoint"; exit 1; fi
+          echo 'Ambient transcription smoke succeeded.'
 
       - name: Create release tag
         if: success() && github.event.inputs.release_tag != ''
