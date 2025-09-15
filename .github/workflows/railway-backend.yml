@@ -1,4 +1,4 @@
-name: Deploy Backend to Railway
+name: Deploy Backend Production to Railway
 
 on:
   workflow_run:
@@ -14,7 +14,11 @@ on:
       include_ml:
         description: 'Install heavy ML deps (whisper, torch, spacy)'
         required: false
-        default: 'false'
+        default: 'true'
+      production_mode:
+        description: 'Deploy in full production mode (no demo)'
+        required: false
+        default: 'true'
 
 jobs:
   deploy:
@@ -51,15 +55,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install backend dependencies (lock-in validation)
+      - name: Install backend dependencies (production mode)
         working-directory: backend
         env:
-          INCLUDE_ML: ${{ github.event.inputs.include_ml }}
+          INCLUDE_ML: ${{ github.event.inputs.include_ml || 'true' }}
+          PRODUCTION_MODE: ${{ github.event.inputs.production_mode || 'true' }}
         run: |
           set -e
           echo "INCLUDE_ML=$INCLUDE_ML"
+          echo "PRODUCTION_MODE=$PRODUCTION_MODE"
           if [ "${INCLUDE_ML}" = "true" ]; then
-            echo "Installing full stack (base + ML)";
+            echo "Installing full stack (base + ML) for production";
             pip install -r requirements.txt;
           else
             echo "Installing light stack (no heavy ML)";
@@ -70,14 +76,16 @@ jobs:
       - name: Install Railway CLI
         run: curl -fsSL https://railway.app/install.sh | sh
 
-      - name: Deploy to Railway
+      - name: Deploy to Railway (Production Mode)
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          PRODUCTION_MODE: ${{ github.event.inputs.production_mode || 'true' }}
         run: |
           if [ -z "$RAILWAY_TOKEN" ]; then
             echo "RAILWAY_TOKEN secret not set" >&2
             exit 1
           fi
+          echo "Deploying backend in production mode: $PRODUCTION_MODE"
           # Pin directory to backend to avoid scanning entire monorepo
           pushd backend
           ~/.railway/bin/railway up --service backend --detach || ~/.railway/bin/railway up --detach

@@ -1,0 +1,20 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "./start.sh"
+healthcheckPath = "/health/live"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[variables]
+ENV = "prod"
+ENVIRONMENT_NAME = "production"
+DEMO_MODE = "false"
+INCLUDE_ML = "true"
+ENABLE_LOCAL_TRANSCRIPTION = "true"
+ENABLE_CLOUD_TRANSCRIPTION = "true"
+
+[[services]]
+name = "backend"

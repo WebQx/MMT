@@ -413,3 +413,24 @@ Run specific test:
 ```
 pytest backend/tests/test_entity_extraction.py::test_extract_entities -q
 ```
+
+## Railway Deployment
+
+The backend is configured for Railway deployment with the following files:
+
+- `start.sh` - Railway startup script that configures and starts the application with gunicorn
+- `railway.toml` - Railway configuration file specifying build and deployment settings
+
+The Railway deployment:
+1. Uses Nixpacks builder to automatically detect Python and install dependencies
+2. Runs the application via `start.sh` which starts gunicorn with uvicorn workers
+3. Exposes health check at `/health/live`
+4. Configures automatic restarts on failure
+
+Environment variables for Railway:
+- `PORT` - Port to bind to (automatically set by Railway)
+- `WORKERS` - Number of gunicorn workers (default: 2)
+- `WORKER_TIMEOUT` - Worker timeout in seconds (default: 120)
+- `MAX_REQUESTS` - Max requests per worker before restart (default: 1000)
+
+All other environment variables from the main configuration still apply.

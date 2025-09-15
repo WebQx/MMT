@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy Frontend Demo to GitHub Pages
 
 on:
   push:
@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      backend_url:
+        description: 'Backend API URL (defaults to Railway production)'
+        required: false
+        default: 'https://mmt-backend-production.up.railway.app'
 
 permissions:
   contents: read
@@ -26,18 +31,38 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Copy frontend files
+      - name: Configure frontend for demo mode
+        env:
+          BACKEND_URL: ${{ github.event.inputs.backend_url || 'https://mmt-backend-production.up.railway.app' }}
         run: |
           mkdir -p _site
           cp -r frontend-landing/* _site/
+          
           # Update base URL for GitHub Pages
           sed -i 's|href="/|href="/MMT/|g' _site/index.html
           sed -i 's|src="/|src="/MMT/|g' _site/index.html
           sed -i 's|url("/|url("/MMT/|g' _site/style.css || true
-          # Update API endpoints to use relative paths or full URLs
-          sed -i 's|http://localhost:8001|https://webqx.github.io/MMT|g' _site/script.js || true
-          sed -i 's|http://localhost:8080|#|g' _site/script.js || true
-          sed -i 's|http://localhost:3000|#|g' _site/script.js || true
+          
+          # Configure API endpoints to use Railway backend
+          sed -i "s|https://api.yourserver.com|${BACKEND_URL}|g" _site/script.js
+          sed -i "s|wss://api.yourserver.com|${BACKEND_URL/https/wss}|g" _site/script.js
+          
+          # Remove localhost references for production demo
+          sed -i 's|http://localhost:8001|#|g' _site/script.js
+          sed -i 's|http://localhost:8080|#|g' _site/script.js
+          sed -i 's|http://localhost:3000|#|g' _site/script.js
+          
+          # Add demo mode configuration
+          echo "window.__MMT_CONFIG = { 
+            API_BASE_URL: '${BACKEND_URL}',
+            DEMO_MODE: true,
+            ENVIRONMENT: 'demo'
+          };" > _site/config.js
+          
+          # Include config in HTML
+          sed -i 's|<head>|<head>\n    <script src="config.js"></script>|' _site/index.html
+          
+          echo "Configured frontend demo with backend: ${BACKEND_URL}"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
