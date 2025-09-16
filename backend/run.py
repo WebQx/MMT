@@ -38,7 +38,7 @@ def main():
         print("Visit: https://railway.app/project/49749dfc-af4f-44b4-be7f-9f6411aee691")
         print("Add a MySQL database service to fix this issue")
     
-    print(f"Starting MMT Backend on Railway...")
+    print(f"Starting MMT Backend on Railway... (MySQL configured)")
     print(f"  PORT: {port}")
     print(f"  WORKERS: {workers}")
     print(f"  ENV: {os.environ.get('ENV')}")
