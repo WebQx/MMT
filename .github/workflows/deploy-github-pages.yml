@@ -44,13 +44,12 @@ jobs:
           sed -i 's|url("/|url("/MMT/|g' _site/style.css || true
           
           # Configure API endpoints to use Railway backend
-          sed -i "s|https://api.yourserver.com|${BACKEND_URL}|g" _site/script.js
-          sed -i "s|wss://api.yourserver.com|${BACKEND_URL/https/wss}|g" _site/script.js
+          sed -i "s|https://mmt-backend-production.up.railway.app|${BACKEND_URL}|g" _site/script.js
+          sed -i "s|wss://mmt-backend-production.up.railway.app|${BACKEND_URL/https/wss}|g" _site/script.js
           
-          # Remove localhost references for production demo
-          sed -i 's|http://localhost:8001|#|g' _site/script.js
-          sed -i 's|http://localhost:8080|#|g' _site/script.js
-          sed -i 's|http://localhost:3000|#|g' _site/script.js
+          # Update localhost references to use production backend for demo
+          sed -i "s|http://localhost:8000|${BACKEND_URL}|g" _site/script.js
+          sed -i "s|ws://localhost:8000|${BACKEND_URL/https/wss}|g" _site/script.js
           
           # Add demo mode configuration
           echo "window.__MMT_CONFIG = { 
