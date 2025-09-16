@@ -1,5 +1,4 @@
 FROM python:3.12-slim AS builder
-ARG INCLUDE_ML=0
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
 
 # Security: Update packages and install minimal dependencies
@@ -14,9 +13,11 @@ COPY requirements.ml.txt requirements.ml.txt
 COPY requirements.txt requirements.txt
 
 # Install dependencies with security updates
+# Always install ML dependencies in production builds
 RUN pip install --upgrade pip setuptools wheel && \
     pip install --prefix /install -r requirements.base.txt && \
-    if [ "$INCLUDE_ML" = "1" ]; then pip install --prefix /install -r requirements.ml.txt; fi
+    echo "Installing ML dependencies for production..." && \
+    pip install --prefix /install -r requirements.ml.txt
 
 FROM python:3.12-slim
 ENV PYTHONUNBUFFERED=1

@@ -29,25 +29,25 @@ class MMTLanding {
         
         if (isDevelopment) {
             return {
-                django: override || 'http://localhost:8001',
+                django: override || 'http://localhost:8000',  // Updated to match typical FastAPI port
                 openemr: 'http://localhost:8080',
                 flutter: 'http://localhost:3000',
-                websocket: (override ? override.replace(/^http/, 'ws') : 'ws://localhost:8001')
+                websocket: (override ? override.replace(/^http/, 'ws') : 'ws://localhost:8000')  // Updated port
             };
         } else if (isGitHubPages) {
             // For production deployment, these would be real URLs
             return {
-                django: override || 'https://api.yourserver.com',  // Replace with actual production URLs or set via query/global
+                django: override || 'https://mmt-backend-production.up.railway.app',  // Updated to Railway URL pattern
                 openemr: 'https://openemr.yourserver.com',
                 flutter: 'https://app.yourserver.com',
-                websocket: (override ? override.replace(/^http/,'wss') : 'wss://api.yourserver.com')
+                websocket: (override ? override.replace(/^http/,'wss') : 'wss://mmt-backend-production.up.railway.app')
             };
         } else {
             // Custom domain detection
             const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
             const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const baseUrl = `${protocol}//${window.location.hostname}`;
-            const api = override || `${baseUrl}:8001`;
+            const api = override || `${baseUrl}:8000`;  // Updated port
             
             return {
                 django: api,
@@ -111,7 +111,8 @@ class MMTLanding {
 
     async sendErrorToBackend(error) {
         try {
-            const response = await fetch(`${this.backendUrls.django}/api/errors/`, {
+            // Try to send to a logging endpoint if it exists, but don't fail if it doesn't
+            const response = await fetch(`${this.backendUrls.django}/logs/errors`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -119,14 +120,17 @@ class MMTLanding {
                 body: JSON.stringify(error)
             });
             
-            if (!response.ok) {
+            if (!response.ok && response.status !== 404) {
                 throw new Error(`HTTP ${response.status}`);
             }
         } catch (err) {
-            // Store failed logs locally for later retry
-            const failedLogs = JSON.parse(localStorage.getItem('mmt_failed_logs') || '[]');
-            failedLogs.push(error);
-            localStorage.setItem('mmt_failed_logs', JSON.stringify(failedLogs.slice(-50))); // Keep last 50
+            // Store failed logs locally for later retry or just ignore
+            // Don't create recursive errors for missing endpoints
+            if (!err.message.includes('404')) {
+                const failedLogs = JSON.parse(localStorage.getItem('mmt_failed_logs') || '[]');
+                failedLogs.push(error);
+                localStorage.setItem('mmt_failed_logs', JSON.stringify(failedLogs.slice(-50))); // Keep last 50
+            }
         }
     }
 
@@ -230,7 +234,7 @@ class MMTLanding {
 
     async checkAllServices() {
         const services = [
-            { name: 'Django API', url: `${this.backendUrls.django}/api/health/`, key: 'django' },
+            { name: 'Django API', url: `${this.backendUrls.django}/health/live`, key: 'django' },
             { name: 'OpenEMR', url: `${this.backendUrls.openemr}/`, key: 'openemr' },
             { name: 'Flutter App', url: `${this.backendUrls.flutter}/`, key: 'flutter' }
         ];
@@ -768,7 +772,7 @@ document.addEventListener('keydown', (e) => {
 function showDemo() {
     const isDev = window.location.hostname === 'localhost';
     const message = isDev ? 
-        '🎬 Local Development Mode\n\nYou\'re running the development version!\n\nServices should be available at:\n• OpenEMR: http://localhost:8080\n• Django API: http://localhost:8001\n• Flutter App: http://localhost:3000\n\nUse docker-compose up to start all services.' :
+        '🎬 Local Development Mode\n\nYou\'re running the development version!\n\nServices should be available at:\n• OpenEMR: http://localhost:8080\n• Django API: http://localhost:8000\n• Flutter App: http://localhost:3000\n\nUse docker-compose up to start all services.' :
         '🎬 Demo Mode\n\nThis is a demonstration of the MMT-OpenEMR integration platform.\n\nTo run the full stack locally:\n1. Clone the repository\n2. Run: docker-compose up\n3. Access services on localhost ports\n\nFor more details, visit the GitHub repository.';
     alert(message);
 }

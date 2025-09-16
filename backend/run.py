@@ -43,18 +43,29 @@ def main():
         print("Visit: https://railway.app/project/49749dfc-af4f-44b4-be7f-9f6411aee691")
         print("Add a MySQL database service to fix this issue")
     
-    print(f"Starting MMT Backend on Railway... (MySQL configured)")
+    print(f"Starting MMT Backend on Railway...")
     print(f"  PORT: {port}")
     print(f"  WORKERS: {workers}")
     print(f"  ENV: {os.environ.get('ENV')}")
     print(f"  DEMO_MODE: {os.environ.get('DEMO_MODE')}")
+    print(f"  INCLUDE_ML: {os.environ.get('INCLUDE_ML')}")
+    print(f"  ENABLE_LOCAL_TRANSCRIPTION: {os.environ.get('ENABLE_LOCAL_TRANSCRIPTION')}")
     print(f"  MySQL Host: {os.environ.get('MYSQLHOST', 'Not configured')}")
+    
+    # Check if whisper is available
+    try:
+        import whisper
+        print("  Whisper: Available")
+    except ImportError:
+        print("  Whisper: Not available (ML dependencies not installed)")
     
     # Give the MySQL service a moment to be fully ready
     if os.environ.get('MYSQLHOST'):
         print("Waiting for MySQL connection to stabilize...")
         import time
-        time.sleep(5)
+        time.sleep(2)  # Reduced from 5 to 2 seconds for faster startup
+    
+    print("Starting gunicorn server...")
     
     # Start the application with gunicorn (optimized for Railway)
     cmd = [

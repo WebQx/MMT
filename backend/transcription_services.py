@@ -31,16 +31,29 @@ def _load_whisper_model():
     global _whisper_model
     if _whisper_model is None:
         settings = get_settings()
-        # Bypass heavy load in test mode or when whisper not installed in non-prod
-        if os.environ.get("FAST_TEST_MODE") == "1" or (whisper is None and os.environ.get('ENV','dev') != 'prod'):
+        # Bypass heavy load in test mode or when whisper not installed
+        if os.environ.get("FAST_TEST_MODE") == "1" or whisper is None:
             class _Dummy:  # pragma: no cover
                 def transcribe(self, path):
-                    return {"text": "dummy transcription"}
+                    return {"text": "dummy transcription - local transcription not available"}
             _whisper_model = _Dummy()
+            # Log warning in production if whisper is not available
+            if whisper is None and os.environ.get('ENV') == 'prod':
+                import structlog
+                logger = structlog.get_logger()
+                logger.warning("Whisper package not available - local transcription disabled. Install ML dependencies if needed.")
         else:
-            if whisper is None:
-                raise RuntimeError("whisper package not available")
-            _whisper_model = whisper.load_model(settings.whisper_model_size)
+            try:
+                _whisper_model = whisper.load_model(settings.whisper_model_size)
+            except Exception as e:
+                # Fallback to dummy model if whisper fails to load
+                import structlog
+                logger = structlog.get_logger()
+                logger.error("Failed to load Whisper model, using dummy fallback", error=str(e))
+                class _Dummy:  # pragma: no cover
+                    def transcribe(self, path):
+                        return {"text": "dummy transcription - model loading failed"}
+                _whisper_model = _Dummy()
     return _whisper_model
 
 
