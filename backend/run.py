@@ -50,6 +50,12 @@ def main():
     print(f"  DEMO_MODE: {os.environ.get('DEMO_MODE')}")
     print(f"  MySQL Host: {os.environ.get('MYSQLHOST', 'Not configured')}")
     
+    # Give the MySQL service a moment to be fully ready
+    if os.environ.get('MYSQLHOST'):
+        print("Waiting for MySQL connection to stabilize...")
+        import time
+        time.sleep(5)
+    
     # Start the application with gunicorn (optimized for Railway)
     cmd = [
         'gunicorn',
