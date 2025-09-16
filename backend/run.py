@@ -11,7 +11,7 @@ def main():
     # Set default port if not provided by Railway
     port = os.environ.get('PORT', '8000')
     
-    # Set default workers if not provided
+    # Set default workers if not provided (reduce for faster startup)
     workers = os.environ.get('WORKERS', '1')
     
     # Production environment configuration
@@ -50,18 +50,19 @@ def main():
     print(f"  DEMO_MODE: {os.environ.get('DEMO_MODE')}")
     print(f"  MySQL Host: {os.environ.get('MYSQLHOST', 'Not configured')}")
     
-    # Start the application with gunicorn
+    # Start the application with gunicorn (optimized for Railway)
     cmd = [
         'gunicorn',
         '-k', 'uvicorn.workers.UvicornWorker',
         '-w', workers,
         '-b', f'0.0.0.0:{port}',
-        '--timeout', '120',
+        '--timeout', '60',
         '--max-requests', '1000',
         '--max-requests-jitter', '100',
         '--preload',
         '--access-logfile', '-',
         '--error-logfile', '-',
+        '--log-level', 'info',
         'main:app'
     ]
     
