@@ -1,7 +1,7 @@
 -r requirements.txt
 pytest==8.3.3
 flake8==7.1.1
-mypy==1.11.2
+mypy==1.18.1
 safety==3.6.1
 locust==2.32.3
 types-requests==2.32.4.20250809
