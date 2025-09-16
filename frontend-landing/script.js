@@ -615,9 +615,176 @@ class MMTLanding {
         let serviceType = 'unknown';
         if (url.includes(':8080')) serviceType = 'openemr';
         else if (url.includes(':3000')) serviceType = 'flutter';
-        else if (url.includes(':8001')) serviceType = 'django';
+        else if (url.includes(':8000')) serviceType = 'django';  // Updated from 8001
+
+        // Special handling for transcription - use backend transcription interface
+        if (serviceName.toLowerCase().includes('transcrib')) {
+            this.accessTranscriptionService(serviceName);
+            return;
+        }
 
         this.accessService(serviceType, serviceName);
+    }
+
+    accessTranscriptionService(serviceName) {
+        const backendService = this.connectionStatus.get('django');
+        const backendUrl = this.backendUrls.django;
+
+        if (!backendUrl) {
+            this.showNotification('Backend service not configured', 'error');
+            return;
+        }
+
+        if (backendService && backendService.status === 'online') {
+            // Backend is online - show transcription options
+            this.showTranscriptionOptions(backendUrl);
+            this.logInteraction('transcription_access', {
+                serviceName,
+                url: backendUrl,
+                status: 'success'
+            });
+        } else {
+            // Backend is offline - show helpful information
+            const isDev = window.location.hostname === 'localhost';
+            const message = isDev ? 
+                `🎤 Backend Transcription Service\n\nThe backend transcription service appears to be offline.\n\nTo start transcribing:\n1. Start the backend: cd backend && python run.py\n2. Visit: ${backendUrl}/docs\n3. Use the /transcribe endpoint\n\nWould you like to try opening the API docs anyway?` :
+                `🎤 Transcription Service\n\nTo use the transcription features:\n\n1. Clone the repository: git clone https://github.com/WebQx/MMT\n2. Start the backend: cd backend && python run.py\n3. Access the API at: http://localhost:8000/docs\n\nWould you like to view the setup guide?`;
+            
+            const proceed = confirm(message);
+            if (proceed) {
+                if (isDev) {
+                    window.open(`${backendUrl}/docs`, '_blank');
+                } else {
+                    window.open('https://github.com/WebQx/MMT#setup', '_blank');
+                }
+                this.logInteraction('transcription_access', {
+                    serviceName,
+                    url: backendUrl,
+                    status: 'offline_attempt'
+                });
+            }
+        }
+    }
+
+    showTranscriptionOptions(backendUrl) {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        `;
+
+        modal.innerHTML = `
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                max-width: 500px;
+                width: 100%;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+                text-align: center;
+                position: relative;
+            ">
+                <button onclick="this.closest('div').parentElement.remove()" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #6b7280;
+                ">&times;</button>
+                
+                <h2 style="color: #1f2937; margin-bottom: 20px;">🎤 Start Transcribing</h2>
+                <p style="color: #6b7280; margin-bottom: 30px;">Choose how you'd like to access the transcription service:</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <button onclick="window.open('${backendUrl}/docs#/default/transcribe_transcribe__post', '_blank'); this.closest('div').parentElement.parentElement.remove();" style="
+                        background: #2563eb;
+                        color: white;
+                        border: none;
+                        padding: 15px 25px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: 500;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 6px rgba(37, 99, 235, 0.25);
+                    " onmouseover="this.style.background='#1d4ed8'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2563eb'; this.style.transform='translateY(0)'">
+                        <i class="fas fa-code"></i> Open API Documentation
+                    </button>
+                    
+                    <button onclick="window.open('${backendUrl}', '_blank'); this.closest('div').parentElement.parentElement.remove();" style="
+                        background: #059669;
+                        color: white;
+                        border: none;
+                        padding: 15px 25px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: 500;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 6px rgba(5, 150, 105, 0.25);
+                    " onmouseover="this.style.background='#047857'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#059669'; this.style.transform='translateY(0)'">
+                        <i class="fas fa-home"></i> Visit Backend Home
+                    </button>
+                    
+                    <button onclick="
+                        navigator.mediaDevices?.getUserMedia ? 
+                        alert('🚧 Web-based transcription coming soon!\\n\\nFor now, use the API endpoints or check back for updates.') :
+                        alert('🎤 Microphone access not available in this browser.\\n\\nPlease use the API documentation to upload audio files.');
+                        this.closest('div').parentElement.parentElement.remove();
+                    " style="
+                        background: #f59e0b;
+                        color: white;
+                        border: none;
+                        padding: 15px 25px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: 500;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.25);
+                    " onmouseover="this.style.background='#d97706'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#f59e0b'; this.style.transform='translateY(0)'">
+                        <i class="fas fa-microphone"></i> Record Audio (Coming Soon)
+                    </button>
+                </div>
+                
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; font-size: 14px;">
+                        💡 <strong>Quick Start:</strong> Use the API documentation to test transcription with audio files, 
+                        or integrate with your own applications using the provided endpoints.
+                    </p>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Close on click outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Close on Escape key
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                modal.remove();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
     }
 
     accessService(serviceType, serviceName = '') {
