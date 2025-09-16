@@ -31,8 +31,13 @@ def main():
     # Railway provides MYSQLHOST, MYSQLPORT, etc. when MySQL addon is installed
     if os.environ.get('MYSQLHOST'):
         print("MySQL database detected from Railway")
-        # Railway MySQL environment variables are automatically available
-        # The persistence.py will use them via TRANSCRIPTS_DB_* variables
+        # Map Railway MySQL environment variables to app variables
+        os.environ['TRANSCRIPTS_DB_HOST'] = os.environ['MYSQLHOST']
+        os.environ['TRANSCRIPTS_DB_PORT'] = os.environ.get('MYSQLPORT', '3306')
+        os.environ['TRANSCRIPTS_DB_USER'] = os.environ['MYSQLUSER']
+        os.environ['TRANSCRIPTS_DB_PASSWORD'] = os.environ['MYSQLPASSWORD']
+        os.environ['TRANSCRIPTS_DB_NAME'] = os.environ['MYSQLDATABASE']
+        print(f"  Database configured: {os.environ['MYSQLUSER']}@{os.environ['MYSQLHOST']}:{os.environ.get('MYSQLPORT', '3306')}/{os.environ['MYSQLDATABASE']}")
     else:
         print("No MySQL detected - check if Railway MySQL addon is installed")
         print("Visit: https://railway.app/project/49749dfc-af4f-44b4-be7f-9f6411aee691")

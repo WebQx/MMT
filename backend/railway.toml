@@ -18,13 +18,9 @@ ENABLE_CLOUD_TRANSCRIPTION = "true"
 INTERNAL_JWT_SECRET = "railway_production_jwt_secret_32_chars_long_abcdef1234567890"
 ALLOW_GUEST_AUTH = "true"
 RABBITMQ_URL = "amqp://guest:guest@localhost:5672/"
-# MySQL connection will be configured via Railway's MySQL addon
-# Railway will automatically provide: MYSQLHOST, MYSQLPORT, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE
-TRANSCRIPTS_DB_HOST = "${{MYSQLHOST}}"
-TRANSCRIPTS_DB_PORT = "${{MYSQLPORT}}"
-TRANSCRIPTS_DB_USER = "${{MYSQLUSER}}"
-TRANSCRIPTS_DB_PASSWORD = "${{MYSQLPASSWORD}}"
-TRANSCRIPTS_DB_NAME = "${{MYSQLDATABASE}}"
+# MySQL connection will be configured automatically via Railway's MySQL addon
+# Railway provides: MYSQLHOST, MYSQLPORT, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE
+# These are mapped to TRANSCRIPTS_DB_* variables in run.py
 
 [[services]]
 name = "backend"
