@@ -27,11 +27,23 @@ def main():
     os.environ.setdefault('RABBITMQ_URL', 'amqp://guest:guest@localhost:5672/')
     os.environ.setdefault('ALLOW_GUEST_AUTH', 'true')
     
+    # MySQL configuration for Railway
+    # Railway provides MYSQLHOST, MYSQLPORT, etc. when MySQL addon is installed
+    if os.environ.get('MYSQLHOST'):
+        print("MySQL database detected from Railway")
+        # Railway MySQL environment variables are automatically available
+        # The persistence.py will use them via TRANSCRIPTS_DB_* variables
+    else:
+        print("No MySQL detected - check if Railway MySQL addon is installed")
+        print("Visit: https://railway.app/project/49749dfc-af4f-44b4-be7f-9f6411aee691")
+        print("Add a MySQL database service to fix this issue")
+    
     print(f"Starting MMT Backend on Railway...")
     print(f"  PORT: {port}")
     print(f"  WORKERS: {workers}")
     print(f"  ENV: {os.environ.get('ENV')}")
     print(f"  DEMO_MODE: {os.environ.get('DEMO_MODE')}")
+    print(f"  MySQL Host: {os.environ.get('MYSQLHOST', 'Not configured')}")
     
     # Start the application with gunicorn
     cmd = [
