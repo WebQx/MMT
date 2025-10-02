@@ -61,6 +61,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     steps:
     - uses: actions/checkout@v4
     
@@ -78,12 +87,18 @@ jobs:
           echo "Building with PUBLIC_BACKEND_URL=${{ secrets.PUBLIC_BACKEND_URL }}"
           flutter build web --base-href /MMT/ --dart-define=BASE_URL=${{ secrets.PUBLIC_BACKEND_URL }}
         else
-          echo "Building with default BASE_URL (localhost)"
-          flutter build web --base-href /MMT/
+          echo "Building with Railway backend as default for production"
+          flutter build web --base-href /MMT/ --dart-define=BASE_URL=https://mmt-backend-production.up.railway.app
         fi
     
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+    
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./app/build/web
+        path: app/build/web
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
