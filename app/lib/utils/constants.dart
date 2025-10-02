@@ -8,9 +8,13 @@ class Constants {
     if (envUrl.isNotEmpty) {
       return envUrl;
     }
-    // Fallback heuristics (should be overridden in production via --dart-define)
+    // Production fallback for GitHub Pages deployment
+    if (kReleaseMode) {
+      return 'https://mmt-backend-production.up.railway.app';
+    }
+    // Development fallback
     if (kDebugMode) return 'http://localhost:8001';
-    return 'http://localhost:8001'; // Safe default if not provided
+    return 'https://mmt-backend-production.up.railway.app'; // Production default
   }
   
   static const String apiVersion = '/api/v1';
@@ -76,7 +80,7 @@ class Constants {
   // When true the app will allow a local/offline guest login flow when the
   // backend is unreachable. This should remain true for local development and
   // false in production deployments.
-  static const bool allowOfflineAuth = true;
+  static const bool allowOfflineAuth = kDebugMode;
   static const String offlineGuestTokenPrefix = 'dev-guest-token';
   
   // Error Messages

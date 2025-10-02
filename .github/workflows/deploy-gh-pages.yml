@@ -52,9 +52,11 @@ jobs:
           BUILD_CMD="flutter build web --base-href /MMT/"
           if [ -n "${PROD_BASE_URL}" ]; then
             BUILD_CMD="$BUILD_CMD --dart-define=BASE_URL=${PROD_BASE_URL}"
-            echo "Using PROD_BASE_URL for build"
+            echo "Using PROD_BASE_URL for build: ${PROD_BASE_URL}"
           else
-            echo "No PROD_BASE_URL set; build will use default BASE_URL (http://localhost:8000)"
+            # Use Railway backend as default for production builds
+            BUILD_CMD="$BUILD_CMD --dart-define=BASE_URL=https://mmt-backend-production.up.railway.app"
+            echo "Using default Railway backend URL for production build"
           fi
           if [ -n "${OPENAI_API_KEY}" ]; then
             BUILD_CMD="$BUILD_CMD --dart-define=OPENAI_API_KEY=${OPENAI_API_KEY}"
