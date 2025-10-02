@@ -92,12 +92,20 @@ jobs:
           cd backend
           
           echo "Starting Railway deployment with token authentication..."
-          # List available services for debugging
-          echo "Available services:"
-          railway status || echo "Status command failed"
-          railway list || echo "List command failed"
-          # Try deployment without service flag first
-          railway up --detach
+          
+          # Check project info
+          railway status
+          
+          # Deploy to the first/default service since we can't list them without login
+          # Try common service names for backend
+          echo "Attempting deployment..."
+          railway up --detach || \
+          railway up --service web --detach || \
+          railway up --service backend --detach || \
+          railway up --service api --detach || {
+            echo "All deployment attempts failed"
+            exit 1
+          }
 
       - name: Post-deploy info
         if: always()
