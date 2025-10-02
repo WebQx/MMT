@@ -82,3 +82,5 @@ uploads/
 .dockerignore
 
 mmt-offline-*.tar.gz
+venv/
+__pycache__/
