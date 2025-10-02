@@ -18,7 +18,7 @@ Features implemented:
  - Persistent transcript storage (MySQL via TRANSCRIPTS_DB_* env or fallback SQLite)
  - Rate limiting middleware & basic source tagging
 - Rate limit response headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`)
- - DLQ publishing for failed consumer messages (`openemr_transcriptions_dlq`)
+- DLQ publishing for failed consumer messages (`transcriptions_dlq`)
 - DLQ reprocessor service (`dlq_reprocessor.py`) with exponential backoff and Prometheus metrics
  - Multi-stage Dockerfile with pre-fetched Whisper model & non-root user
  - SMART-on-FHIR authorization_code flow endpoints (`/auth/fhir/authorize` + `/auth/fhir/callback`) issuing internal JWT bound to FHIR access token session
@@ -26,6 +26,21 @@ Features implemented:
  - Transcription endpoints require `user/DocumentReference.write` scope (no guest write)
  - Internal JWT secret rotates on restart if not set via env
  - TLS: To enable HTTPS, set `UVICORN_SSL_KEYFILE` and `UVICORN_SSL_CERTFILE` env vars and run with `--ssl-keyfile`/`--ssl-certfile` (see below)
+
+### OpenAI / Whisper API Key Secrets
+
+Cloud transcription relies on the OpenAI Whisper API. Provide the credential via one of the following:
+
+- `OPENAI_API_KEY` (primary) or `WHISPER_API_KEY` (alias) environment variables.
+- `OPENAI_API_KEY_FILE` / `WHISPER_API_KEY_FILE` pointing to a file mounted by your secrets manager (Kubernetes Secret, Docker secret, etc.).
+
+When multiple sources are present the resolution order is:
+1. `OPENAI_API_KEY`
+2. `OPENAI_API_KEY_FILE`
+3. `WHISPER_API_KEY_FILE`
+4. `WHISPER_API_KEY`
+
+This allows cloud deployments to keep the Whisper key in a secret store without embedding the value into images or git-managed `.env` files.
 
 ### Production Hardening (In Progress)
 - DLQ reprocessor with exponential backoff & Prometheus metrics.
@@ -151,7 +166,16 @@ uvicorn main:app --host 0.0.0.0 --port 9000 --ssl-keyfile $UVICORN_SSL_KEYFILE -
 
 ### Persistence Environment Variables
 
-```
+Configure how transcripts are persisted and exported:
+
+- `STORAGE_PROVIDER` (default `database`) – set to `nextcloud` to enable WebDAV uploads.
+- `NEXTCLOUD_BASE_URL` – Nextcloud host (e.g. `https://nextcloud.example`).
+- `NEXTCLOUD_USERNAME` / `NEXTCLOUD_PASSWORD` – Credentials for the WebDAV user.
+- `NEXTCLOUD_ROOT_PATH` (default `MedicalTranscripts`) – Base folder for transcript exports.
+- `NEXTCLOUD_VERIFY_TLS` (default `true`) – Disable only for self-signed dev environments.
+- `NEXTCLOUD_TIMEOUT_SECONDS` (default `10`) – Request timeout for WebDAV operations.
+- `TRANSCRIPTION_QUEUE` (default `transcriptions`) – RabbitMQ queue consumed by the worker.
+
 ### DLQ Reprocessor
 
 Run the DLQ reprocessor (in separate process or container):
@@ -162,8 +186,8 @@ python dlq_reprocessor.py
 
 Environment variables you can override:
 
-- `DLQ_QUEUE` (default `openemr_transcriptions_dlq`)
-- `MAIN_QUEUE` (default `openemr_transcriptions`)
+- `DLQ_QUEUE` (default `transcriptions_dlq`)
+- `MAIN_QUEUE` (default `transcriptions`)
 - `MAX_REPROCESS_ATTEMPTS` (default 5)
 - `BACKOFF_BASE_SECONDS` (default 5)
 
@@ -196,7 +220,7 @@ Enable KEDA (disables traditional HPA to avoid conflicts):
 ```
 helm upgrade --install mmt deploy/helm/mmt \
     --set keda.enabled=true \
-    --set keda.rabbitmq.queueName=openemr_transcriptions \
+    --set keda.rabbitmq.queueName=transcriptions \
     --set keda.rabbitmq.hostFromSecret=rabbitmq-credentials \
     --set keda.rabbitmq.hostFromSecretKey=connection
 ```
@@ -386,6 +410,108 @@ async def send_audio(path):
 
 asyncio.run(send_audio("sample.wav"))
 ```
+
+### OAuth (Google / Microsoft / Apple) & Remote Cloud Transcription
+
+The backend exposes generic web SSO endpoints so remote testers can log in with an OAuth provider and immediately exercise cloud (OpenAI Whisper) transcription without provisioning local credentials.
+
+Endpoints:
+
+- `GET /auth/oauth/{provider}/authorize` → returns `{ "authorize_url": "..." }` you should redirect the browser to.
+- `GET /auth/oauth/{provider}/callback` → provider redirects here; backend exchanges code and issues an internal JWT (returned via JSON or 302 redirect with `#access_token=` fragment if `OAUTH_FRONTEND_REDIRECT_URL` set).
+
+Supported providers: `google`, `microsoft`, `apple`.
+
+Minimal environment variables (set in deployment or `.env`):
+
+```
+# Common (used to build redirect_uri). Prefer a stable https backend origin.
+OAUTH_BACKEND_BASE_URL=https://transcribe.example.com
+
+# Google
+OAUTH_GOOGLE_CLIENT_ID=...
+OAUTH_GOOGLE_CLIENT_SECRET=...
+
+# Microsoft (multi‑tenant)
+OAUTH_MICROSOFT_CLIENT_ID=...
+OAUTH_MICROSOFT_CLIENT_SECRET=...
+
+# Apple (requires generated client secret / signed JWT)
+OAUTH_APPLE_CLIENT_ID=...
+OAUTH_APPLE_CLIENT_SECRET=...   # Pre‑generated JWT per Apple guidelines
+
+# Optional frontend SPA redirect (token passed via URL fragment)
+OAUTH_FRONTEND_REDIRECT_URL=https://app.example.com/post-auth
+
+# OpenAI / Whisper cloud transcription key (choose ONE of the first two ideally)
+OPENAI_API_KEY=sk-live-...
+OPENAI_API_KEY_FILE=/var/run/secrets/openai_api_key   # Mounted secret file alternative
+WHISPER_API_KEY=...                                   # Legacy alias (lowest precedence)
+WHISPER_API_KEY_FILE=/var/run/secrets/whisper_api_key # Alias file
+
+# Enable cloud transcription path in unified endpoint
+ENABLE_CLOUD_TRANSCRIPTION=1
+```
+
+Key resolution / precedence (already implemented in `config.py`):
+1. `OPENAI_API_KEY`
+2. `OPENAI_API_KEY_FILE`
+3. `WHISPER_API_KEY_FILE`
+4. `WHISPER_API_KEY`
+
+Auth flow summary:
+1. Client `GET /auth/oauth/google/authorize` → receive `authorize_url`.
+2. Browser redirects user to provider; user consents.
+3. Provider redirects to `/auth/oauth/google/callback?code=...`.
+4. Backend exchanges `code`, generates internal JWT with writer scope, returns token.
+5. Client stores `access_token` (Bearer) and calls transcription endpoints:
+    - `POST /transcribe/` with `use_cloud=true` & file → OpenAI Whisper (cloud) using resolved API key.
+    - Or `POST /transcribe/cloud/` (if enabled) depending on frontend integration.
+
+Security notes:
+- Do NOT expose the raw OpenAI key to the browser; only the internal JWT is returned.
+- Supply production secrets via Kubernetes Secret / Docker secret mounted to the `*_FILE` path when possible.
+- Set CORS origins explicitly in production: `CORS_ALLOW_ORIGINS=https://app.example.com`.
+
+Testing locally (Google example):
+1. Create OAuth 2.0 Client (Web) in Google Cloud Console; add authorized redirect `http://localhost:9000/auth/oauth/google/callback`.
+2. Export `OAUTH_GOOGLE_CLIENT_ID` / `OAUTH_GOOGLE_CLIENT_SECRET` and `OPENAI_API_KEY`.
+3. Run `uvicorn main:app --reload --port 9000`.
+4. `curl -s localhost:9000/auth/oauth/google/authorize | jq -r .authorize_url` → open URL.
+5. After callback, capture token fragment or JSON response; use in Authorization header for transcription requests.
+
+Automated test coverage: `backend/tests/test_oauth_authorize.py` validates authorize URL composition for Google and Microsoft; Apple covered conditionally if env variable present.
+
+Troubleshooting:
+- 400 "<Provider> OAuth not configured" → missing client id env var.
+- 400 token exchange failures → verify backend base URL matches the redirect registered with the provider.
+- 401 on transcription after login → ensure token returned is used as `Authorization: Bearer <token>` and includes writer scope (default in current implementation).
+
+Future enhancements (roadmap): PKCE support, persistent user identity claims, refresh token handling, Apple private key generation automation.
+
+#### GitHub Pages Frontend Configuration
+
+If you deploy the Flutter web app at `https://webqx.github.io/MMT/` (GitHub Pages), set these backend environment variables so OAuth and CORS work end‑to‑end:
+
+```
+OAUTH_FRONTEND_REDIRECT_URL=https://webqx.github.io/MMT/
+OAUTH_BACKEND_BASE_URL=https://api.your-backend-domain.example   # public backend base
+CORS_ALLOW_ORIGINS=https://webqx.github.io
+WEBSOCKET_ALLOWED_ORIGINS=https://webqx.github.io
+```
+
+Then configure each OAuth provider redirect URI to point to (example Google):
+```
+https://webqx.github.io/MMT/auth/oauth/google/callback
+```
+Because the backend constructs `redirect_uri` from `OAUTH_BACKEND_BASE_URL` (server endpoint) you typically expose the backend publicly (e.g. `https://api.mmt.example`) and let the provider redirect there. The backend then issues the internal JWT and (if `OAUTH_FRONTEND_REDIRECT_URL` set) performs a 302 to:
+```
+https://webqx.github.io/MMT/#access_token=...<jwt>
+```
+The Flutter app (web) now auto-extracts the token fragment (implemented in `app/lib/main.dart`). If you prefer the provider to return directly to GitHub Pages you can set `OAUTH_BACKEND_BASE_URL` equal to `OAUTH_FRONTEND_REDIRECT_URL`, but this requires CORS + HTTPS alignment.
+
+Security tip: Keep `CORS_ALLOW_ORIGINS` narrowly scoped (avoid wildcard in production) and ensure HTTPS is enforced on the backend (HSTS already added by middleware).
+
 
 ## Tests
 ## FHIR Integration

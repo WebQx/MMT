@@ -1,10 +1,11 @@
 name: Deploy Frontend Demo to GitHub Pages
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  # Disabled automatic triggers to avoid overriding Flutter web app during remote testing.
+  # push:
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
   workflow_dispatch:
     inputs:
       backend_url:

@@ -10,7 +10,7 @@ from datetime import datetime, UTC, timedelta
 import openemr_consumer as consumer
 
 
-def _invoke_api_and_consumer(monkeypatch, transcript_text="sample transcript"):
+def _invoke_api_and_consumer(monkeypatch, transcript_text="sample transcript", nextcloud_calls=None):
     # Avoid heavy model load in integration tests
     import os as _os
     _os.environ["FAST_TEST_MODE"] = "1"
@@ -31,6 +31,21 @@ def _invoke_api_and_consumer(monkeypatch, transcript_text="sample transcript"):
         return transcript_text
 
     monkeypatch.setattr(app_module, "transcribe_local", fake_transcribe_local, raising=True)
+
+    monkeypatch.setattr(
+        consumer,
+        "extract_entities",
+        lambda text: type("E", (), {"to_dict": lambda self: {}})(),
+        raising=True,
+    )
+    monkeypatch.setattr(consumer, "summarize_text", lambda text: "summary", raising=True)
+
+    if nextcloud_calls is not None:
+        def fake_store_payload(**kwargs):
+            nextcloud_calls.append(kwargs)
+        monkeypatch.setattr(consumer, "store_transcript_payload", fake_store_payload, raising=True)
+    else:
+        monkeypatch.setattr(consumer, "store_transcript_payload", lambda **k: None, raising=True)
 
     # Monkeypatch queue publish to synchronously invoke consumer callback
     def fake_send(queue, message, rabbitmq_url=None):
@@ -59,62 +74,13 @@ def _invoke_api_and_consumer(monkeypatch, transcript_text="sample transcript"):
     assert resp.status_code == 200, resp.text
 
 
-def test_end_to_end_fhir_document_reference(monkeypatch):
-    import os as _os
-    if _os.environ.get("FAST_TEST_MODE") != "1":
-        _os.environ["FAST_TEST_MODE"] = "1"
-    # Ensure FHIR is enabled
-    consumer.settings.openemr_fhir_base_url = "http://example"
-    consumer.settings.openemr_fhir_client_id = "cid"
-    consumer.settings.openemr_fhir_client_secret = "csecret"
-    consumer.settings.openemr_fhir_username = "user"
-    consumer.settings.openemr_fhir_password = "pass"
-
-    called = {}
-
-    def fake_create_document_reference(text, filename):
-        called["text"] = text
-        called["filename"] = filename
-        return {"id": "doc-123"}
-
-    def fail_legacy(**kwargs):  # shouldn't be called
-        raise AssertionError("Legacy API should not be used when FHIR succeeds")
-
-    monkeypatch.setattr(consumer, "create_document_reference", fake_create_document_reference, raising=True)
-    monkeypatch.setattr(consumer, "send_to_openemr_api", fail_legacy, raising=True)
-
-    _invoke_api_and_consumer(monkeypatch)
-
-    assert "SUMMARY:" in called["text"]
-    assert "ENRICHMENT:" in called["text"]
-    assert called["filename"] == "audio.wav"
-
-
-def test_end_to_end_legacy_fallback(monkeypatch):
-    import os as _os
-    if _os.environ.get("FAST_TEST_MODE") != "1":
-        _os.environ["FAST_TEST_MODE"] = "1"
-    # Disable FHIR
-    consumer.settings.openemr_fhir_base_url = None
-    consumer.settings.openemr_fhir_client_id = None
-    consumer.settings.openemr_fhir_client_secret = None
-    consumer.settings.openemr_fhir_username = None
-    consumer.settings.openemr_fhir_password = None
-
-    legacy_called = {}
-
-    def fake_legacy_api(filename, text, api_url, api_key):
-        legacy_called["filename"] = filename
-        legacy_called["text"] = text
-        return {"status": "ok"}
-
-    def fail_fhir(*args, **kwargs):  # should not be called
-        raise AssertionError("FHIR should not be attempted when disabled")
-
-    monkeypatch.setattr(consumer, "send_to_openemr_api", fake_legacy_api, raising=True)
-    monkeypatch.setattr(consumer, "create_document_reference", fail_fhir, raising=True)
-
-    _invoke_api_and_consumer(monkeypatch, transcript_text="another transcript")
-
-    assert legacy_called["filename"] == "audio.wav"
-    assert "SUMMARY:" in legacy_called["text"]
+def test_end_to_end_nextcloud_upload(monkeypatch):
+    calls = []
+    _invoke_api_and_consumer(monkeypatch, transcript_text="nextcloud body", nextcloud_calls=calls)
+    assert calls, "store_transcript_payload should be invoked"
+    payload = calls[0]
+    assert payload["filename"] == "audio.wav"
+    assert payload["text"] == "nextcloud body"
+    assert payload["summary"] == "summary"
+    assert isinstance(payload["enrichment"], dict)
+    assert payload["metadata"]["queue"] == consumer.TRANSCRIPTION_QUEUE

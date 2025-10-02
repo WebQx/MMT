@@ -90,11 +90,17 @@ spec:
                   name: {{ .Values.secrets.vault.secretName }}
                   key: secretId
           {{- end }}
-          {{- if .Values.openai.secretName }}
+          {{- if and .Values.openai .Values.openai.secretName }}
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.openai.secretName }}
+                  key: OPENAI_API_KEY
+          {{- else if and .Values.secrets .Values.secrets.openai .Values.secrets.openai.secretName }}
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.openai.secretName }}
                   key: OPENAI_API_KEY
           {{- end }}
           {{- end }}

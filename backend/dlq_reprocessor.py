@@ -1,6 +1,6 @@
 """Dead-letter queue (DLQ) reprocessor service.
 
-Consumes messages from the DLQ (``openemr_transcriptions_dlq``) and attempts to
+Consumes messages from the DLQ (``transcriptions_dlq``) and attempts to
 re-publish them to the primary queue after optional backoff. Implements a
 bounded retry counter embedded in the message payload (``_dlq_attempts``).
 
@@ -10,8 +10,8 @@ Exit codes:
 
 Environment variables:
  RABBITMQ_URL  AMQP connection URL
- DLQ_QUEUE     Name of DLQ queue (default: openemr_transcriptions_dlq)
- MAIN_QUEUE    Name of main queue (default: openemr_transcriptions)
+ DLQ_QUEUE     Name of DLQ queue (default: transcriptions_dlq)
+ MAIN_QUEUE    Name of main queue (default: transcriptions)
  MAX_REPROCESS_ATTEMPTS  Maximum retry attempts (default: 5)
  BACKOFF_BASE_SECONDS    Base backoff seconds (default: 5)
 
@@ -44,8 +44,8 @@ from opentelemetry import trace  # type: ignore
 logger = structlog.get_logger().bind(component="dlq_reprocessor")
 
 RABBITMQ_URL = os.environ.get("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
-DLQ_QUEUE = os.environ.get("DLQ_QUEUE", "openemr_transcriptions_dlq")
-MAIN_QUEUE = os.environ.get("MAIN_QUEUE", "openemr_transcriptions")
+DLQ_QUEUE = os.environ.get("DLQ_QUEUE", "transcriptions_dlq")
+MAIN_QUEUE = os.environ.get("MAIN_QUEUE", "transcriptions")
 MAX_REPROCESS_ATTEMPTS = int(os.environ.get("MAX_REPROCESS_ATTEMPTS", "5"))
 BACKOFF_BASE_SECONDS = float(os.environ.get("BACKOFF_BASE_SECONDS", "5"))
 

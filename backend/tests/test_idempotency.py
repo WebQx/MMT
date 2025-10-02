@@ -20,6 +20,15 @@ def test_duplicate_suppression(monkeypatch):
     consumer.settings.enable_db_idempotency = False
     # Use in-memory path (no redis)
     consumer._redis_client = None  # type: ignore[attr-defined]
+    monkeypatch.setattr(consumer, "store_transcript", lambda **k: 1, raising=False)
+    monkeypatch.setattr(
+        consumer,
+        "extract_entities",
+        lambda text: type("E", (), {"to_dict": lambda self: {}})(),
+        raising=False,
+    )
+    monkeypatch.setattr(consumer, "summarize_text", lambda text: "summary", raising=False)
+    monkeypatch.setattr(consumer, "store_transcript_payload", lambda **k: None, raising=False)
 
     client = TestClient(app_module.app)
     session_id = "dup-test"
@@ -80,6 +89,15 @@ def test_duplicate_suppression_redis(monkeypatch):
     r = redis.StrictRedis.from_url(url, decode_responses=True)
     r.flushdb()
     consumer._redis_client = r  # type: ignore[attr-defined]
+    monkeypatch.setattr(consumer, "store_transcript", lambda **k: 1, raising=False)
+    monkeypatch.setattr(
+        consumer,
+        "extract_entities",
+        lambda text: type("E", (), {"to_dict": lambda self: {}})(),
+        raising=False,
+    )
+    monkeypatch.setattr(consumer, "summarize_text", lambda text: "summary", raising=False)
+    monkeypatch.setattr(consumer, "store_transcript_payload", lambda **k: None, raising=False)
     client = TestClient(app_module.app)
     session_id = "dup-test-redis"
     save_session(session_id, "user/DocumentReference.write", "dummy", None, datetime.now(UTC)+timedelta(hours=1))

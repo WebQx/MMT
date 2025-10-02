@@ -46,7 +46,7 @@ class AppTheme {
         ),
         contentPadding: const EdgeInsets.all(Constants.padding),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(Constants.borderRadius),
@@ -104,7 +104,7 @@ class AppTheme {
         ),
         contentPadding: const EdgeInsets.all(Constants.padding),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(Constants.borderRadius),

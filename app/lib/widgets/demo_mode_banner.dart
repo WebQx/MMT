@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/constants.dart';
 
 /// Simple top banner indicating the app is connected to a demo backend.
 /// You can toggle this by providing a runtime flag in the future; for now

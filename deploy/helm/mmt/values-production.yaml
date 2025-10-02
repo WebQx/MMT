@@ -33,7 +33,7 @@ keda:
   enabled: true
   pollingInterval: 15
   cooldownPeriod: 120
-  queueName: openemr_transcriptions
+  queueName: transcriptions
   queueLengthTarget: "50"
 
 # Security context (production hardening)

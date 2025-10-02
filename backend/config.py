@@ -6,17 +6,25 @@ from __future__ import annotations
 
 import os
 from functools import lru_cache
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field
+from pydantic import Field, model_validator
 import secrets
 import structlog
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     # API / Auth
     openai_api_key: str | None = Field(default=None, env="OPENAI_API_KEY")
+    openai_api_key_file: str | None = Field(default=None, env="OPENAI_API_KEY_FILE")
+    whisper_api_key: str | None = Field(default=None, env="WHISPER_API_KEY")
+    whisper_api_key_file: str | None = Field(default=None, env="WHISPER_API_KEY_FILE")
     keycloak_public_key: str | None = Field(default=None, env="KEYCLOAK_PUBLIC_KEY")
     keycloak_issuer: str | None = Field(default=None, env="KEYCLOAK_ISSUER")
     keycloak_jwks_url: str | None = Field(default=None, env="KEYCLOAK_JWKS_URL")
@@ -31,7 +39,7 @@ class Settings(BaseSettings):
 
     # RabbitMQ / Queues
     rabbitmq_url: str = Field(default="amqp://guest:guest@localhost:5672/", env="RABBITMQ_URL")
-    transcription_queue: str = Field(default="openemr_transcriptions")
+    transcription_queue: str = Field(default="transcriptions", env="TRANSCRIPTION_QUEUE")
 
     # Models
     whisper_model_size: str = Field(default="base", env="WHISPER_MODEL_SIZE")
@@ -42,6 +50,15 @@ class Settings(BaseSettings):
     enable_partial_streaming: bool = Field(default=False, env="ENABLE_PARTIAL_STREAMING")
     # Chart templates / structured note prompts
     enable_chart_templates: bool = Field(default=False, env="ENABLE_CHART_TEMPLATES")
+
+    # External storage providers
+    storage_provider: str = Field(default="database", env="STORAGE_PROVIDER")
+    nextcloud_base_url: str | None = Field(default=None, env="NEXTCLOUD_BASE_URL")
+    nextcloud_username: str | None = Field(default=None, env="NEXTCLOUD_USERNAME")
+    nextcloud_password: str | None = Field(default=None, env="NEXTCLOUD_PASSWORD")
+    nextcloud_root_path: str = Field(default="MedicalTranscripts", env="NEXTCLOUD_ROOT_PATH")
+    nextcloud_timeout_seconds: float = Field(default=10.0, env="NEXTCLOUD_TIMEOUT_SECONDS")
+    nextcloud_verify_tls: bool = Field(default=True, env="NEXTCLOUD_VERIFY_TLS")
 
     # OpenEMR FHIR integration (optional)
     openemr_fhir_base_url: str | None = Field(default=None, env="OPENEMR_FHIR_BASE_URL")
@@ -132,6 +149,32 @@ class Settings(BaseSettings):
     sentry_traces_sample_rate: float = Field(default=0.0, env="SENTRY_TRACES_SAMPLE_RATE")
     # Demo mode (disable external integrations & queue publishing)
     demo_mode: bool = Field(default=False, env="DEMO_MODE")
+
+    @model_validator(mode="after")
+    def _apply_whisper_secret_fallback(self):  # type: ignore[override]
+        """Normalize OpenAI/Whisper API credentials, supporting secret file mounts."""
+
+        def _read_secret(path: str | None) -> str | None:
+            if not path:
+                return None
+            try:
+                data = Path(path).read_text(encoding="utf-8").strip()
+                return data or None
+            except FileNotFoundError:
+                structlog.get_logger(__name__).warning("config/secret-file-missing", path=path)
+            except OSError as exc:  # pragma: no cover - unexpected IO errors
+                structlog.get_logger(__name__).warning("config/secret-file-error", path=path, error=str(exc))
+            return None
+
+        if not self.openai_api_key:
+            file_value = _read_secret(self.openai_api_key_file) or _read_secret(self.whisper_api_key_file)
+            if file_value:
+                object.__setattr__(self, "openai_api_key", file_value)
+        if not self.openai_api_key and self.whisper_api_key:
+            object.__setattr__(self, "openai_api_key", self.whisper_api_key.strip())
+        if self.openai_api_key:
+            object.__setattr__(self, "openai_api_key", self.openai_api_key.strip())
+        return self
 
 
 @lru_cache(maxsize=1)

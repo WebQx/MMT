@@ -51,9 +51,11 @@ def validate_session_id(session_id: str) -> str:
     """Validate session ID format."""
     if not session_id:
         raise ValueError("Session ID cannot be empty")
-    
-    # Session IDs should be alphanumeric with limited special chars
-    if not re.match(r'^[a-zA-Z0-9_-]{8,64}$', session_id):
-        raise ValueError("Invalid session ID format")
-    
+
+    if len(session_id) > 256:
+        raise ValueError("Session ID too long")
+
+    if any(ch in session_id for ch in {"\n", "\r", "\x00"}):
+        raise ValueError("Invalid control characters in session ID")
+
     return session_id

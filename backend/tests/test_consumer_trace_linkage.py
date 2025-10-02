@@ -41,13 +41,11 @@ def test_consumer_parent_span_linkage(monkeypatch):
     tracer = trace.get_tracer(__name__)
 
     # Monkeypatch ack and any external calls inside consumer (FHIR, DB) to no-op quickly
-    monkeypatch.setattr('openemr_consumer._maybe_publish_fhir_document', lambda *a, **k: None, raising=False)
-    monkeypatch.setattr('openemr_consumer._publish_legacy_endpoint', lambda *a, **k: None, raising=False)
-    monkeypatch.setattr('openemr_consumer._persist_transcript', lambda *a, **k: None, raising=False)
-    monkeypatch.setattr('openemr_consumer._is_duplicate', lambda *a, **k: False, raising=False)
+    monkeypatch.setattr('openemr_consumer._check_duplicate', lambda *a, **k: False, raising=False)
     monkeypatch.setattr('openemr_consumer.store_transcript', lambda **k: 1, raising=False)
     monkeypatch.setattr('openemr_consumer.extract_entities', lambda text: type('E',(),{'to_dict':lambda self: {}})(), raising=False)
     monkeypatch.setattr('openemr_consumer.summarize_text', lambda text: 'summary', raising=False)
+    monkeypatch.setattr('openemr_consumer.store_transcript_payload', lambda **k: None, raising=False)
 
     # Capture spans
     with tracer.start_as_current_span("publish-root") as parent_span:

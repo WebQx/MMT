@@ -1,25 +1,7 @@
 # Multilingual Medical Transcription (MMT) - End-to-End Blueprint
+![Deploy Flutter web to GitHub Pages](https://github.com/WebQx/MMT/actions/workflows/deploy-gh-pages.yml/badge.svg)
 
-![Frontend Demo](https://github.com/WebQx/MMT/actions/workflows/deploy-github-pages.yml/badge.svg)
-![Backend Production](https://github.com/WebQx/MMT/actions/workflows/railway-backend.yml/badge.svg)
-![CI/CD](https://github.com/WebQx/MMT/actions/workflows/ci-cd.yml/badge.svg)
-
-**Current Version:** v0.3.0  
-**Live Demo:** [https://webqx.github.io/MMT/](https://webqx.github.io/MMT/)  
-**Backend Status:** [https://mmt-backend-production.up.railway.app/health/live](https://mmt-backend-production.up.railway.app/health/live)
-
-## 🚀 Quick Start
-
-### Try the Live Demo
-Visit [**webqx.github.io/MMT**](https://webqx.github.io/MMT/) to test the platform with a live production backend.
-
-### Deploy Your Own
-1. **Fork this repository**
-2. **Configure Railway**: Add `RAILWAY_TOKEN` to GitHub secrets
-3. **Set environment variables** in Railway dashboard (see [DEPLOYMENT_CONFIG.md](DEPLOYMENT_CONFIG.md))
-4. **Push to main** - automatic deployment to Railway (backend) and GitHub Pages (frontend)
-
----
+Current Version: **v0.3.0**
 ## UI & Navigation Flow (Flutter)
 \n+## Automated Documentation for Medical Transcriptions\n+\n+🔹 **Automated Documentation Features:**\n+\n+• Capture patient-provider conversations and generate complete clinical notes\n+• Document history, examination, assessment, and plan\n+• Create comprehensive notes by the end of each visit\n+• Support both in-clinic and telehealth visits\n*** End Patch
 
@@ -251,236 +233,6 @@ python3 backend/openemr_consumer.py
 ```
 
 ---
-## Large Assets & Git LFS Policy
-
-To conserve repository size and avoid exhausting container disk space:
-
-* Build artifacts, SDK binaries, Flutter ephemeral outputs, and temporary archives are NOT committed.
-* Large sample archives (e.g., `mmt-offline-sample.tar.gz`) are excluded via `.gitignore`.
-* A helper script `scripts/get-offline-sample.sh` is provided to download optional large sample data externally.
-* Git LFS is initialized but currently tracks no files intentionally. Uncomment patterns in `.gitattributes` only when you have a versioned, stable binary asset that must live in the repo.
-
-Recommended workflow for adding a new large asset:
-1. Publish the asset to a release or object storage (preferred) OR add an LFS pattern in `.gitattributes`.
-2. If using LFS, run `git lfs track <pattern>` and commit the pointer.
-3. Document usage and retrieval in this section.
-
-Benefits:
-* Faster clone times.
-* Lower CI storage utilization.
-* Avoids hitting Codespace / container disk limits during large image builds (Flutter, OpenEMR, Whisper, etc.).
-
-If you accidentally commit a large binary directly, rewrite history safely:
-```
-git lfs migrate import --include="path/to/asset" --include-ref=refs/heads/main
-```
-Push with:
-```
-git push --force-with-lease
-```
-Coordinate with collaborators before history rewrites.
-
----
-## Developing Without OpenEMR (Bypassing Health Dependencies)
-
-During active feature work you often do NOT need a full OpenEMR instance. In the default `docker-compose.yml` both `django-backend` and `frontend-landing` declare `depends_on` with `condition: service_healthy` for `openemr`. When OpenEMR initialization loops or is heavy to pull (≈1.3GB), this can block iteration.
-
-### Quick Bypass (Ad‑hoc)
-Start only the services you need and ignore declared dependencies:
-
-```bash
-# Start database (needed for django-backend if it uses MariaDB directly)
-docker compose up -d mariadb
-
-# Start backend & landing without waiting for OpenEMR health
-docker compose up -d --no-deps django-backend frontend-landing
-
-# (Optional) Start the lightweight FastAPI async backend service
-docker compose up -d --no-deps backend
-
-# Build & run Flutter web (served on :3000)
-docker compose build frontend
-docker compose up -d --no-deps frontend
-```
-
-### Why Containers Show as "unhealthy"
-Healthchecks may fail (marked `unhealthy`) if they expect OpenEMR-dependent endpoints. This is acceptable during UI / API development unrelated to OpenEMR. Focus on:
-* `:8001/health/` (Django backend) returning 200
-* `:9000/health/live` (FastAPI backend) returning 200
-* Frontend assets served (landing `:80`, Flutter `:3000`)
-
-### Suggested Improvement: Compose Profiles
-You can make OpenEMR (and other heavy or optional services like Whisper) opt‑in by adding a profile in `docker-compose.yml`:
-
-```yaml
-	openemr:
-		profiles: ["ehr"]
-		# ...existing config...
-
-	mariadb:
-		profiles: ["ehr"]
-		# or leave without a profile if generally needed
-
-	django-backend:
-		# remove the openemr health dependency or guard it:
-		depends_on:
-			mariadb:
-				condition: service_healthy
-		# (Optionally add: profiles: ["core"])
-```
-
-Then run core development stack without EHR:
-```bash
-docker compose up -d backend django-backend frontend-landing frontend
-```
-Add OpenEMR only when required:
-```bash
-docker compose --profile ehr up -d openemr
-```
-
-### Re‑introducing OpenEMR Later
-1. Pull + start OpenEMR: `docker compose --profile ehr up -d openemr`
-2. Wait for initial configuration (can take a few minutes on first run)
-3. Restart dependent services normally (without `--no-deps`) if you want health gating restored.
-
-### Troubleshooting Persistent OpenEMR Init Loops
-If auto configure loops on table creation:
-1. Stop container: `docker compose stop openemr`
-2. Remove only its sites volume if safe: `docker volume rm mmt_openemr_sites` (WARNING: wipes EHR site data)
-3. Bring it back up and watch logs: `docker compose up openemr -d && docker logs -f mmt-openemr-1`
-4. Confirm DB connectivity and that `mariadb` health is passing before OpenEMR starts.
-
-### Safety Notes
-* `--no-deps` bypasses dependency start order; ensure prerequisites (DB, message broker) are up manually.
-* Do not rely on bypass procedure for production—it's a development convenience only.
-
-This section codifies the approach used to keep progress moving when OpenEMR was large/unhealthy; adopt profiles to formalize it.
-
----
-## Demo Mode (Local, No External Integrations)
-
-Use `DEMO_MODE=1` to run the backend without RabbitMQ or OpenEMR. Transcriptions are accepted and stored locally (SQLite) but are not published to queues.
-
-### What Demo Mode Does
-* Skips RabbitMQ publish (persists transcript immediately).
-* Ignores OpenEMR integration paths.
-* Still supports cloud vs local transcription flags (`ENABLE_CLOUD_TRANSCRIPTION`, `ENABLE_LOCAL_TRANSCRIPTION`).
-* Provides a status endpoint at `/demo/status` for the frontend to tailor UI.
-
-### Minimal Environment Variables
-```env
-DEMO_MODE=1
-ALLOW_GUEST_AUTH=1
-ENABLE_CLOUD_TRANSCRIPTION=1
-ENABLE_LOCAL_TRANSCRIPTION=0   # (optional) disable if you only test cloud
-OPENAI_API_KEY=sk-your-key     # required if cloud transcription enabled
-```
-
-### Run Backend (Demo Mode)
-```bash
-cd backend
-DEMO_MODE=1 ALLOW_GUEST_AUTH=1 OPENAI_API_KEY=sk-... uvicorn main:app --port 9000 --reload
-```
-
-### Docker Compose (Selective)
-If you only need the core FastAPI backend and Flutter web build:
-```bash
-docker compose up -d backend frontend
-```
-Then hit: `http://localhost:9000/demo/status`
-
-### Verifying
-1. `curl -s http://localhost:9000/demo/status` shows `"demo_mode": true`.
-2. POST a transcription (cloud) and confirm JSON response.
-3. Query stored transcript (future endpoint or DB) if needed.
-
-### Limitations
-* No queue-based async processing.
-* No OpenEMR posting.
-* Circuit breaker metrics still present but queue calls are bypassed.
-
-Once you’re ready for full integration, unset `DEMO_MODE` and start RabbitMQ + OpenEMR services.
-
----
-## Production Deployment (Railway Backend + GitHub Pages Frontend)
-
-The repository is configured for split deployment with:
-- **Backend**: Railway (production mode, full ML stack)
-- **Frontend**: GitHub Pages (demo mode with live backend connection)
-
-### 🔄 Automatic Deployment Flow
-1. **Push to main** triggers CI/CD pipeline
-2. **Backend deploys** to Railway in production mode after successful tests
-3. **Frontend deploys** to GitHub Pages in demo mode
-4. **Health checks** verify deployment success
-
-### 🎛️ Runtime API Configuration
-The frontend auto-detects environment and connects to the Railway backend, but you can override:
-
-1. **Query parameter**: `?api=https://your-railway-app.up.railway.app`
-2. **Inline global JS** before `script.js`:
-	```html
-	<script>window.__MMT_CONFIG={API_BASE_URL:'https://your-railway-app.up.railway.app'};</script>
-	<script src="/script.js" defer></script>
-	```
-3. **Banner "Change API" button** (persists via localStorage)
-
-### 🚦 Status Indicators
-The banner color indicates backend status:
-* **Green** – Production backend responding (`DEMO_MODE=false`)
-* **Blue** – Demo backend (`DEMO_MODE=true`)
-* **Red** – Unreachable endpoint (static-only state)
-
-### 🔧 Manual Deployment Triggers
-Both deployments support manual triggering:
-- **Backend**: Use GitHub Actions "Deploy Backend Production to Railway" workflow
-- **Frontend**: Use GitHub Actions "Deploy Frontend Demo to GitHub Pages" workflow
-
-### 📊 Health Monitoring
-Automated health checks monitor the production deployment:
-- **Endpoint**: `/demo/status` and `/health/live`
-- **Frequency**: Every 30 minutes via GitHub Actions
-- **Alerts**: Workflow fails if backend is unreachable or in demo mode
-
-Environment configuration guidance, security checklist, and troubleshooting live in [`DEPLOYMENT_CONFIG.md`](DEPLOYMENT_CONFIG.md).
-Use `backend/.env.production.example` as a starting point for production environment variables (copy & adapt; never commit real secrets).
-
-### Remote API Health Probe
-A scheduled probe workflow (`remote-api-health.yml`) runs every 30 minutes hitting `/demo/status` against a configured production backend. Add repository secret `REMOTE_API_BASE_URL` (e.g., `https://mmt-prod.up.railway.app`). Fails the workflow if response is non-200 or missing `demo_mode` flag.
-
-### Flutter Build API Injection
-Docker web build now accepts build arg:
-```
-docker build -f app/Dockerfile.web --build-arg API_BASE_URL=https://mmt-prod.up.railway.app -t mmt-web .
-```
-Which injects `--dart-define=BASE_URL=...` so the Flutter client uses the correct backend. For manual local builds:
-```
-flutter build web --release --dart-define=BASE_URL=https://mmt-prod.up.railway.app
-```
-
-### Static Hosting config.js
-Use `frontend-landing/config.template.js` (rename to `config.js`) to specify `window.__MMT_CONFIG.API_BASE_URL` in static hosting environments when you prefer a file over query param or inline script snippet.
-
-### Production Upgrade Flow
-If you provide both a demo and production backend, define:
-```
-<script>
-	window.__MMT_CONFIG = {
-		API_BASE_URL: 'https://demo.yourdomain',
-		PRODUCTION_API_BASE_URL: 'https://api.yourdomain'
-	};
-</script>
-```
-When the current backend reports `demo_mode: true`, the banner renders a "Connect to Production" button, switching `?api=` to the production host.
-
-### Secret Generation Script
-Generate strong secrets & optional RSA / encryption keys:
-```
-python scripts/generate_secrets.py --all > generated-secrets.env
-```
-Copy values (not the file) into Railway or your secret manager. See [`DEPLOYMENT_CONFIG.md`](DEPLOYMENT_CONFIG.md) sections for rotation & upgrade details.
-
----
 # Multilingual Medical Transcription (MMT) - End-to-End Blueprint
 
 ## Overview
@@ -549,50 +301,7 @@ MMT is a secure, multilingual, healthcare-grade transcription platform supportin
 
 ## Deployment
 
-MMT supports multiple deployment strategies. The recommended production setup uses:
-- **Frontend Demo**: GitHub Pages with demo mode
-- **Backend Production**: Railway with full ML stack and production configuration
-
-### 🚀 Quick Start Deployment
-
-#### Frontend Demo (GitHub Pages)
-**Automatically deploys on push to main branch**
-
-- **URL**: https://webqx.github.io/MMT/
-- **Configuration**: Demo mode with live backend connection
-- **Workflow**: `.github/workflows/deploy-github-pages.yml`
-
-The demo frontend automatically connects to the Railway production backend and provides a safe demo environment.
-
-#### Backend Production (Railway) 
-**Automatically deploys after successful CI/CD**
-
-- **Configuration**: Full production mode with ML stack
-- **Workflow**: `.github/workflows/railway-backend.yml`
-- **Requirements**: `RAILWAY_TOKEN` secret configured
-
-### 📋 Deployment Configuration
-
-For detailed deployment setup, environment variables, and troubleshooting, see [`DEPLOYMENT_CONFIG.md`](DEPLOYMENT_CONFIG.md).
-
-#### Required Railway Environment Variables
-```env
-# Core Production Settings
-ENV=prod
-DEMO_MODE=false
-INTERNAL_JWT_SECRET=<32+-character-secret>
-
-# API Keys
-OPENAI_API_KEY=<your-openai-api-key>
-
-# Database & Queue
-TRANSCRIPTS_DB_URL=<mysql-connection-string>
-RABBITMQ_URL=<rabbitmq-connection-string>
-```
-
-### Alternative Deployment Options
-
-#### Web (Flutter) via Firebase Hosting
+### Web (Flutter) via Firebase Hosting
 1. Create a Firebase project (or use existing) and enable Hosting.
 2. Add secrets in GitHub repo settings:
 	- `FIREBASE_SERVICE_ACCOUNT`: JSON service account (Base64 or raw) with `Firebase Hosting Admin`.
@@ -603,11 +312,12 @@ RABBITMQ_URL=<rabbitmq-connection-string>
 
 The workflow builds the Flutter web app from `app/` and deploys the contents of `app/build/web` to the live channel.
 
-#### Backend (FastAPI) - Local/Custom
+
+### Backend (FastAPI)
 1. Set up `.env` with all secrets (OpenAI, Keycloak, OpenEMR, RabbitMQ)
 2. Run: `uvicorn main:app --reload`
 3. Ensure CORS is enabled for your frontend domain
-4. (Optional) Supply `REDIS_URL` to enable distributed idempotency + rate limiting.
+ 4. (Optional) Supply `REDIS_URL` to enable distributed idempotency + rate limiting.
 
 ### Idempotency & Duplicate Suppression
 To avoid double-processing (client retries, network races), the consumer applies best-effort idempotency:
@@ -649,25 +359,12 @@ Prometheus Alerts (Helm): P95 latency, duplicate spike, consumer failure ratio.
 
 ## File Structure (Key Parts)
 
-### Backend
 - `/backend/main.py` - FastAPI backend, all endpoints
-- `/backend/.env` - Secrets and API keys (local development)
-- `/backend/start.sh` - Railway startup script
-- `/backend/railway.toml` - Railway deployment configuration
-- `/backend/Procfile` - Alternative process definition
+- `/backend/.env` - Secrets and API keys
 - `/backend/openemr_consumer.py` - RabbitMQ to OpenEMR integration
-
-### Frontend
 - `/app/lib/main.dart` - Flutter app main logic
 - `/app/pubspec.yaml` - Flutter dependencies
 - `/app/web/index.html` - Web entry point
-- `/frontend-landing/` - Landing page for demos
-
-### Deployment & Configuration
-- `/.github/workflows/deploy-github-pages.yml` - Frontend demo deployment
-- `/.github/workflows/railway-backend.yml` - Backend production deployment
-- `/DEPLOYMENT_CONFIG.md` - Comprehensive deployment guide
-- `/backend/.env.production.example` - Production environment template
 
 ---
 

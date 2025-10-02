@@ -106,7 +106,7 @@ keda:
   enabled: false
   pollingInterval: 15
   cooldownPeriod: 120
-  queueName: openemr_transcriptions
+  queueName: transcriptions
   queueLengthTarget: "50"  # scale when > this many messages
   rabbitmqHostSecretRef: RABBITMQ_URL  # env var style connection string
 
@@ -129,4 +129,4 @@ secrets:
     secretName: "vault-approle"      # keys: roleId, secretId
 
   openai:
-    secretName: ""  # Kubernetes Secret name containing OPENAI_API_KEY (key: OPENAI_API_KEY)
+    secretName: ""  # Kubernetes Secret containing OPENAI_API_KEY/WHISPER_API_KEY (key: OPENAI_API_KEY)

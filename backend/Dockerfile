@@ -1,32 +1,28 @@
 FROM python:3.12-slim AS builder
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
 
-# Security: Update packages and install minimal dependencies
+# Install only build tools and headers needed for wheel compilation; defer ffmpeg to runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg build-essential git ca-certificates \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    build-essential pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /w
 COPY requirements.base.txt requirements.base.txt
 COPY requirements.ml.txt requirements.ml.txt
 COPY requirements.txt requirements.txt
 
-# Install dependencies with security updates
-# Always install ML dependencies in production builds
+# Optional ML dependency installation governed by build arg
+ARG INCLUDE_ML=1
 RUN pip install --upgrade pip setuptools wheel && \
     pip install --prefix /install -r requirements.base.txt && \
-    echo "Installing ML dependencies for production..." && \
-    pip install --prefix /install -r requirements.ml.txt
+    if [ "$INCLUDE_ML" = "1" ]; then echo "Including ML requirements" && pip install --prefix /install -r requirements.ml.txt ; else echo "Skipping ML requirements" ; fi
 
 FROM python:3.12-slim
 ENV PYTHONUNBUFFERED=1
 
-# Security: Create non-root user with minimal privileges
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg ca-certificates \
+# Install only runtime deps (ffmpeg); create non-root user
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean \
     && groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser
 
 WORKDIR /app

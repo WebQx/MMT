@@ -7,12 +7,6 @@ from prometheus_client import Gauge
 transcripts_published_total = Counter(
 	"transcripts_published_total", "Number of transcripts published"
 )
-consumer_fhir_success_total = Counter(
-	"consumer_fhir_success_total", "FHIR DocumentReferences created"
-)
-consumer_legacy_success_total = Counter(
-	"consumer_legacy_success_total", "Legacy API posts"
-)
 consumer_failure_total = Counter(
 	"consumer_failure_total", "Consumer failures"
 )
@@ -39,6 +33,12 @@ consumer_dlq_total = Counter(
 )
 transcripts_persisted_total = Counter(
 	"transcripts_persisted_total", "Transcripts persisted to storage"
+)
+nextcloud_upload_success_total = Counter(
+	"nextcloud_upload_success_total", "Transcripts uploaded to Nextcloud"
+)
+nextcloud_upload_failure_total = Counter(
+	"nextcloud_upload_failure_total", "Transcripts that failed uploading to Nextcloud", ["reason"]
 )
 reprocessor_attempt_total = Counter(
 	"reprocessor_attempt_total", "DLQ reprocessor attempts"
@@ -202,13 +202,13 @@ encryption_rotate_failures_total = Counter(
 __all__ = [
 	# counters
 	"transcripts_published_total",
-	"consumer_fhir_success_total",
-	"consumer_legacy_success_total",
 	"consumer_failure_total",
 	"websocket_partial_sent_total",
 	"websocket_rejected_total",
 	"consumer_dlq_total",
 	"transcripts_persisted_total",
+	"nextcloud_upload_success_total",
+	"nextcloud_upload_failure_total",
 	"reprocessor_attempt_total",
 	"reprocessor_success_total",
 	"reprocessor_failure_total",

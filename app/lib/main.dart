@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/oauth_fragment.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'providers/app_state_provider.dart';
 import 'screens/home_screen.dart';
@@ -14,9 +15,16 @@ import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+  // Extract token from URL fragment for web OAuth redirects (safe no-op off web).
+  final fragmentToken = extractAccessTokenFromFragmentAndClean();
+
   final prefs = await SharedPreferences.getInstance();
   final sentryDsn = const String.fromEnvironment('SENTRY_DSN', defaultValue: '');
+  if (fragmentToken != null && fragmentToken.isNotEmpty) {
+    // Persist token and mark user authenticated optimistically. User type 'oauth'.
+    await prefs.setString(Constants.authTokenKey, fragmentToken);
+    await prefs.setString(Constants.userTypeKey, 'oauth');
+  }
   
   if (sentryDsn.isNotEmpty) {
     SentryFlutter.init((o) {

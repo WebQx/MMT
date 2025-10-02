@@ -1,104 +1,22 @@
 version: '3.8'
 
 services:
-  mariadb:
-    image: mariadb:10.11
+  nextcloud:
+    image: nextcloud:apache
     restart: unless-stopped
     environment:
-      MARIADB_ROOT_PASSWORD: root
-      MARIADB_USER: openemr
-      MARIADB_PASSWORD: openemr
-      MARIADB_DATABASE: openemr
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: openemr
-      MYSQL_PASSWORD: openemr
-      MYSQL_DATABASE: openemr
-    ports:
-      - "3306:3306"
-    volumes:
-      - mariadb_data:/var/lib/mysql
-      - ./mysql-config:/etc/mysql/conf.d
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-proot"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-  openemr:
-    image: openemr/openemr:latest
-    restart: unless-stopped
-    environment:
-      OE_USER: admin
-      OE_PASS: pass
-      OE_SITE: default
-      MYSQL_HOST: mariadb
-      MYSQL_ROOT_PASS: root
-      OE_INSTALL: '1'
-      # Enable FHIR API
-      FHIR_ENABLED: '1'
-      # Enable REST API
-      REST_API_ENABLED: '1'
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: changeme
+      NEXTCLOUD_TRUSTED_DOMAINS: localhost nextcloud
     ports:
       - "8080:80"
-    depends_on:
-      mariadb:
-        condition: service_healthy
     volumes:
-      - openemr_sites:/var/www/localhost/htdocs/openemr/sites
+      - nextcloud_data:/var/www/html
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost/status.php || exit 1"]
       interval: 60s
-      timeout: 5s
-      retries: 3
-
-  frontend-landing:
-    build:
-      context: ./frontend-landing
-      dockerfile: Dockerfile
-    image: mmt-frontend-landing:local
-    restart: unless-stopped
-    depends_on:
-      django-backend:
-        condition: service_healthy
-      openemr:
-        condition: service_healthy
-    ports:
-      - "80:80"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-  django-backend:
-    build:
-      context: ./medtranscribe_backend
-      dockerfile: Dockerfile
-    image: mmt-django-backend:local
-    restart: unless-stopped
-    environment:
-      DB_NAME: openemr
-      DB_USER: openemr
-      DB_PASSWORD: openemr
-      DB_HOST: mariadb
-      DB_PORT: 3306
-      DJANGO_SECRET_KEY: "django-insecure--gz6b(fb9a-#sbh*wb-(f54v0oep2o3ri5o%sy=ct(+3f09img"
-      DJANGO_DEBUG: "False"
-      OPENEMR_BASE_URL: "http://openemr"
-      ALLOWED_HOSTS: "localhost,127.0.0.1,django-backend"
-    depends_on:
-      mariadb:
-        condition: service_healthy
-      openemr:
-        condition: service_healthy
-    ports:
-      - "8001:8000"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health/ || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+      timeout: 10s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3.13-management
@@ -130,6 +48,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        INCLUDE_ML: 0
     image: mmt-backend:local
     restart: unless-stopped
     environment:
@@ -137,6 +57,11 @@ services:
       REDIS_URL: redis://redis:6379/0
       RATE_LIMIT_PER_MINUTE: 120
       STORE_PHI: "true"
+      ENABLE_LOCAL_TRANSCRIPTION: 0
+      STORAGE_PROVIDER: nextcloud
+      NEXTCLOUD_BASE_URL: http://nextcloud
+      NEXTCLOUD_USERNAME: admin
+      NEXTCLOUD_PASSWORD: changeme
     depends_on:
       - rabbitmq
       - redis
@@ -165,8 +90,45 @@ services:
       timeout: 5s
       retries: 3
 
+  frontend-landing:
+    build:
+      context: ./frontend-landing
+      dockerfile: Dockerfile
+    image: mmt-frontend-landing:local
+    depends_on:
+      - django-whisper
+      - nextcloud
+    ports:
+      - "80:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  django-whisper:
+    build:
+      context: ./medtranscribe_backend
+      dockerfile: Dockerfile
+    image: django-whisper:local
+    restart: unless-stopped
+    volumes:
+      - ./medtranscribe_backend:/app
+    environment:
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: adminpass
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+      DJANGO_DB_ENGINE: sqlite3
+      NEXTCLOUD_BASE_URL: http://nextcloud
+      NEXTCLOUD_USERNAME: admin
+      NEXTCLOUD_PASSWORD: changeme
+    depends_on:
+      - nextcloud
+    ports:
+      - "8001:8000"
+
 volumes:
-  mariadb_data:
+  nextcloud_data:
     driver: local
-  openemr_sites:
-    driver: local
+
+

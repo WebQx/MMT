@@ -33,6 +33,18 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- Optional: Preserve access_token fragment across reloads by storing to sessionStorage early.
+       The Flutter app will still re-extract, but this reduces race risk if splash takes long. -->
+  <script>
+    (function() {
+      try {
+        if (location.hash && location.hash.indexOf('access_token=') !== -1) {
+          // Store raw fragment temporarily (not strictly necessary but useful for debugging)
+          sessionStorage.setItem('mmt_oauth_fragment', location.hash);
+        }
+      } catch (e) { /* no-op */ }
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

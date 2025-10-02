@@ -1,41 +1,25 @@
-FROM python:3.11-slim
+FROM python:3.10-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=medtranscribe_backend.settings
-
-# Set work directory
-WORKDIR /app
-
-# Install system dependencies
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        build-essential \
-        default-libmysqlclient-dev \
-        pkg-config \
-        curl \
-        ffmpeg \
+    && apt-get install -y --no-install-recommends curl ca-certificates xz-utils \
+    && curl -sSL https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /tmp/ffmpeg.tar.xz \
+    && mkdir -p /tmp/ffmpeg \
+    && tar -xJf /tmp/ffmpeg.tar.xz -C /tmp/ffmpeg --strip-components=1 \
+    && mv /tmp/ffmpeg/ffmpeg /usr/local/bin/ffmpeg \
+    && mv /tmp/ffmpeg/ffprobe /usr/local/bin/ffprobe \
+    && chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe \
+    && rm -rf /tmp/ffmpeg /tmp/ffmpeg.tar.xz \
+    && apt-get purge -y --auto-remove curl xz-utils \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR /app
+COPY . /app
 
-# Copy project
-COPY . /app/
+ENV PIP_NO_CACHE_DIR=1
+RUN pip install --upgrade pip && pip install --no-cache-dir \
+    django==4.2.* gunicorn djangorestframework faster-whisper pymysql
 
-# Create a non-root user
-RUN groupadd -r django && useradd -r -g django django
-RUN chown -R django:django /app
-USER django
-
-# Expose port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health/ || exit 1
-
-# Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--timeout", "120", "medtranscribe_backend.wsgi:application"]
+CMD ["gunicorn", "medtranscribe_backend.wsgi:application", "--bind", "0.0.0.0:8000"]

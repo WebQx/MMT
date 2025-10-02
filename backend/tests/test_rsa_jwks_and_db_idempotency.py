@@ -50,6 +50,15 @@ def test_rsa_jwks_and_db_idempotency(monkeypatch):
     import openemr_consumer as consumer
     consumer.settings.enable_idempotency = False  # isolate DB layer
     consumer.settings.enable_db_idempotency = True
+    consumer._redis_client = None  # type: ignore[attr-defined]
+    monkeypatch.setattr(consumer, "store_transcript_payload", lambda **k: None, raising=False)
+    monkeypatch.setattr(
+        consumer,
+        "extract_entities",
+        lambda text: type("E", (), {"to_dict": lambda self: {}})(),
+        raising=False,
+    )
+    monkeypatch.setattr(consumer, "summarize_text", lambda text: "summary", raising=False)
 
     payload = {"filename": "f.wav", "text": "hello world", "source": "api"}
     body = json.dumps(payload).encode()

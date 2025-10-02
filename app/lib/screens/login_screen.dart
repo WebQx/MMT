@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../services/auth_service.dart';
+import '../services/oauth_service.dart';
 import '../utils/constants.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -75,13 +76,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Keycloak Login
-                        ElevatedButton.icon(
-                          onPressed: _isLoading ? null : _loginWithKeycloak,
-                          icon: const Icon(Icons.security),
-                          label: const Text('Login with Keycloak'),
+                        // OAuth Buttons Row
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: _isLoading ? null : () => _oauth('google'),
+                              icon: const Icon(Icons.g_mobiledata),
+                              label: const Text('Google'),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: _isLoading ? null : () => _oauth('microsoft'),
+                              icon: const Icon(Icons.window),
+                              label: const Text('Microsoft'),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: _isLoading ? null : () => _oauth('apple'),
+                              icon: const Icon(Icons.apple),
+                              label: const Text('Apple'),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         
                         // Guest Login
                         OutlinedButton.icon(
@@ -203,6 +220,18 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Constants.errorColor,
       ),
     );
+  }
+
+  Future<void> _oauth(String provider) async {
+    setState(() => _isLoading = true);
+    try {
+      final svc = OAuthService();
+      await svc.beginOAuthFlow(provider);
+    } catch (e) {
+      _showError('OAuth ($provider) start failed: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 }
 
