@@ -96,17 +96,17 @@ jobs:
           # Check project info
           railway status
           
-          # Try to create a new service if none exist with expected names
-          echo "Attempting to create and deploy service..."
+          # Try deployment with existing services first
+          echo "Attempting deployment to existing services..."
           railway up --detach || \
           railway up --service web --detach || \
           railway up --service backend --detach || \
           railway up --service api --detach || \
           railway up --service app --detach || {
-            echo "Trying to create new service 'backend'..."
-            railway service create backend --detach || \
-            railway up --name backend --detach || {
-              echo "All deployment attempts failed"
+            echo "No existing services worked, trying to deploy without service specification..."
+            # Sometimes Railway can auto-create services during deployment
+            railway deploy --detach || {
+              echo "All deployment attempts failed. Manual service creation may be required."
               exit 1
             }
           }
