@@ -105,9 +105,12 @@ jobs:
           railway up --service app --detach || {
             echo "No existing services worked, trying to deploy without service specification..."
             # Sometimes Railway can auto-create services during deployment
-            railway deploy --detach || {
-              echo "All deployment attempts failed. Manual service creation may be required."
-              exit 1
+            railway deploy || {
+              echo "Trying railway up without service flag as final attempt..."
+              railway up || {
+                echo "All deployment attempts failed. Manual service creation may be required."
+                exit 1
+              }
             }
           }
 
