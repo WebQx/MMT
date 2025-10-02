@@ -90,8 +90,12 @@ jobs:
           echo "Deploying backend in production mode: $PRODUCTION_MODE"
           # Verify Railway CLI is available
           which railway || { echo "Railway CLI not found in PATH"; exit 1; }
+          # Login to Railway
+          echo "Logging into Railway..."
+          railway login --browserless
           # Pin directory to backend to avoid scanning entire monorepo
           pushd backend
+          echo "Deploying backend service..."
           railway up --service backend --detach || railway up --detach
           popd
 
