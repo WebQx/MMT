@@ -74,7 +74,9 @@ jobs:
           python -m py_compile $(git ls-files '*.py' | tr '\n' ' ')
 
       - name: Install Railway CLI
-        run: curl -fsSL https://railway.app/install.sh | sh
+        run: |
+          curl -fsSL https://railway.app/install.sh | sh
+          echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
       - name: Deploy to Railway (Production Mode)
         env:
@@ -86,9 +88,11 @@ jobs:
             exit 1
           fi
           echo "Deploying backend in production mode: $PRODUCTION_MODE"
+          # Verify Railway CLI is available
+          which railway || { echo "Railway CLI not found in PATH"; exit 1; }
           # Pin directory to backend to avoid scanning entire monorepo
           pushd backend
-          ~/.railway/bin/railway up --service backend --detach || ~/.railway/bin/railway up --detach
+          railway up --service backend --detach || railway up --detach
           popd
 
       - name: Post-deploy info
