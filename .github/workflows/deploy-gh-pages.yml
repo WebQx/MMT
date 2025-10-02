@@ -1,8 +1,13 @@
 name: Deploy Flutter web to GitHub Pages
 
 permissions:
-  contents: write
+  contents: read
   pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
 
 on:
   push:
@@ -10,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
     env:
       # Optionally override API base URL for the web build (set this in repository secrets if you have a production API)
@@ -24,8 +29,17 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.3'
           channel: stable
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            app/.dart_tool
+          key: flutter-pub-${{ runner.os }}-${{ hashFiles('app/pubspec.lock') }}
+          restore-keys: |
+            flutter-pub-${{ runner.os }}-
 
       - name: Install deps
         working-directory: app
@@ -65,9 +79,23 @@ jobs:
             app/build/web
             /tmp/build-logs/flutter_build.log
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./app/build/web
-          publish_branch: gh-pages
+          path: app/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        env:
+          ACTIONS_DEPLOY_PAGES_DISABLE_FRAMEWORKS: true
