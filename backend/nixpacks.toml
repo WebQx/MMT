@@ -1,16 +1,26 @@
 [phases.setup]
-nixPkgs = ["python312", "python312Packages.pip", "python312Packages.setuptools", "python312Packages.wheel", "ffmpeg", "git", "gcc", "pkg-config"]
+nixPkgs = ["python312", "python312Packages.pip", "python312Packages.setuptools", "python312Packages.wheel", "python312Packages.virtualenv", "ffmpeg", "git", "gcc", "pkg-config", "stdenv"]
 
 [phases.install]
 cmds = [
+    "echo 'Python version:' && python3 --version",
+    "echo 'Pip location:' && which python3 && which pip3",
+    "python3 -m pip --version",
     "python3 -m pip install --upgrade pip setuptools wheel",
+    "echo 'Installing base requirements...'",
     "python3 -m pip install -r requirements.base.txt",
     "echo 'INCLUDE_ML environment variable: $INCLUDE_ML'",
-    "if [ \"${INCLUDE_ML:-false}\" = \"true\" ]; then echo 'Installing ML dependencies...' && python3 -m pip install -r requirements.ml.txt; else echo 'Skipping ML dependencies'; fi"
+    "if [ \"${INCLUDE_ML:-false}\" = \"true\" ]; then echo 'Installing ML dependencies...' && python3 -m pip install -r requirements.ml.txt; else echo 'Skipping ML dependencies'; fi",
+    "echo 'Installation complete. Checking installed packages:'",
+    "python3 -m pip list"
 ]
 
 [phases.build]
-cmds = ["echo 'Build phase complete'"]
+cmds = [
+    "echo 'Build phase starting...'",
+    "python3 -c 'import sys; print(f\"Python executable: {sys.executable}\")' || echo 'Python import test failed'",
+    "echo 'Build phase complete'"
+]
 
 [start]
-cmd = "python run.py"
+cmd = "python3 run.py"

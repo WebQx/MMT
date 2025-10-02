@@ -96,15 +96,19 @@ jobs:
           # Check project info
           railway status
           
-          # Deploy to the first/default service since we can't list them without login
-          # Try common service names for backend
-          echo "Attempting deployment..."
+          # Try to create a new service if none exist with expected names
+          echo "Attempting to create and deploy service..."
           railway up --detach || \
           railway up --service web --detach || \
           railway up --service backend --detach || \
-          railway up --service api --detach || {
-            echo "All deployment attempts failed"
-            exit 1
+          railway up --service api --detach || \
+          railway up --service app --detach || {
+            echo "Trying to create new service 'backend'..."
+            railway service create backend --detach || \
+            railway up --name backend --detach || {
+              echo "All deployment attempts failed"
+              exit 1
+            }
           }
 
       - name: Post-deploy info
