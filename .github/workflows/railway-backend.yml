@@ -75,8 +75,7 @@ jobs:
 
       - name: Install Railway CLI
         run: |
-          curl -fsSL https://railway.app/install.sh | sh
-          echo "$HOME/.railway/bin" >> $GITHUB_PATH
+          npm install -g @railway/cli
 
       - name: Deploy to Railway (Production Mode)
         env:
@@ -88,23 +87,13 @@ jobs:
             exit 1
           fi
           echo "Deploying backend in production mode: $PRODUCTION_MODE"
-          # Verify Railway CLI is available
-          which railway || { echo "Railway CLI not found in PATH"; exit 1; }
           
-          # Create a simple deployment using Railway's auto-detection
+          # Change to backend directory
           cd backend
           
-          # Create a simple railway project if needed
-          echo "Attempting Railway deployment..."
-          
-          # Try direct deployment with token auth
-          echo "$RAILWAY_TOKEN" | railway login --token
-          
-          # Deploy the backend
-          railway up --detach || {
-            echo "Direct deployment failed, trying service-specific deployment..."
-            railway up --service backend --detach
-          }
+          echo "Starting Railway deployment with token authentication..."
+          # Simple Railway deployment using token
+          railway up --detach
 
       - name: Post-deploy info
         if: always()
