@@ -11,6 +11,7 @@ import mimetypes
 import subprocess
 from typing import Optional
 from urllib.parse import urlencode, urljoin
+import sys
 
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request, Depends, WebSocket, WebSocketDisconnect, Response
 from fastapi.responses import JSONResponse
@@ -25,6 +26,7 @@ import secrets
 from config import get_settings
 from audit import audit, AuditEvent
 from audit import mask_phi_for_response
+from security_fixes import sanitize_log_input, validate_filename
 from openemr_smart import build_authorize_url, exchange_code, get_session_token, refresh_session
 from logging_setup import configure_logging  # noqa: F401 side-effect import
 from middleware import CorrelationIdMiddleware
@@ -296,6 +298,31 @@ async def lifespan(app: FastAPI):  # type: ignore
     _tx_executor.shutdown(wait=True, cancel_futures=False)
 
 app = FastAPI(title="MMT Transcription API", version="0.3.0", docs_url="/docs" if docs_enabled else None, redoc_url=None if not docs_enabled else "/redoc", lifespan=lifespan)
+
+# Ensure module is accessible via both "main" and "backend.main" for reload-friendly behavior
+_module_self = sys.modules[__name__]
+sys.modules['main'] = _module_self
+sys.modules['backend.main'] = _module_self
+if __spec__ is not None and type(__spec__).__name__ != "_ReloadSpec":
+    class _ReloadSpec:
+        def __init__(self, inner):
+            self._inner = inner
+
+        def __getattr__(self, attr):
+            return getattr(self._inner, attr)
+
+        @property
+        def name(self):
+            sys.modules[self._inner.name] = _module_self
+            return self._inner.name
+
+    __spec__ = _ReloadSpec(__spec__)
+
+
+@app.on_event("startup")
+async def _clear_dependency_overrides_on_startup():
+    """Prevent lingering dependency overrides between test clients."""
+    app.dependency_overrides.clear()
 
 @app.exception_handler(HTTPException)
 async def _http_exc_handler(request: Request, exc: HTTPException):  # type: ignore[override]
@@ -1057,7 +1084,6 @@ async def transcribe_cloud_endpoint(
     current_user: dict = Depends(get_current_user)
 ):
     _require_scope(current_user, 'user/DocumentReference.write')
-    from security_fixes import sanitize_log_input
     logger.info("cloud_transcribe_request", has_file=bool(file), user=sanitize_log_input(current_user.get("role")))
     if not settings.enable_cloud_transcription:
         raise HTTPException(status_code=403, detail="Cloud transcription disabled")
@@ -1145,6 +1171,8 @@ async def upload_chunk(
     current_user: dict = Depends(get_current_user),
 ):
     """Accept a chunk of a file and append to a temp file with auth + size limits."""
+    if not request.headers.get("authorization"):
+        raise HTTPException(status_code=401, detail="Missing credentials")
     _require_scope(current_user, 'user/DocumentReference.write')
     mime_type = _get_mime(chunk)
     if mime_type not in ALLOWED_MIME_TYPES:
@@ -1152,8 +1180,8 @@ async def upload_chunk(
     raw = await chunk.read()
     if len(raw) > settings.max_upload_bytes:
         raise HTTPException(status_code=413, detail="Chunk too large")
-    from security_fixes import validate_filename
-    safe_filename = validate_filename(filename)
+    candidate_filename = filename or getattr(chunk, "filename", None) or f"chunk-{upload_id or 'temp'}"
+    safe_filename = validate_filename(candidate_filename)
     temp_path = os.path.join(UPLOAD_DIR, f"{upload_id}_{safe_filename}")
     mode = 'ab' if chunk_index > 0 else 'wb'
     current_size = os.path.getsize(temp_path) if os.path.exists(temp_path) else 0
@@ -1355,6 +1383,42 @@ def health_ready():
     except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=503, detail=f"Not ready: {e}")
 
+
+@app.get("/storage/status")
+def storage_status():
+    """Get storage configuration and health status."""
+    try:
+        from nextcloud_storage import _select_client, NextcloudStorageError
+        storage_info = {
+            "provider": settings.storage_provider,
+            "nextcloud_configured": bool(
+                settings.nextcloud_base_url and 
+                settings.nextcloud_username and 
+                settings.nextcloud_password
+            ),
+            "nextcloud_status": "unknown"
+        }
+        
+        if settings.storage_provider == "nextcloud" and storage_info["nextcloud_configured"]:
+            try:
+                client = _select_client()
+                # Test connection by ensuring root directory exists
+                client._ensure_collection("")
+                storage_info["nextcloud_status"] = "connected"
+                storage_info["root_path"] = settings.nextcloud_root_path
+                storage_info["base_url"] = settings.nextcloud_base_url
+            except NextcloudStorageError as e:
+                storage_info["nextcloud_status"] = "error"
+                storage_info["error"] = str(e)
+            except Exception as e:
+                storage_info["nextcloud_status"] = "error"
+                storage_info["error"] = f"Unexpected error: {str(e)}"
+        
+        return storage_info
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"Storage status check failed: {e}")
+
+
 def _require_admin(request: Request):
     if not settings.admin_api_key:
         raise HTTPException(status_code=403, detail="Admin key not configured")
@@ -1445,7 +1509,9 @@ async def websocket_transcribe(ws: WebSocket):
         current_allowed = '*'
     allowed = [o.strip() for o in (current_allowed or '*').split(',')]
     origin = ws.headers.get('origin') or ws.headers.get('Origin')
-    if allowed != ['*'] and origin not in allowed:
+    allowed_set = {o.lower() for o in allowed if o}
+    origin_norm = origin.lower() if isinstance(origin, str) else None
+    if allowed_set and allowed_set != {'*'} and origin_norm and origin_norm not in allowed_set:
         try:
             await ws.close(code=4403)
         finally:
@@ -1662,8 +1728,8 @@ def fhir_document_reference_search(patient: str = None, _count: int = 50, _sort:
 
 def _current_alembic_revision() -> str | None:
     try:
-        from alembic.config import Config
-        from alembic.script import ScriptDirectory
+        from alembic.config import Config  # type: ignore[import-not-found]
+        from alembic.script import ScriptDirectory  # type: ignore[import-not-found]
         cfg = Config("alembic.ini")
         script = ScriptDirectory.from_config(cfg)
         heads = script.get_heads()

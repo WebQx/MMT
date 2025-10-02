@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../utils/constants.dart';
@@ -127,6 +129,78 @@ class SettingsScreen extends StatelessWidget {
                       title: const Text('Clear Local Data'),
                       subtitle: const Text('Remove cached files and settings'),
                       onTap: () => _showClearDataDialog(context),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Storage Section
+              _SectionHeader(title: 'Storage'),
+              Card(
+                child: Column(
+                  children: [
+                    FutureBuilder<Map<String, dynamic>>(
+                      future: _getStorageStatus(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const ListTile(
+                            leading: CircularProgressIndicator(),
+                            title: Text('Storage Provider'),
+                            subtitle: Text('Checking status...'),
+                          );
+                        }
+                        
+                        if (snapshot.hasError) {
+                          return ListTile(
+                            leading: const Icon(Icons.error, color: Colors.red),
+                            title: const Text('Storage Provider'),
+                            subtitle: Text('Error: ${snapshot.error}'),
+                          );
+                        }
+                        
+                        final data = snapshot.data ?? {};
+                        final provider = data['provider'] ?? 'database';
+                        final nextcloudConfigured = data['nextcloud_configured'] ?? false;
+                        final nextcloudStatus = data['nextcloud_status'] ?? 'unknown';
+                        
+                        IconData statusIcon;
+                        Color statusColor;
+                        String statusText;
+                        
+                        if (provider == 'nextcloud') {
+                          if (nextcloudStatus == 'connected') {
+                            statusIcon = Icons.cloud_done;
+                            statusColor = Colors.green;
+                            statusText = 'Nextcloud Connected';
+                          } else if (nextcloudStatus == 'error') {
+                            statusIcon = Icons.cloud_off;
+                            statusColor = Colors.red;
+                            statusText = 'Nextcloud Error';
+                          } else {
+                            statusIcon = Icons.cloud_queue;
+                            statusColor = Colors.orange;
+                            statusText = 'Nextcloud Pending';
+                          }
+                        } else {
+                          statusIcon = Icons.storage;
+                          statusColor = Colors.blue;
+                          statusText = 'Database Only';
+                        }
+                        
+                        return ListTile(
+                          leading: Icon(statusIcon, color: statusColor),
+                          title: const Text('Storage Provider'),
+                          subtitle: Text(statusText),
+                          trailing: provider == 'nextcloud' && data['base_url'] != null
+                            ? IconButton(
+                                icon: const Icon(Icons.info_outline),
+                                onPressed: () => _showStorageInfo(context, data),
+                              )
+                            : null,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -459,6 +533,61 @@ class SettingsScreen extends StatelessWidget {
             'The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\n'
             'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.',
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<Map<String, dynamic>> _getStorageStatus() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${Constants.baseUrl}/storage/status'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Storage status check failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Unable to check storage status: $e');
+    }
+  }
+
+  void _showStorageInfo(BuildContext context, Map<String, dynamic> data) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Storage Information'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Provider: ${data['provider'] ?? 'Unknown'}'),
+            const SizedBox(height: 8),
+            if (data['base_url'] != null) ...[
+              Text('Nextcloud URL: ${data['base_url']}'),
+              const SizedBox(height: 8),
+            ],
+            if (data['root_path'] != null) ...[
+              Text('Storage Path: ${data['root_path']}'),
+              const SizedBox(height: 8),
+            ],
+            Text('Status: ${data['nextcloud_status'] ?? 'Unknown'}'),
+            if (data['error'] != null) ...[
+              const SizedBox(height: 8),
+              Text('Error: ${data['error']}', style: const TextStyle(color: Colors.red)),
+            ],
+            const SizedBox(height: 16),
+            const Text('Transcriptions are automatically backed up to your configured storage provider.'),
+          ],
         ),
         actions: [
           TextButton(
