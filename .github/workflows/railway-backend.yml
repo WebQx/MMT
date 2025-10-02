@@ -92,8 +92,8 @@ jobs:
           cd backend
           
           echo "Starting Railway deployment with token authentication..."
-          # Simple Railway deployment using token
-          railway up --detach
+          # Simple Railway deployment using token, specify backend service
+          railway up --service backend --detach
 
       - name: Post-deploy info
         if: always()
