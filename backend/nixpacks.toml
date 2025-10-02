@@ -1,12 +1,12 @@
 [phases.setup]
-nixPkgs = ["python3", "python3Packages.pip", "ffmpeg", "git", "gcc", "pkg-config"]
+nixPkgs = ["python312", "python312Packages.pip", "python312Packages.setuptools", "python312Packages.wheel", "ffmpeg", "git", "gcc", "pkg-config"]
 
 [phases.install]
 cmds = [
-    "pip install --upgrade pip setuptools wheel",
-    "pip install -r requirements.base.txt",
+    "python3 -m pip install --upgrade pip setuptools wheel",
+    "python3 -m pip install -r requirements.base.txt",
     "echo 'INCLUDE_ML environment variable: $INCLUDE_ML'",
-    "if [ \"${INCLUDE_ML:-false}\" = \"true\" ]; then echo 'Installing ML dependencies...' && pip install -r requirements.ml.txt; else echo 'Skipping ML dependencies'; fi"
+    "if [ \"${INCLUDE_ML:-false}\" = \"true\" ]; then echo 'Installing ML dependencies...' && python3 -m pip install -r requirements.ml.txt; else echo 'Skipping ML dependencies'; fi"
 ]
 
 [phases.build]
