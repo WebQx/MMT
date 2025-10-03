@@ -93,22 +93,20 @@ jobs:
           # Run from backend directory so railway.toml is picked up
           cd backend
           
-          # Configure Railway project and environment via environment variables
-          export RAILWAY_PROJECT_ID="humble-gentleness"
-          export RAILWAY_ENVIRONMENT="production"
-          export RAILWAY_SERVICE_NAME="accomplished-spirit"
+          # Link to the specific service using service ID
+          echo "Linking to Railway service..."
+          railway link 483f92e2-5d86-41dd-9c18-7cd195f5be9e || {
+            echo "Failed to link to service"
+            exit 1
+          }
           
           # Check project info
           echo "Railway status:"
           railway status || echo "Could not get status"
           
-          # List available services to aid debugging when failures occur
-          echo "Available services:"
-          railway service list || echo "Could not list services"
-          
-          echo "Deploying to project 'humble-gentleness', environment 'production', service 'accomplished-spirit'..."
-          railway up --service accomplished-spirit --detach || {
-            echo "Deployment failed for project 'humble-gentleness', environment 'production', service 'accomplished-spirit'"
+          echo "Deploying service..."
+          railway up --detach || {
+            echo "Deployment failed"
             exit 1
           }
 
