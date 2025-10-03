@@ -1,5 +1,6 @@
 [build]
 builder = "dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 serviceId = "483f92e2-5d86-41dd-9c18-7cd195f5be9e"
