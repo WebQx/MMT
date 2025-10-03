@@ -96,7 +96,7 @@ jobs:
           # Configure Railway project and environment via environment variables
           export RAILWAY_PROJECT_ID="humble-gentleness"
           export RAILWAY_ENVIRONMENT="production"
-          export RAILWAY_SERVICE_ID="483f92e2-5d86-41dd-9c18-7cd195f5be9e"
+          export RAILWAY_SERVICE_NAME="accomplished-spirit"
           
           # Check project info
           echo "Railway status:"
@@ -106,9 +106,9 @@ jobs:
           echo "Available services:"
           railway service list || echo "Could not list services"
           
-          echo "Deploying to project 'humble-gentleness', environment 'production', service ID '483f92e2-5d86-41dd-9c18-7cd195f5be9e'..."
-          railway up --service 483f92e2-5d86-41dd-9c18-7cd195f5be9e --detach || {
-            echo "Deployment failed for project 'humble-gentleness', environment 'production', service ID '483f92e2-5d86-41dd-9c18-7cd195f5be9e'"
+          echo "Deploying to project 'humble-gentleness', environment 'production', service 'accomplished-spirit'..."
+          railway up --service accomplished-spirit --detach || {
+            echo "Deployment failed for project 'humble-gentleness', environment 'production', service 'accomplished-spirit'"
             exit 1
           }
 
