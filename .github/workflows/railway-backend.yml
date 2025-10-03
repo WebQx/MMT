@@ -107,7 +107,7 @@ jobs:
           railway service list || echo "Could not list services"
           
           echo "Deploying to project 'humble-gentleness', environment 'production', service ID '483f92e2-5d86-41dd-9c18-7cd195f5be9e'..."
-          railway up --detach || {
+          railway up --service 483f92e2-5d86-41dd-9c18-7cd195f5be9e --detach || {
             echo "Deployment failed for project 'humble-gentleness', environment 'production', service ID '483f92e2-5d86-41dd-9c18-7cd195f5be9e'"
             exit 1
           }
