@@ -88,30 +88,26 @@ jobs:
           fi
           echo "Deploying backend in production mode: $PRODUCTION_MODE"
           
-          # Change to backend directory
-          cd backend
-          
           echo "Starting Railway deployment with token authentication..."
           
-          # Check project info
-          railway status
+          # Run from backend directory so railway.toml is picked up
+          cd backend
           
-          # Try deployment with existing services first
-          echo "Attempting deployment to existing services..."
-          railway up --detach || \
-          railway up --service web --detach || \
-          railway up --service backend --detach || \
-          railway up --service api --detach || \
-          railway up --service app --detach || {
-            echo "No existing services worked, trying to deploy without service specification..."
-            # Sometimes Railway can auto-create services during deployment
-            railway deploy || {
-              echo "Trying railway up without service flag as final attempt..."
-              railway up || {
-                echo "All deployment attempts failed. Manual service creation may be required."
-                exit 1
-              }
-            }
+          # Check project info
+          railway status --project humble-gentleness --environment production
+          
+          # List available services to aid debugging when failures occur
+          echo "Available services:"
+          railway service list --project humble-gentleness --environment production || echo "Could not list services"
+          
+          echo "Deploying to project 'humble-gentleness', environment 'production', service ID '483f92e2-5d86-41dd-9c18-7cd195f5be9e'..."
+          railway up \
+            --project humble-gentleness \
+            --environment production \
+            --service 483f92e2-5d86-41dd-9c18-7cd195f5be9e \
+            --detach || {
+            echo "Deployment failed for project 'humble-gentleness', environment 'production', service ID '483f92e2-5d86-41dd-9c18-7cd195f5be9e'"
+            exit 1
           }
 
       - name: Post-deploy info

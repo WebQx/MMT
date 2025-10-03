@@ -21,6 +21,3 @@ RABBITMQ_URL = "amqp://guest:guest@localhost:5672/"
 # MySQL connection will be configured automatically via Railway's MySQL addon
 # Railway provides: MYSQLHOST, MYSQLPORT, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE
 # These are mapped to TRANSCRIPTS_DB_* variables in run.py
-
-[[services]]
-name = "backend"
