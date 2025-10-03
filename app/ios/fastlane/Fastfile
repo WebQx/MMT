@@ -1,0 +1,114 @@
+# Fastlane Configuration for MMT iOS App
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "Runner.xcodeproj",
+      build_number: latest_testflight_build_number + 1
+    )
+
+    # Build the app
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          ENV["BUNDLE_ID"] || "com.example.mmt" => ENV["PROVISIONING_PROFILE_NAME"] || "match AppStore com.example.mmt"
+        }
+      }
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      distribute_external: false,
+      notify_external_testers: false
+    )
+
+    # Clean up
+    clean_build_artifacts
+  end
+
+  desc "Build for release (App Store submission)"
+  lane :release do
+    # Ensure clean state
+    ensure_git_status_clean
+
+    # Increment version
+    increment_version_number(
+      xcodeproj: "Runner.xcodeproj"
+    )
+
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "Runner.xcodeproj",
+      build_number: latest_testflight_build_number + 1
+    )
+
+    # Build the app
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store"
+    )
+
+    # Upload to App Store Connect
+    upload_to_app_store(
+      skip_metadata: false,
+      skip_screenshots: true,
+      submit_for_review: false,
+      automatic_release: false
+    )
+
+    # Tag the release
+    add_git_tag(
+      tag: "ios/v#{get_version_number(xcodeproj: 'Runner.xcodeproj')}-#{get_build_number(xcodeproj: 'Runner.xcodeproj')}"
+    )
+
+    # Push to git
+    push_to_git_remote
+
+    # Clean up
+    clean_build_artifacts
+  end
+
+  desc "Setup code signing with match"
+  lane :setup_signing do
+    # Install certificates and provisioning profiles using match
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: ENV["BUNDLE_ID"] || "com.example.mmt"
+    )
+  end
+
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      devices: ["iPhone 14"],
+      code_coverage: true
+    )
+  end
+
+  desc "Take screenshots for App Store"
+  lane :screenshots do
+    capture_screenshots(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner"
+    )
+  end
+
+  # Error handling
+  error do |lane, exception|
+    # Send error notification or log
+    puts "Error in lane #{lane}: #{exception}"
+  end
+end

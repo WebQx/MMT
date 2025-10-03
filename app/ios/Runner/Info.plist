@@ -45,5 +45,20 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Microphone access for audio recording -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>MMT needs access to the microphone to record medical transcriptions and voice notes.</string>
+	<!-- Speech Recognition -->
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>MMT uses speech recognition to transcribe your medical notes accurately.</string>
+	<!-- Photo Library access (for document saving) -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>MMT needs permission to save transcription documents to your photo library.</string>
+	<!-- Camera access (if needed for medical documentation) -->
+	<key>NSCameraUsageDescription</key>
+	<string>MMT needs camera access for capturing medical documentation and images.</string>
+	<!-- File access -->
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>MMT needs access to documents folder to save and manage transcription files.</string>
 </dict>
 </plist>

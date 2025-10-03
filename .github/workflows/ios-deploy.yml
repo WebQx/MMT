@@ -1,0 +1,207 @@
+name: iOS Build and Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'app/**'
+      - '.github/workflows/ios-deploy.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'app/**'
+  workflow_dispatch:
+    inputs:
+      deploy_to_testflight:
+        description: 'Deploy to TestFlight'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  build:
+    name: Build iOS App
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Run analyzer
+        working-directory: app
+        run: flutter analyze
+
+      - name: Run tests
+        working-directory: app
+        run: flutter test
+
+      - name: Install CocoaPods
+        run: |
+          cd app/ios
+          pod install
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build iOS (Debug)
+        if: github.event_name == 'pull_request'
+        working-directory: app
+        run: |
+          flutter build ios --debug --no-codesign
+
+      - name: Build iOS (Release - No Signing)
+        if: github.event_name != 'pull_request' && (github.event.inputs.deploy_to_testflight == 'false' || github.event.inputs.deploy_to_testflight == '')
+        working-directory: app
+        run: |
+          flutter build ios --release --no-codesign
+
+  deploy_testflight:
+    name: Deploy to TestFlight
+    runs-on: macos-latest
+    timeout-minutes: 90
+    needs: build
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_testflight == 'true') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[ios-deploy]'))
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install CocoaPods
+        run: |
+          cd app/ios
+          pod install
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: app/ios
+
+      - name: Install Fastlane
+        run: |
+          cd app/ios
+          gem install fastlane
+          bundle install
+
+      - name: Configure App Store Connect API Key
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: |
+          mkdir -p ~/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY_CONTENT" | base64 --decode > ~/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+          echo "API_KEY_PATH=~/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8" >> $GITHUB_ENV
+
+      - name: Import Code Signing Certificates
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          
+          # Import certificate
+          echo "$CERTIFICATE_BASE64" | base64 --decode > certificate.p12
+          security import certificate.p12 -k build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          
+          # Clean up
+          rm certificate.p12
+
+      - name: Import Provisioning Profile
+        env:
+          PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROVISIONING_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+
+      - name: Build and Deploy to TestFlight
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ITC_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+          BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+        working-directory: app/ios
+        run: |
+          fastlane beta
+
+      - name: Upload IPA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: app/ios/*.ipa
+          retention-days: 30
+
+      - name: Cleanup
+        if: always()
+        run: |
+          security delete-keychain build.keychain || true
+          rm -rf ~/private_keys
+          rm -rf ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: deploy_testflight
+    if: always()
+    steps:
+      - name: Deployment Success
+        if: needs.deploy_testflight.result == 'success'
+        run: |
+          echo "🎉 iOS app successfully deployed to TestFlight!"
+          echo "Check App Store Connect for processing status:"
+          echo "https://appstoreconnect.apple.com"
+
+      - name: Deployment Failed
+        if: needs.deploy_testflight.result == 'failure'
+        run: |
+          echo "❌ iOS deployment to TestFlight failed"
+          echo "Check the logs above for details"
+          exit 1
