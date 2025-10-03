@@ -93,18 +93,12 @@ jobs:
           # Run from backend directory so railway.toml is picked up
           cd backend
           
-          # Link to the specific service using service ID
-          echo "Linking to Railway service..."
-          railway link 483f92e2-5d86-41dd-9c18-7cd195f5be9e || {
-            echo "Failed to link to service"
-            exit 1
-          }
-          
+          # The serviceId in railway.toml will be used automatically
           # Check project info
           echo "Railway status:"
           railway status || echo "Could not get status"
           
-          echo "Deploying service..."
+          echo "Deploying service (using serviceId from railway.toml)..."
           railway up --detach || {
             echo "Deployment failed"
             exit 1
