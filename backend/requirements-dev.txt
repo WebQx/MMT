@@ -3,6 +3,6 @@ pytest==8.3.3
 flake8==7.1.1
 mypy==1.11.2
 safety==3.6.1
-locust==2.32.3
+locust==2.41.5
 types-requests==2.32.4.20250809
 types-redis==4.6.0.20241004
